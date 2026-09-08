@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { HouseNumber, PlanetId, ChartStyle } from './types/astrology';
 import { Header } from './components/Header';
 import { KundliBuilder } from './components/KundliBuilder';
@@ -383,6 +384,9 @@ export default function App() {
         onClose={() => setLegalModalOpen(false)}
         initialDoc={selectedLegalDoc}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
 
     </div>
   );
