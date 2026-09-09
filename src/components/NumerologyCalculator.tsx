@@ -202,9 +202,9 @@ Calculated via Astronava (astronava.vercel.app)`;
   return (
     <div className="space-y-6 print:space-y-4">
       {/* 1. Unified Numerology Command & Input Card */}
-      <div className="bg-white p-5 sm:p-7 rounded-3xl border border-stone-200/90 shadow-xs space-y-5 print:p-4 print:border-amber-900/40">
+      <div className="bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-xs space-y-4 sm:space-y-5 print:p-4 print:border-amber-900/40">
         {/* Header Row: Title, Subtitle, Quick Actions & Presets */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-stone-100">
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase tracking-wider">
@@ -216,32 +216,35 @@ Calculated via Astronava (astronava.vercel.app)`;
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 print:hidden">
-            <span className="text-xs font-semibold text-stone-500 mr-1 hidden sm:inline">Quick Test:</span>
-            {PRESET_PROFILES.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => applyPreset(p)}
-                className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100/70 hover:text-amber-950 text-stone-700 text-xs font-medium border border-stone-200/80 transition-colors"
-              >
-                {p.label}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 sm:gap-2 print:hidden">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {PRESET_PROFILES.map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => applyPreset(p)}
+                  className="px-2 sm:px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100/70 hover:text-amber-950 text-stone-700 text-xs font-medium border border-stone-200/80 transition-colors shrink-0"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
             <div className="h-4 w-px bg-stone-200 mx-1 hidden sm:block" />
-            <button
-              onClick={handleCopySummary}
-              className="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-stone-200 transition-colors"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-            <button
-              onClick={handlePrint}
-              className="px-3 py-1.5 rounded-lg bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleCopySummary}
+                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold flex items-center gap-1 border border-stone-200 transition-colors"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+              <button
+                onClick={handlePrint}
+                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -390,58 +393,56 @@ Calculated via Astronava (astronava.vercel.app)`;
       {/* SECTION 1: CORE OVERVIEW (MULANK & BHAGYANK & SYNERGY)                     */}
       {/* ========================================================================= */}
       {(activeSection === 'overview' || typeof window === 'undefined') && (
-        <div className="space-y-8">
+        <div className="space-y-5 sm:space-y-8">
           {/* 17 September Easter Egg Card */}
           {day === 17 && month === 9 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-100/90 via-amber-50 to-stone-50 border-2 border-amber-300 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-900 text-amber-100 flex items-center justify-center shrink-0 shadow-xs">
-                  <Sparkles className="w-5 h-5 text-amber-300" />
+            <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-100/90 via-amber-50 to-stone-50 border border-amber-300 shadow-2xs flex items-start sm:items-center gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-900 text-amber-100 flex items-center justify-center shrink-0 shadow-2xs">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wide text-amber-900">
+                    Easter Egg: 17 September
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[10px] font-bold">
+                    Mulank 8 (Saturn)
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-amber-900">
-                      Easter Egg Unlocked: 17 September
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[10px] font-bold">
-                      Mulank 8 (Saturn)
-                    </span>
-                  </div>
-                  <p className="text-xs text-stone-700 mt-0.5">
-                    Coincides with <strong>Vishwakarma Jayanti</strong> (Cosmic Architect) &amp; the birth date of Narendra Modi (Mulank 8, Saturn). Revered in Ank Jyotish for monumental perseverance, karmic discipline, and builder archetypes.
-                  </p>
-                </div>
+                <p className="text-xs text-stone-700 mt-1 leading-relaxed">
+                  Coincides with <strong>Vishwakarma Jayanti</strong> &amp; the birth date of Narendra Modi (Mulank 8, Saturn) — archetype of monumental perseverance, karmic discipline, and builder vibration.
+                </p>
               </div>
             </div>
           )}
 
           {/* Top 2 Primary Cards: Mulank & Bhagyank */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             
             {/* Card A: Mulank (Driver Number) */}
-            <div className="bg-gradient-to-br from-amber-50/90 via-white to-orange-50/50 p-6 sm:p-7 rounded-3xl border border-amber-200 shadow-xs space-y-5 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-md border border-amber-300/60">
-                    Driver / Root Number • मूलांक
+            <div className="bg-gradient-to-br from-amber-50/90 via-white to-orange-50/50 p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-amber-200 shadow-xs space-y-4 sm:space-y-5 relative overflow-hidden">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-300/60 inline-block">
+                    Driver / Root • मूलांक
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold font-vedic text-stone-900 mt-2">
+                  <h2 className="text-lg sm:text-2xl font-bold font-vedic text-stone-900 mt-1.5 truncate">
                     {mulankData.title}
                   </h2>
-                  <p className="text-xs text-amber-900 font-medium">
+                  <p className="text-xs text-amber-900 font-medium mt-0.5">
                     Ruled by <strong>{mulankData.sanskritPlanet}</strong> ({mulankData.planet})
                   </p>
                 </div>
 
                 {/* Big Number Visual */}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-radial from-amber-400 to-amber-600 flex flex-col items-center justify-center text-amber-950 font-vedic shadow-md ring-4 ring-amber-300/40 shrink-0">
-                  <span className="text-3xl sm:text-4xl font-extrabold leading-none">{mulank}</span>
-                  <span className="text-[9px] uppercase font-bold tracking-wider mt-0.5">Mulank</span>
+                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-radial from-amber-400 to-amber-600 flex flex-col items-center justify-center text-amber-950 font-vedic shadow-md ring-2 sm:ring-4 ring-amber-300/40 shrink-0">
+                  <span className="text-2xl sm:text-4xl font-extrabold leading-none">{mulank}</span>
+                  <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider mt-0.5">Mulank</span>
                 </div>
               </div>
 
               {/* Mathematical Formula Pill */}
-              <div className="p-3 rounded-xl bg-amber-100/60 border border-amber-300/50 text-xs text-stone-800 flex items-center justify-between">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-amber-100/60 border border-amber-300/50 text-xs text-stone-800 flex flex-wrap items-center justify-between gap-1">
                 <span>
                   Calculation: Day of Birth <strong>{day}</strong>
                 </span>
@@ -455,25 +456,25 @@ Calculated via Astronava (astronava.vercel.app)`;
               </p>
 
               {/* Key Strengths & Weaknesses */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-white/90 border border-emerald-200/80 text-xs space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white/90 border border-emerald-200/80 text-xs space-y-1">
                   <span className="font-bold text-emerald-900 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     Key Strengths
                   </span>
-                  <ul className="text-stone-600 space-y-1 pl-4 list-disc">
+                  <ul className="text-stone-600 space-y-0.5 pl-4 list-disc">
                     {mulankData.strengths.slice(0, 3).map((s, idx) => (
                       <li key={idx}>{s}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white/90 border border-rose-200/80 text-xs space-y-1.5">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white/90 border border-rose-200/80 text-xs space-y-1">
                   <span className="font-bold text-rose-900 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
                     Karmic Caution
                   </span>
-                  <ul className="text-stone-600 space-y-1 pl-4 list-disc">
+                  <ul className="text-stone-600 space-y-0.5 pl-4 list-disc">
                     {mulankData.weaknesses.slice(0, 3).map((w, idx) => (
                       <li key={idx}>{w}</li>
                     ))}
@@ -482,7 +483,7 @@ Calculated via Astronava (astronava.vercel.app)`;
               </div>
 
               {/* Sacred Beej Mantra */}
-              <div className="p-3.5 rounded-xl bg-amber-950 text-amber-100 text-xs space-y-1">
+              <div className="p-3 sm:p-3.5 rounded-xl bg-amber-950 text-amber-100 text-xs space-y-1">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400">
                   Sacred Vedic Beej Mantra
                 </span>
@@ -493,31 +494,31 @@ Calculated via Astronava (astronava.vercel.app)`;
             </div>
 
             {/* Card B: Bhagyank (Conductor Number) */}
-            <div className="bg-gradient-to-br from-orange-50/90 via-white to-amber-50/50 p-6 sm:p-7 rounded-3xl border border-orange-200 shadow-xs space-y-5 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-orange-800 bg-orange-100/80 px-2.5 py-0.5 rounded-md border border-orange-300/60">
-                    Conductor / Destiny Number • भाग्यांक
+            <div className="bg-gradient-to-br from-orange-50/90 via-white to-amber-50/50 p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-orange-200 shadow-xs space-y-4 sm:space-y-5 relative overflow-hidden">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-orange-800 bg-orange-100/80 px-2 py-0.5 rounded-md border border-orange-300/60 inline-block">
+                    Conductor / Destiny • भाग्यांक
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-bold font-vedic text-stone-900 mt-2">
+                  <h2 className="text-lg sm:text-2xl font-bold font-vedic text-stone-900 mt-1.5 truncate">
                     {bhagyankData.destinyRole}
                   </h2>
-                  <p className="text-xs text-orange-900 font-medium">
+                  <p className="text-xs text-orange-900 font-medium mt-0.5">
                     Ruled by <strong>{bhagyankData.sanskritPlanet}</strong> ({bhagyankData.planet})
                   </p>
                 </div>
 
                 {/* Big Number Visual */}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-radial from-orange-500 to-amber-700 flex flex-col items-center justify-center text-orange-50 font-vedic shadow-md ring-4 ring-orange-300/40 shrink-0">
-                  <span className="text-3xl sm:text-4xl font-extrabold leading-none">{bhagyank}</span>
-                  <span className="text-[9px] uppercase font-bold tracking-wider mt-0.5">Bhagyank</span>
+                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-radial from-orange-500 to-amber-700 flex flex-col items-center justify-center text-orange-50 font-vedic shadow-md ring-2 sm:ring-4 ring-orange-300/40 shrink-0">
+                  <span className="text-2xl sm:text-4xl font-extrabold leading-none">{bhagyank}</span>
+                  <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider mt-0.5">Bhagyank</span>
                 </div>
               </div>
 
               {/* Mathematical Formula Pill */}
-              <div className="p-3 rounded-xl bg-orange-100/60 border border-orange-300/50 text-xs text-stone-800 flex items-center justify-between">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-orange-100/60 border border-orange-300/50 text-xs text-stone-800 flex flex-wrap items-center justify-between gap-1">
                 <span>
-                  Calculation: Full Date ({day} + {month} + {year})
+                  Calculation: ({day} + {month} + {year})
                 </span>
                 <span className="font-mono font-bold text-orange-950">
                   Digital Root = {bhagyank}
@@ -529,12 +530,12 @@ Calculated via Astronava (astronava.vercel.app)`;
               </p>
 
               {/* Karmic Lessons */}
-              <div className="p-3.5 rounded-xl bg-white/90 border border-amber-200/80 text-xs space-y-1.5">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-white/90 border border-amber-200/80 text-xs space-y-1">
                 <span className="font-bold text-amber-950 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                  <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
                   Karmic Evolution Lessons
                 </span>
-                <ul className="text-stone-600 space-y-1 pl-4 list-disc">
+                <ul className="text-stone-600 space-y-0.5 pl-4 list-disc">
                   {bhagyankData.karmicLessons.map((lesson, idx) => (
                     <li key={idx}>{lesson}</li>
                   ))}
@@ -542,7 +543,7 @@ Calculated via Astronava (astronava.vercel.app)`;
               </div>
 
               {/* Mature Fruit & Spiritual Advice */}
-              <div className="p-3.5 rounded-xl bg-stone-900 text-stone-200 text-xs space-y-1">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-900 text-stone-200 text-xs space-y-1">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400">
                   Maturity Cycle &amp; Spiritual Counsel
                 </span>
@@ -554,27 +555,20 @@ Calculated via Astronava (astronava.vercel.app)`;
           </div>
 
           {/* Driver-Conductor Synergy Section */}
-          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-stone-200 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-stone-100">
-              <div className="space-y-1">
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800">
+          <div className="bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-stone-200 shadow-xs space-y-3.5 sm:space-y-4">
+            <div className="flex items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-stone-100">
+              <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-amber-800">
                   Driver-Conductor Harmony
                 </span>
-                <h3 className="text-lg font-bold font-vedic text-stone-900">
+                <h3 className="text-base sm:text-lg font-bold font-vedic text-stone-900 truncate">
                   {driverConductor.relationshipLabel} ({driverConductor.sanskritTerm})
                 </h3>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <span className="text-xs text-stone-500 font-medium">Synergy Rating</span>
-                  <p className="text-xl font-extrabold text-amber-900">
-                    {driverConductor.compatibilityScore}%
-                  </p>
-                </div>
-                <div className="w-14 h-14 rounded-xl bg-amber-50 border border-amber-300 flex items-center justify-center font-bold text-lg text-amber-900">
-                  {driverConductor.compatibilityScore}%
-                </div>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-amber-50 border border-amber-300/80 flex flex-col items-center justify-center font-bold text-amber-900 shadow-2xs shrink-0">
+                <span className="text-base sm:text-lg font-extrabold leading-none">{driverConductor.compatibilityScore}%</span>
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-wider text-amber-800/80 mt-0.5">Synergy</span>
               </div>
             </div>
 
@@ -582,9 +576,9 @@ Calculated via Astronava (astronava.vercel.app)`;
               {driverConductor.analysis}
             </p>
 
-            <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-950 space-y-1">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-950 space-y-1">
               <strong className="font-bold flex items-center gap-1.5 text-amber-900">
-                <Compass className="w-4 h-4 text-amber-700" />
+                <Compass className="w-4 h-4 text-amber-700 shrink-0" />
                 Vedic Synthesis &amp; Action Plan
               </strong>
               <p className="leading-relaxed text-stone-700">{driverConductor.guidance}</p>
@@ -592,84 +586,84 @@ Calculated via Astronava (astronava.vercel.app)`;
           </div>
 
           {/* Auspicious Vedic Factors Table */}
-          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-stone-200 shadow-xs space-y-5">
-            <h3 className="text-base font-bold font-vedic text-stone-900 flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-700" />
-              Auspicious Astrological &amp; Numerological Correspondences
+          <div className="bg-white p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-stone-200 shadow-xs space-y-4 sm:space-y-5">
+            <h3 className="text-sm sm:text-base font-bold font-vedic text-stone-900 flex items-center gap-2">
+              <Award className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>Auspicious Vedic Correspondences</span>
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Lucky Days</span>
-                <span className="font-bold text-stone-900 block">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 text-xs">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Lucky Days</span>
+                <span className="font-bold text-stone-900 block truncate">
                   {mulankData.luckyDays.join(', ')}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Lucky Dates</span>
-                <span className="font-bold text-amber-900 block">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Lucky Dates</span>
+                <span className="font-bold text-amber-900 block truncate">
                   {mulankData.luckyDates.join(', ')}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Auspicious Colors</span>
-                <span className="font-bold text-stone-900 block">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Auspicious Colors</span>
+                <span className="font-bold text-stone-900 block truncate">
                   {mulankData.luckyColors.slice(0, 2).join(', ')}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Prescribed Gem</span>
-                <span className="font-bold text-amber-950 block">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Prescribed Gem</span>
+                <span className="font-bold text-amber-950 block truncate">
                   {mulankData.luckyGems[0]}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Deity / Force</span>
-                <span className="font-bold text-stone-900 block">{mulankData.deity}</span>
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Deity / Force</span>
+                <span className="font-bold text-stone-900 block truncate">{mulankData.deity}</span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-                <span className="text-stone-500 font-medium block">Cardinal Direction</span>
-                <span className="font-bold text-stone-900 block">
+              <div className="p-2.5 sm:p-3.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-0.5 sm:space-y-1">
+                <span className="text-[11px] text-stone-500 font-medium block">Direction</span>
+                <span className="font-bold text-stone-900 block truncate">
                   {mulankData.luckyDirection}
                 </span>
               </div>
             </div>
 
             {/* Friendship Matrix Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-              <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950 space-y-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-1 text-xs">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950 space-y-1">
                 <span className="font-bold flex items-center gap-1 text-emerald-900">
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  Friendly Numbers (Mitra)
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  Friendly (Mitra)
                 </span>
                 <p className="font-mono font-bold text-base text-emerald-800">
                   {mulankData.friendlyNumbers.join(', ')}
                 </p>
-                <p className="text-[11px] text-emerald-700">Best for business partners, spouses, and key ventures.</p>
+                <p className="text-[11px] text-emerald-700 leading-tight">Best for business partners, spouses, key ventures.</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-stone-100/70 border border-stone-200 text-stone-800 space-y-1">
-                <span className="font-bold text-stone-900">Neutral Numbers (Sama)</span>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-stone-100/70 border border-stone-200 text-stone-800 space-y-1">
+                <span className="font-bold text-stone-900">Neutral (Sama)</span>
                 <p className="font-mono font-bold text-base text-stone-700">
                   {mulankData.neutralNumbers.join(', ')}
                 </p>
-                <p className="text-[11px] text-stone-500">Provide steady, transactional relationships without friction.</p>
+                <p className="text-[11px] text-stone-500 leading-tight">Steady, transactional relationships without friction.</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-rose-50/70 border border-rose-200 text-rose-950 space-y-1">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50/70 border border-rose-200 text-rose-950 space-y-1">
                 <span className="font-bold flex items-center gap-1 text-rose-900">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                  Enemy Numbers (Shatru)
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  Enemy (Shatru)
                 </span>
                 <p className="font-mono font-bold text-base text-rose-800">
                   {mulankData.enemyNumbers.join(', ')}
                 </p>
-                <p className="text-[11px] text-rose-700">Avoid setting major contracts or signing deals on these dates.</p>
+                <p className="text-[11px] text-rose-700 leading-tight">Avoid setting major contracts or deals on these dates.</p>
               </div>
             </div>
           </div>
