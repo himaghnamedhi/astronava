@@ -1,10 +1,10 @@
 import React from 'react';
-import { Compass, Search, Share2, Gem, Heart } from 'lucide-react';
+import { Compass, Search, Share2, Gem, Heart, Hash, Check } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 
 interface HeaderProps {
-  activeTab: 'generator' | 'builder' | 'gemstones' | 'match' | 'legal';
-  setActiveTab: (tab: 'generator' | 'builder' | 'gemstones' | 'match' | 'legal') => void;
+  activeTab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal';
+  setActiveTab: (tab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal') => void;
   chartStyle: ChartStyle;
   setChartStyle: (style: ChartStyle) => void;
   onOpenSearch: () => void;
@@ -52,11 +52,11 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Desktop Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 bg-stone-200/60 p-1 rounded-xl border border-stone-300/70 text-xs lg:text-sm font-medium shrink-0">
+          <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 bg-stone-200/50 p-1 rounded-xl border border-stone-300/60 text-xs lg:text-sm font-medium shrink-0">
             <button
               id="nav-tab-generator"
               onClick={() => setActiveTab('generator')}
-              className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg transition-all flex items-center gap-1.5 lg:gap-2 whitespace-nowrap ${
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'generator'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
               <img
                 src="/icons/app_logo.svg"
                 alt="Kundali Maker"
-                className="w-4 h-4 rounded-xs shrink-0 object-cover"
+                className="w-3.5 h-3.5 rounded-xs shrink-0 object-cover"
                 referrerPolicy="no-referrer"
               />
               <span>Kundali Maker</span>
@@ -74,39 +74,52 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-gemstones"
               onClick={() => setActiveTab('gemstones')}
-              className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg transition-all flex items-center gap-1.5 lg:gap-2 whitespace-nowrap ${
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'gemstones'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
               }`}
             >
-              <Gem className="w-3.5 h-3.5 lg:w-4 lg:h-4 shrink-0" />
+              <Gem className="w-3.5 h-3.5 shrink-0" />
               <span>Gemstones</span>
             </button>
 
             <button
               id="nav-tab-match"
               onClick={() => setActiveTab('match')}
-              className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg transition-all flex items-center gap-1.5 lg:gap-2 whitespace-nowrap ${
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'match'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
               }`}
             >
-              <Heart className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-rose-500 fill-rose-500/30 shrink-0" />
+              <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/30 shrink-0" />
               <span>Match Finder</span>
+            </button>
+
+            <button
+              id="nav-tab-numerology"
+              onClick={() => setActiveTab('numerology')}
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'numerology'
+                  ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
+                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
+              }`}
+            >
+              <Hash className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+              <span>Numerology</span>
             </button>
 
             <button
               id="nav-tab-builder"
               onClick={() => setActiveTab('builder')}
-              className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg transition-all flex items-center gap-1.5 lg:gap-2 whitespace-nowrap ${
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'builder'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
               }`}
             >
-              <Compass className="w-3.5 h-3.5 lg:w-4 lg:h-4 shrink-0" />
+              <Compass className="w-3.5 h-3.5 shrink-0" />
               <span>Kundli Reader</span>
             </button>
           </nav>
@@ -117,20 +130,20 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-search-topics"
               onClick={onOpenSearch}
               title="Search life query or symptom"
-              className="h-9 px-2.5 sm:px-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-colors flex items-center gap-1.5 text-xs font-medium active:scale-95 shrink-0"
+              aria-label="Search topics"
+              className="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-colors flex items-center justify-center active:scale-95 shrink-0"
             >
               <Search className="w-4 h-4 text-amber-800" />
-              <span className="hidden sm:inline">Search</span>
             </button>
 
             <button
               id="btn-share-link"
               onClick={handleShare}
-              title="Share Astronava"
-              className="h-9 px-2.5 sm:px-3 rounded-xl bg-amber-100/70 hover:bg-amber-200 text-amber-900 border border-amber-300/80 transition-colors flex items-center gap-1 text-xs font-medium active:scale-95 shrink-0"
+              title={copied ? 'Copied link!' : 'Share Astronava'}
+              aria-label={copied ? 'Copied link to clipboard' : 'Share Astronava'}
+              className="w-9 h-9 rounded-xl bg-amber-100/70 hover:bg-amber-200 text-amber-900 border border-amber-300/80 transition-colors flex items-center justify-center active:scale-95 shrink-0"
             >
-              <Share2 className="w-4 h-4 text-amber-800" />
-              <span className="hidden xs:inline sm:inline">{copied ? 'Copied!' : 'Share'}</span>
+              {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Share2 className="w-4 h-4 text-amber-800" />}
             </button>
           </div>
         </div>
@@ -139,6 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-stone-200/80 no-scrollbar -mx-4 px-4">
           {[
             { id: 'generator', label: 'Kundali Maker', icon: Compass },
+            { id: 'numerology', label: 'Numerology', icon: Hash },
             { id: 'gemstones', label: 'Gemstones', icon: Gem },
             { id: 'match', label: 'Match Finder', icon: Heart },
             { id: 'builder', label: 'Kundli Reader', icon: Compass },

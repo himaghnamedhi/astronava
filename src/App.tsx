@@ -5,6 +5,7 @@ import { KundliBuilder } from './components/KundliBuilder';
 import { KundliGenerator } from './components/KundliGenerator';
 import { GemstoneRecommender } from './components/GemstoneRecommender';
 import { MatchFinder } from './components/MatchFinder';
+import { NumerologyCalculator } from './components/NumerologyCalculator';
 import { SearchModal } from './components/SearchModal';
 import { CustomReportModal } from './components/CustomReportModal';
 import { LegalModal } from './components/LegalModal';
@@ -14,7 +15,7 @@ import { CompleteKundliData } from './data/vedicEphemeris';
 import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'generator' | 'builder' | 'gemstones' | 'match' | 'legal'>('generator');
+  const [activeTab, setActiveTab] = useState<'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal'>('generator');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>('sun');
   const [chartStyle, setChartStyle] = useState<ChartStyle>('north');
@@ -137,11 +138,22 @@ export default function App() {
         {activeTab === 'match' && (
           <MatchFinder
             onNavigateToTab={(tab) => {
-              if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
+              if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match' || tab === 'numerology') {
                 setActiveTab(tab);
               }
             }}
             onOpenCustomReport={(data) => handleOpenReport('match', data)}
+          />
+        )}
+
+        {activeTab === 'numerology' && (
+          <NumerologyCalculator
+            initialName={reportKundliData?.nativeName || ''}
+            initialDob={{
+              day: reportKundliData?.birthData.day || 17,
+              month: reportKundliData?.birthData.month || 9,
+              year: reportKundliData?.birthData.year || 1950,
+            }}
           />
         )}
 
@@ -230,6 +242,18 @@ export default function App() {
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">4.</span>
                     <span>Match Finder (Kundali Milan)</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('numerology');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">5.</span>
+                    <span>Numerology Calculator</span>
                   </button>
                 </li>
               </ul>
