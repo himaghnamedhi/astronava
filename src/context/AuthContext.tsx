@@ -110,9 +110,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
         setUser(appUser);
         await syncUserProfile(appUser);
+        setIsAuthModalOpen(false);
       }
-      setIsAuthModalOpen(false);
     } catch (error: any) {
+      // User closed or dismissed the popup window before completing sign-in;
+      // this is normal user cancellation behavior, not an application crash.
+      if (
+        error?.code === 'auth/popup-closed-by-user' ||
+        error?.code === 'auth/cancelled-popup-request' ||
+        (error?.message && error.message.includes('popup-closed-by-user'))
+      ) {
+        return;
+      }
       console.error('Google Sign-In Error:', error);
       throw error;
     }

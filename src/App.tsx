@@ -45,9 +45,126 @@ export default function App() {
   const [reportGemstoneData, setReportGemstoneData] = useState<{ lagna?: number; profile?: any; name?: string }>({});
   const [reportKundliData, setReportKundliData] = useState<CompleteKundliData | null>(null);
 
+  // Helper to map pathname to view state
+  const parsePathname = (path: string) => {
+    const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+    if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy') {
+      setSelectedLegalDoc('privacy');
+      setActiveTab('legal');
+      document.title = 'Privacy Policy — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/terms-and-conditions' || cleanPath === '/terms' || cleanPath === '/terms-of-service' || cleanPath === '/legal/terms') {
+      setSelectedLegalDoc('terms');
+      setActiveTab('legal');
+      document.title = 'Terms & Conditions — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/disclaimer' || cleanPath === '/legal/disclaimer') {
+      setSelectedLegalDoc('disclaimer');
+      setActiveTab('legal');
+      document.title = 'Disclaimer — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/contact' || cleanPath === '/contact-us' || cleanPath === '/legal/contact') {
+      setSelectedLegalDoc('contact');
+      setActiveTab('legal');
+      document.title = 'Contact Us — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/builder') {
+      setActiveTab('builder');
+      document.title = 'Kundli Reader & Builder — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/gemstones') {
+      setActiveTab('gemstones');
+      document.title = 'Gemstone Recommendations — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/match') {
+      setActiveTab('match');
+      document.title = 'Kundali Milan (Match Finder) — astronava.com';
+      return true;
+    }
+    if (cleanPath === '/numerology') {
+      setActiveTab('numerology');
+      document.title = 'Vedic Numerology Calculator — astronava.com';
+      return true;
+    }
+    if (cleanPath === '' || cleanPath === '/' || cleanPath === '/generator' || cleanPath === '/kundli') {
+      setActiveTab('generator');
+      document.title = 'astronava.com — Vedic Kundli House Chart & Planetary Guide';
+      return true;
+    }
+    return false;
+  };
+
+  // Sync route on mount and browser back/forward (popstate)
+  React.useEffect(() => {
+    parsePathname(window.location.pathname);
+
+    const handlePopState = () => {
+      parsePathname(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleOpenLegal = (doc: LegalDocType) => {
     setSelectedLegalDoc(doc);
     setActiveTab('legal');
+
+    let path = '/privacy-policy';
+    let title = 'Privacy Policy — astronava.com';
+    if (doc === 'terms') {
+      path = '/terms-and-conditions';
+      title = 'Terms & Conditions — astronava.com';
+    } else if (doc === 'disclaimer') {
+      path = '/disclaimer';
+      title = 'Disclaimer — astronava.com';
+    } else if (doc === 'contact') {
+      path = '/contact';
+      title = 'Contact Us — astronava.com';
+    }
+
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    document.title = title;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTabChange = (tab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal') => {
+    setActiveTab(tab);
+    let path = '/';
+    let title = 'astronava.com — Vedic Kundli House Chart & Planetary Guide';
+    if (tab === 'builder') {
+      path = '/builder';
+      title = 'Kundli Reader & Builder — astronava.com';
+    } else if (tab === 'gemstones') {
+      path = '/gemstones';
+      title = 'Gemstone Recommendations — astronava.com';
+    } else if (tab === 'match') {
+      path = '/match';
+      title = 'Kundali Milan (Match Finder) — astronava.com';
+    } else if (tab === 'numerology') {
+      path = '/numerology';
+      title = 'Vedic Numerology Calculator — astronava.com';
+    } else if (tab === 'legal') {
+      path = selectedLegalDoc === 'terms' ? '/terms-and-conditions' : selectedLegalDoc === 'disclaimer' ? '/disclaimer' : selectedLegalDoc === 'contact' ? '/contact' : '/privacy-policy';
+      title = `${selectedLegalDoc === 'terms' ? 'Terms & Conditions' : selectedLegalDoc === 'disclaimer' ? 'Disclaimer' : selectedLegalDoc === 'contact' ? 'Contact Us' : 'Privacy Policy'} — astronava.com`;
+    }
+
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    document.title = title;
+  };
+
+  const handleReturnHome = () => {
+    handleTabChange('generator');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -93,7 +210,7 @@ export default function App() {
       {/* Top Header */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         chartStyle={chartStyle}
         setChartStyle={setChartStyle}
         onOpenSearch={() => setIsSearchOpen(true)}
@@ -109,7 +226,7 @@ export default function App() {
             onKundliGenerated={(kData) => setReportKundliData(kData)}
             onApplyPlacementsToBuilder={(placements) => {
               setCustomPlacements(placements);
-              setActiveTab('builder');
+              handleTabChange('builder');
             }}
           />
         )}
@@ -131,7 +248,7 @@ export default function App() {
             initialLagna={1}
             onNavigateToTab={(tab) => {
               if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
-                setActiveTab(tab);
+                handleTabChange(tab);
               }
             }}
             onOpenCustomReport={(data) => handleOpenReport('gemstone', data)}
@@ -142,7 +259,7 @@ export default function App() {
           <MatchFinder
             onNavigateToTab={(tab) => {
               if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match' || tab === 'numerology') {
-                setActiveTab(tab);
+                handleTabChange(tab);
               }
             }}
             onOpenCustomReport={(data) => handleOpenReport('match', data)}
@@ -163,11 +280,8 @@ export default function App() {
         {activeTab === 'legal' && (
           <LegalPage
             activeDoc={selectedLegalDoc}
-            onSelectDoc={(doc) => setSelectedLegalDoc(doc)}
-            onBack={() => {
-              setActiveTab('generator');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onSelectDoc={(doc) => handleOpenLegal(doc)}
+            onBack={handleReturnHome}
           />
         )}
 
@@ -181,7 +295,7 @@ export default function App() {
             
             {/* Col 1: About */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 cursor-pointer" onClick={handleReturnHome}>
                 <img
                   src="/icons/app_logo.svg"
                   alt="Astronava Logo"
@@ -202,7 +316,7 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      setActiveTab('generator');
+                      handleTabChange('generator');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
@@ -214,7 +328,7 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      setActiveTab('builder');
+                      handleTabChange('builder');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
@@ -226,7 +340,7 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      setActiveTab('gemstones');
+                      handleTabChange('gemstones');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
@@ -238,7 +352,7 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      setActiveTab('match');
+                      handleTabChange('match');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
@@ -250,7 +364,7 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      setActiveTab('numerology');
+                      handleTabChange('numerology');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
@@ -267,31 +381,43 @@ export default function App() {
               <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 font-vedic">Legal &amp; Policies</h4>
               <ul className="space-y-2 text-xs text-stone-400">
                 <li>
-                  <button
-                    onClick={() => handleOpenLegal('privacy')}
+                  <a
+                    href="/privacy-policy"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenLegal('privacy');
+                    }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
                   >
                     <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Privacy Policy</span>
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => handleOpenLegal('terms')}
+                  <a
+                    href="/terms-and-conditions"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenLegal('terms');
+                    }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
                   >
                     <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Terms &amp; Conditions</span>
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => handleOpenLegal('disclaimer')}
+                  <a
+                    href="/disclaimer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenLegal('disclaimer');
+                    }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
                   >
                     <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Disclaimer</span>
-                  </button>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -299,13 +425,17 @@ export default function App() {
             {/* Col 4: Contact Us */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 font-vedic">
-                <button
+                <a
+                  href="/contact"
                   id="footer-contact-us-heading-btn"
-                  onClick={() => handleOpenLegal('contact')}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleOpenLegal('contact');
+                  }}
                   className="hover:text-amber-300 transition-colors cursor-pointer text-left"
                 >
                   Contact Us
-                </button>
+                </a>
               </h4>
             </div>
 
@@ -314,33 +444,49 @@ export default function App() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-stone-800 flex flex-col items-center justify-center text-xs text-stone-400 gap-6 relative">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-stone-400">
-              <button
-                onClick={() => handleOpenLegal('privacy')}
+              <a
+                href="/privacy-policy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenLegal('privacy');
+                }}
                 className="hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Privacy Policy
-              </button>
+              </a>
               <span>&bull;</span>
-              <button
-                onClick={() => handleOpenLegal('terms')}
+              <a
+                href="/terms-and-conditions"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenLegal('terms');
+                }}
                 className="hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Terms &amp; Conditions
-              </button>
+              </a>
               <span>&bull;</span>
-              <button
-                onClick={() => handleOpenLegal('disclaimer')}
+              <a
+                href="/disclaimer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenLegal('disclaimer');
+                }}
                 className="hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Disclaimer
-              </button>
+              </a>
               <span>&bull;</span>
-              <button
-                onClick={() => handleOpenLegal('contact')}
+              <a
+                href="/contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenLegal('contact');
+                }}
                 className="hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Contact Us
-              </button>
+              </a>
             </div>
 
             <p className="text-center w-full max-w-sm sm:max-w-none">

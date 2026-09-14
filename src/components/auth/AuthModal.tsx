@@ -74,8 +74,14 @@ export const AuthModal: React.FC = () => {
           domain: currentDomain,
           projectId: 'project-51605426-b73c-4f18-be6',
         });
-      } else if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Google Sign-in was cancelled or encountered an issue.');
+      } else if (err.code === 'auth/popup-blocked' || (err.message && err.message.includes('popup-blocked'))) {
+        setError('The sign-in popup was blocked by your browser. Please allow popups or open the app in a new tab.');
+      } else if (
+        err.code !== 'auth/popup-closed-by-user' &&
+        err.code !== 'auth/cancelled-popup-request' &&
+        !err.message?.includes('popup-closed-by-user')
+      ) {
+        setError(err.message || 'Google Sign-in encountered an issue. Please try again.');
       }
     } finally {
       setLoading(false);

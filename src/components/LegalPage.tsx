@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, Copy, Check, Link2 } from 'lucide-react';
 import {
   LegalDocType,
   DISCLAIMER_CONTENT,
@@ -20,6 +20,27 @@ export const LegalPage: React.FC<LegalPageProps> = ({
   onBack,
 }) => {
   const tabsRef = useRef<HTMLDivElement>(null);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  const getDocPath = (type: LegalDocType): string => {
+    switch (type) {
+      case 'privacy':
+        return '/privacy-policy';
+      case 'terms':
+        return '/terms-and-conditions';
+      case 'disclaimer':
+        return '/disclaimer';
+      case 'contact':
+        return '/contact';
+    }
+  };
+
+  const handleCopyUrl = () => {
+    const fullUrl = `https://www.astronava.com${getDocPath(activeDoc)}`;
+    navigator.clipboard.writeText(fullUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
 
   // Smoothly center the active tab when clicked or selected
   useEffect(() => {
@@ -209,9 +230,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
       <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
         
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-stone-200 bg-stone-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 border border-amber-200">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 border border-amber-200 shrink-0">
               {activeDoc === 'privacy' && <Shield className="w-5 h-5" />}
               {activeDoc === 'terms' && <FileText className="w-5 h-5" />}
               {activeDoc === 'disclaimer' && <AlertCircle className="w-5 h-5" />}
@@ -225,9 +246,35 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 {activeDoc === 'contact' && 'Contact Us'}
               </h1>
               <p className="text-xs text-stone-500">
-                Astronava Official Policies &bull; Effective September 2026
+                Astronava Official Legal Policies &bull; Effective September 2026
               </p>
             </div>
+          </div>
+
+          {/* Canonical Public URL Badge & 1-Click Copy for Google Cloud/OAuth/Firebase */}
+          <div className="flex items-center gap-2 bg-white/95 border border-stone-200 px-3 py-1.5 rounded-xl shadow-2xs text-xs self-start sm:self-auto">
+            <Link2 className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span className="font-mono text-stone-700 text-[11px] sm:text-xs select-all">
+              astronava.com{getDocPath(activeDoc)}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 font-semibold transition-colors cursor-pointer text-[10.5px]"
+              title="Copy public URL"
+            >
+              {copiedUrl ? (
+                <>
+                  <Check className="w-3 h-3 text-emerald-600" />
+                  <span className="text-emerald-700">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3 text-stone-500" />
+                  <span>Copy URL</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
