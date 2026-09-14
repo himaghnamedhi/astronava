@@ -2236,9 +2236,9 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
             <TraditionalPatrikaPage
               kundliData={kundliData}
               brandName="Astronava"
-              websiteAddress="www.astronava.vercel.app"
+              websiteAddress="www.astronava.com"
               servicesLine="Astrology | Numerology | Palmistry | Occult | Courses | Tarot Card | Gemsstone | Vastu"
-              contactLine="www.astronava.vercel.app"
+              contactLine="www.astronava.com"
               pageNumber="1"
             />
 
@@ -2328,7 +2328,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
               {/* Page 2 Footer & Seal */}
               <div className="pt-2 border-t border-amber-900/30 flex justify-between items-center text-[9.5px] text-stone-500">
-                <span>Website: <strong className="text-amber-900 underline font-semibold">www.astronava.vercel.app</strong> • Certified Vedic Jyotish Patrika</span>
+                <span>Website: <strong className="text-amber-900 underline font-semibold">www.astronava.com</strong> • Certified Vedic Jyotish Patrika</span>
                 <span className="font-mono text-[8.5px]">DOC-ID: AN-KUNDLI-{kundliData.birthDetails.name.length * 3141}</span>
                 <span className="font-bold text-amber-950">Page 2 of 2</span>
               </div>

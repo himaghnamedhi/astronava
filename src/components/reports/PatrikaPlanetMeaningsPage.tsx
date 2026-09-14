@@ -16,9 +16,9 @@ interface PatrikaPlanetMeaningsPageProps {
 export const PatrikaPlanetMeaningsPage: React.FC<PatrikaPlanetMeaningsPageProps> = ({
   kundliData,
   brandName = 'Astronava',
-  websiteAddress = 'www.astronava.vercel.app',
+  websiteAddress = 'www.astronava.com',
   servicesLine = 'Astrology | Numerology | Palmistry | Occult | Courses | Tarot Card | Gemsstone | Vastu',
-  contactLine = 'www.astronava.vercel.app',
+  contactLine = 'www.astronava.com',
   pageNumber = 4,
 }) => {
   return (

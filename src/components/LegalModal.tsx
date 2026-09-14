@@ -326,7 +326,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                     rel="noopener noreferrer"
                     className="text-stone-900 font-semibold text-sm hover:text-amber-800 transition-colors inline-flex items-center gap-1"
                   >
-                    <span>astronava.vercel.app</span>
+                    <span>www.astronava.com</span>
                     <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
                   </a>
                   <p className="text-[11px] text-stone-500">

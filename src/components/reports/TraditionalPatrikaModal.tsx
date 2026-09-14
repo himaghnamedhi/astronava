@@ -29,10 +29,10 @@ export const TraditionalPatrikaModal: React.FC<TraditionalPatrikaModalProps> = (
 }) => {
   // Astronava Official Branding - Fixed for authenticity
   const brandName = 'Astronava';
-  const websiteAddress = 'www.astronava.vercel.app';
+  const websiteAddress = 'www.astronava.com';
   const servicesLine =
     'Astrology | Numerology | Palmistry | Occult | Courses | Tarot Card | Gemsstone | Vastu';
-  const contactLine = 'www.astronava.vercel.app';
+  const contactLine = 'www.astronava.com';
 
   const [selectedPages, setSelectedPages] = useState<{
     page1: boolean;

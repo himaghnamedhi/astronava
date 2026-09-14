@@ -33,9 +33,9 @@ const GEM_DATA: Record<PlanetId, { gem: string; metal: string; finger: string; d
 export const PatrikaRemediesPage: React.FC<PatrikaRemediesPageProps> = ({
   kundliData,
   brandName = 'Astronava',
-  websiteAddress = 'www.astronava.vercel.app',
+  websiteAddress = 'www.astronava.com',
   servicesLine = 'Astrology | Numerology | Palmistry | Occult | Courses | Tarot Card | Gemsstone | Vastu',
-  contactLine = 'www.astronava.vercel.app',
+  contactLine = 'www.astronava.com',
   pageNumber = 5,
 }) => {
   const lagnaSign = kundliData.lagnaSign;

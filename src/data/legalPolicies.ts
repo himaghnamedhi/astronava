@@ -133,7 +133,7 @@ If you have any questions regarding this Disclaimer, please contact us:
 
 **Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
 
-**Website:** https://astronava.vercel.app
+**Website:** https://www.astronava.com
 
 ---
 
@@ -311,7 +311,7 @@ If you have any questions regarding these Terms & Conditions, please contact us:
 
 **Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
 
-**Website:** https://astronava.vercel.app
+**Website:** https://www.astronava.com
 
 ---
 
@@ -473,7 +473,7 @@ If you have any questions about this Privacy Policy or the way your information 
 
 **Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
 
-**Website:** https://astronava.vercel.app
+**Website:** https://www.astronava.com
 
 ---
 
@@ -481,7 +481,7 @@ Thank you for trusting **Astronava**.`;
 
 export const CONTACT_INFO = {
   email: 'himaaghna@gmail.com',
-  website: 'https://astronava.vercel.app',
+  website: 'https://www.astronava.com',
   developerName: 'Himaghna Medhi',
   twitter: 'https://x.com/himaghnamedhi',
   effectiveDate: 'September 2026',

@@ -188,7 +188,7 @@ Synergy: ${driverConductor.relationshipLabel} (${driverConductor.compatibilitySc
 Name Number (${system.toUpperCase()}): Compound ${nameAnalysis.compoundNumber} -> Root ${nameAnalysis.rootNumber}
 Name Verdict: ${nameAnalysis.overallNameVerdict}
 Personal Year ${targetYear}: ${personalYearData.personalYearNumber} (${personalYearData.theme})
-Calculated via Astronava (astronava.vercel.app)`;
+Calculated via Astronava (www.astronava.com)`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -1435,7 +1435,7 @@ Calculated via Astronava (astronava.vercel.app)`;
             </span>
           </div>
           <span className="text-[10px] text-stone-500 font-mono">
-            Generated on {new Date().toLocaleDateString()} • astronava.vercel.app
+            Generated on {new Date().toLocaleDateString()} • www.astronava.com
           </span>
         </div>
 

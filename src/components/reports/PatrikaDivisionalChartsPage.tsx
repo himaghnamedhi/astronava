@@ -16,9 +16,9 @@ interface PatrikaDivisionalChartsPageProps {
 export const PatrikaDivisionalChartsPage: React.FC<PatrikaDivisionalChartsPageProps> = ({
   kundliData,
   brandName = 'Astronava',
-  websiteAddress = 'www.astronava.vercel.app',
+  websiteAddress = 'www.astronava.com',
   servicesLine = 'Astrology | Numerology | Palmistry | Occult | Courses | Tarot Card | Gemsstone | Vastu',
-  contactLine = 'www.astronava.vercel.app',
+  contactLine = 'www.astronava.com',
   pageNumber = 3,
 }) => {
   const vargasToShow: DivisionalChartType[] = ['D1', 'D9', 'D10', 'D7', 'D2', 'D3', 'D4', 'D12'];

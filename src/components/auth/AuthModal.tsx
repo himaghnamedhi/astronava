@@ -20,12 +20,14 @@ export const AuthModal: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [unauthorizedDomainInfo, setUnauthorizedDomainInfo] = useState<{ domain: string; projectId: string } | null>(null);
 
   if (!isAuthModalOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setUnauthorizedDomainInfo(null);
     setLoading(true);
 
     try {
@@ -61,11 +63,18 @@ export const AuthModal: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    setUnauthorizedDomainInfo(null);
     setLoading(true);
     try {
       await signInWithGoogle();
     } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') {
+      if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('auth/unauthorized-domain'))) {
+        const currentDomain = typeof window !== 'undefined' ? (window.location.hostname || 'www.astronava.com') : 'www.astronava.com';
+        setUnauthorizedDomainInfo({
+          domain: currentDomain,
+          projectId: 'project-51605426-b73c-4f18-be6',
+        });
+      } else if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message || 'Google Sign-in was cancelled or encountered an issue.');
       }
     } finally {
@@ -75,6 +84,7 @@ export const AuthModal: React.FC = () => {
 
   const handleDemoSignIn = async () => {
     setError(null);
+    setUnauthorizedDomainInfo(null);
     setLoading(true);
     try {
       await signInAsDemoUser(name || 'Vedic Explorer');
@@ -155,13 +165,52 @@ export const AuthModal: React.FC = () => {
             <div className="flex-1 border-t border-stone-300"></div>
           </div>
 
-          {/* Error Message */}
-          {error && (
+          {/* Error & Unauthorized Domain Messages */}
+          {unauthorizedDomainInfo ? (
+            <div className="p-3 sm:p-3.5 bg-amber-50/95 border border-amber-300/90 rounded-2xl text-stone-800 text-xs space-y-2 animate-fadeIn shadow-xs">
+              <div className="flex items-start gap-2 text-amber-950 font-bold">
+                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-bold leading-tight">Domain Authorization Needed for Google Sign-In</h4>
+                  <p className="text-[10.5px] font-normal text-stone-600 mt-0.5">
+                    Google Sign-In on <strong className="text-stone-900 font-semibold">{unauthorizedDomainInfo.domain}</strong> requires adding the domain to your Firebase Authorized Domains whitelist.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/90 p-2.5 rounded-xl border border-amber-200/80 text-[10.5px] sm:text-[11px] space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between text-stone-500 text-[9.5px]">
+                  <span className="font-semibold uppercase tracking-wider">FIREBASE PROJECT</span>
+                  <code className="bg-stone-100 text-stone-800 px-1.5 py-0.5 rounded font-mono text-[9.5px]">{unauthorizedDomainInfo.projectId}</code>
+                </div>
+                <p className="font-semibold text-stone-800">Quick 1-Minute Configuration:</p>
+                <ol className="list-decimal list-inside text-stone-600 space-y-0.5">
+                  <li>Go to <strong>Firebase Console &gt; Authentication &gt; Settings</strong></li>
+                  <li>In <strong>Authorized domains</strong>, click <strong>Add domain</strong></li>
+                  <li>Add: <code className="bg-amber-100/90 text-amber-950 px-1 py-0.5 rounded font-mono font-bold">astronava.com</code> and <code className="bg-amber-100/90 text-amber-950 px-1 py-0.5 rounded font-mono font-bold">www.astronava.com</code></li>
+                </ol>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-amber-200/70 text-[11px]">
+                <span className="text-stone-600">Available instantly:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUnauthorizedDomainInfo(null);
+                    setIsSignUp(true);
+                  }}
+                  className="text-amber-900 font-bold hover:underline cursor-pointer"
+                >
+                  Use Email / Password Below ↓
+                </button>
+              </div>
+            </div>
+          ) : error ? (
             <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-start gap-2 animate-fadeIn">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
-          )}
+          ) : null}
 
           {/* Email / Password Form */}
           <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
@@ -262,6 +311,7 @@ export const AuthModal: React.FC = () => {
                   onClick={() => {
                     setIsSignUp(false);
                     setError(null);
+                    setUnauthorizedDomainInfo(null);
                   }}
                   className="text-amber-900 font-bold hover:underline cursor-pointer"
                 >
@@ -276,6 +326,7 @@ export const AuthModal: React.FC = () => {
                   onClick={() => {
                     setIsSignUp(true);
                     setError(null);
+                    setUnauthorizedDomainInfo(null);
                   }}
                   className="text-amber-900 font-bold hover:underline cursor-pointer"
                 >
