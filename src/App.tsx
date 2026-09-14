@@ -13,6 +13,8 @@ import { LegalPage } from './components/LegalPage';
 import { LegalDocType } from './data/legalPolicies';
 import { CompleteKundliData } from './data/vedicEphemeris';
 import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink } from 'lucide-react';
+import { AuthProvider } from './context/AuthContext';
+import { AuthModal } from './components/auth/AuthModal';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal'>('generator');
@@ -85,7 +87,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950">
+    <AuthProvider>
+      <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950">
       
       {/* Top Header */}
       <Header
@@ -408,6 +411,10 @@ export default function App() {
         initialDoc={selectedLegalDoc}
       />
 
+      {/* User Authentication & Sign-Up Modal */}
+      <AuthModal />
+
     </div>
+    </AuthProvider>
   );
 }

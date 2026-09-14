@@ -51,6 +51,26 @@ service cloud.firestore {
         data.sessionId is string && data.sessionId.size() <= 128;
     }
 
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email', 'createdAt']) &&
+        data.id is string && data.id == request.auth.uid &&
+        data.email is string && data.email.size() <= 150 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500)) &&
+        (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 30)) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidAiSummary(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'nativeName', 'summaryData', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.userId is string && data.userId == userId &&
+        data.nativeName is string && data.nativeName.size() <= 100 &&
+        (!('lagnaSign' in data) || (data.lagnaSign is string && data.lagnaSign.size() <= 50)) &&
+        data.summaryData is map &&
+        data.createdAt == request.time;
+    }
+
     // Match Finder 24-hour collection
     match /matchSubmissions/{matchId} {
       // Creation: strict validation, immutable calculation, exact 24h expiration ceiling
@@ -73,6 +93,22 @@ service cloud.firestore {
         existing().expiresAt <= request.time ||
         (request.auth != null && request.auth.uid == existing().sessionId)
       );
+    }
+
+    // User Profile and Account Management
+    match /users/{userId} {
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow list: if false; // Users cannot be enumerated
+      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(incoming());
+      allow delete: if request.auth != null && request.auth.uid == userId;
+
+      // Saved AI Summaries subcollection
+      match /aiSummaries/{summaryId} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId && isValidId(summaryId) && summaryId == incoming().id && isValidAiSummary(incoming(), userId);
+        allow update: if false; // AI Summaries are immutable records
+        allow delete: if request.auth != null && request.auth.uid == userId && isValidId(summaryId);
+      }
     }
   }
 }

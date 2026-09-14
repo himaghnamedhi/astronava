@@ -132,30 +132,30 @@ export const DailyLifeImprovementGuide: React.FC<DailyLifeImprovementGuideProps>
   const mind = getMindAdvice();
 
   return (
-    <div id="daily-improvement-section" className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-6">
+    <div id="daily-improvement-section" className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 p-4 sm:p-6 md:p-7 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-stone-200">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full font-vedic">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <span className="inline-flex items-center text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100/90 border border-amber-200/70 px-2 sm:px-2.5 py-0.5 rounded-full font-vedic whitespace-nowrap shrink-0">
               Ayur-Jyotish &amp; Dinacharya
             </span>
-            <span className="text-[11px] font-semibold text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full">
+            <span className="inline-flex items-center text-[10px] sm:text-[11px] font-semibold text-stone-600 bg-stone-100/90 border border-stone-200/70 px-2 sm:px-2.5 py-0.5 rounded-full truncate max-w-[200px] xs:max-w-[260px] sm:max-w-none">
               Personalized for {kundliData?.birthDetails?.name || 'Native'}
             </span>
           </div>
-          <h3 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700" />
-            <span>Daily Life Improvements &amp; Vedic Guidance (दैनिक जीवन सुधार)</span>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-stone-900 flex items-center gap-1.5 sm:gap-2 leading-snug">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-700 shrink-0" />
+            <span>Daily Life Improvements &amp; Vedic Guidance <span className="hidden sm:inline">(दैनिक जीवन सुधार)</span></span>
           </h3>
-          <p className="text-xs text-stone-600 mt-1 max-w-3xl">
+          <p className="text-[11px] sm:text-xs text-stone-600 mt-1 max-w-3xl leading-relaxed">
             Practical lifestyle habits, peak productivity cycles, emotional grounding, and daily micro-remedies calculated from your 
             <strong> {lagnaSign} Lagna ({lagnaElement.title})</strong>, <strong>{moonRashi} Moon ({moonNakshatra})</strong>, and current <strong>{mahadasha} Mahadasha</strong>.
           </p>
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap gap-1.5 shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap overflow-x-auto pb-1 sm:pb-0 gap-1.5 shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {[
             { id: 'all', label: 'All Guidance' },
             { id: 'dinacharya', label: 'Daily Routine' },
@@ -167,7 +167,7 @@ export const DailyLifeImprovementGuide: React.FC<DailyLifeImprovementGuideProps>
               key={cat.id}
               type="button"
               onClick={() => setActiveCategory(cat.id as any)}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              className={`whitespace-nowrap px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                 activeCategory === cat.id
                   ? 'bg-amber-900 text-amber-50 shadow-2xs'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200'

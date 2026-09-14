@@ -1,6 +1,7 @@
-import React from 'react';
-import { Compass, Search, Share2, Gem, Heart, Hash, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Compass, Search, Share2, Gem, Heart, Hash, Check, User, LogOut, Sparkles, ChevronDown } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   activeTab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal';
@@ -18,6 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const { user, openAuthModal, signOut } = useAuth();
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -131,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenSearch}
               title="Search life query or symptom"
               aria-label="Search topics"
-              className="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-colors flex items-center justify-center active:scale-95 shrink-0"
+              className="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-colors flex items-center justify-center active:scale-95 shrink-0 cursor-pointer"
             >
               <Search className="w-4 h-4 text-amber-800" />
             </button>
@@ -141,10 +144,78 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={handleShare}
               title={copied ? 'Copied link!' : 'Share Astronava'}
               aria-label={copied ? 'Copied link to clipboard' : 'Share Astronava'}
-              className="w-9 h-9 rounded-xl bg-amber-100/70 hover:bg-amber-200 text-amber-900 border border-amber-300/80 transition-colors flex items-center justify-center active:scale-95 shrink-0"
+              className="w-9 h-9 rounded-xl bg-amber-100/70 hover:bg-amber-200 text-amber-900 border border-amber-300/80 transition-colors flex items-center justify-center active:scale-95 shrink-0 cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Share2 className="w-4 h-4 text-amber-800" />}
             </button>
+
+            {/* User Account / Membership Control */}
+            {user ? (
+              <div className="relative">
+                <button
+                  id="btn-user-profile"
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-100 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-amber-600/30 cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">
+                    {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <span className="max-w-[70px] sm:max-w-[100px] truncate hidden xs:inline">
+                    {user.displayName || 'Member'}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-stone-400" />
+                </button>
+
+                {userDropdownOpen && (
+                  <div 
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-stone-200 shadow-xl p-3 z-50 animate-fadeIn space-y-2"
+                    onClick={() => setUserDropdownOpen(false)}
+                  >
+                    <div className="px-2 py-1.5 border-b border-stone-100">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-stone-900">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Astronava Member</span>
+                      </div>
+                      <p className="text-[11px] text-stone-500 truncate mt-0.5">
+                        {user.email || 'Member Account'}
+                      </p>
+                      {user.phoneNumber && (
+                        <p className="text-[10px] text-stone-400 truncate">
+                          {user.phoneNumber}
+                        </p>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab('generator');
+                      }}
+                      className="w-full px-2 py-1.5 text-left text-xs font-medium text-stone-700 hover:bg-amber-50 hover:text-amber-900 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                      <span>AI Kundli Summary</span>
+                    </button>
+
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full px-2 py-1.5 text-left text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-2 cursor-pointer border-t border-stone-100 pt-2"
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                id="btn-open-login"
+                onClick={() => openAuthModal('Sign up to unlock AI Astrological Summary with planetary house and lord interpretations.')}
+                className="h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
+              >
+                <User className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden xs:inline">Sign In</span>
+              </button>
+            )}
           </div>
         </div>
 

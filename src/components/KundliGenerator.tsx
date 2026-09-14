@@ -71,6 +71,7 @@ import { GrahaSpashtaTable } from './astrology/GrahaSpashtaTable';
 import { AllDivisionalChartsGrid } from './astrology/AllDivisionalChartsGrid';
 import { PlanetHouseMeaningsView } from './astrology/PlanetHouseMeaningsView';
 import { VedicRemediesDossier } from './astrology/VedicRemediesDossier';
+import { AiKundliSummaryView } from './astrology/AiKundliSummaryView';
 
 export interface RecentKundliItem {
   id: string;
@@ -333,7 +334,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   const [chartStyle, setChartStyle] = useState<ChartStyle>('north');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [activeAnalysisTab, setActiveAnalysisTab] = useState<
-    'grahas' | 'vargas' | 'meanings' | 'remedies' | 'dasha' | 'ashtakavarga' | 'yogas' | 'bhavas' | 'effects'
+    'ai-summary' | 'grahas' | 'vargas' | 'meanings' | 'remedies' | 'dasha' | 'ashtakavarga' | 'yogas' | 'bhavas' | 'effects'
   >('grahas');
 
   // Search & City Input State
@@ -1674,6 +1675,25 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
               <button
                 type="button"
+                onClick={() => {
+                  setActiveAnalysisTab('ai-summary');
+                  const el = document.getElementById('analysis-tabs-container');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 border border-amber-600/80 text-left transition-all cursor-pointer group shadow-2xs"
+                title="Click to view full AI synthesis of planets in houses and house lords"
+              >
+                <span className="text-amber-200 text-[10px] uppercase font-bold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <span>AI Synthesis</span>
+                </span>
+                <strong className="text-white font-semibold group-hover:underline">
+                  Planets &amp; House Lords
+                </strong>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleResetToNewDetails}
                 className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold border border-stone-300 text-xs flex items-center gap-1 transition-colors"
                 title="Enter details for another person"
@@ -1786,13 +1806,14 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               </div>
             </div>
 
-            {/* Right 7 Cols: Analysis Tabs (Grahas, Dasha, Ashtakavarga, Yogas, Bhavas, Remedies) */}
-            <div className="lg:col-span-7 space-y-4">
+            {/* Right 7 Cols: Analysis Tabs (AI Summary, Grahas, Dasha, Ashtakavarga, Yogas, Bhavas, Remedies) */}
+            <div id="analysis-tabs-container" className="lg:col-span-7 space-y-4 scroll-mt-24">
               <div className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-xs">
                 
                 {/* Horizontal Tab Navigation */}
                 <div className="flex items-center gap-1.5 border-b border-stone-200 overflow-x-auto no-scrollbar pb-2 text-xs font-semibold">
                   {[
+                    { id: 'ai-summary', label: '✦ AI Summary', icon: Sparkles },
                     { id: 'grahas', label: 'Graha Spashta', icon: Sparkles },
                     { id: 'vargas', label: 'All Charts (षोडशवर्ग)', icon: Layers },
                     { id: 'meanings', label: 'Planets in Houses', icon: BookOpen },
@@ -1820,6 +1841,13 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                     );
                   })}
                 </div>
+
+                {/* TAB: AI ASTROLOGICAL SUMMARY & SYNTHESIS */}
+                {activeAnalysisTab === 'ai-summary' && (
+                  <div className="mt-4">
+                    <AiKundliSummaryView kundliData={kundliData} />
+                  </div>
+                )}
 
                 {/* TAB 1: GRAHA SPASHTA (PLANETARY POSITIONS) */}
                 {activeAnalysisTab === 'grahas' && (

@@ -1,5 +1,90 @@
 {
   "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with account metadata and membership details.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier matching Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 150
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User avatar URL",
+          "maxLength": 500
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "User contact telephone or mobile number",
+          "maxLength": 30
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account registration timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "createdAt"
+      ]
+    },
+    "AiSummary": {
+      "title": "AiSummary",
+      "description": "Saved AI Astrological synthesis report for a native chart.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the summary record",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "nativeName": {
+          "type": "string",
+          "description": "Name of the native whose Kundli was summarized",
+          "maxLength": 100
+        },
+        "lagnaSign": {
+          "type": "string",
+          "description": "Lagna ascendant sign name",
+          "maxLength": 50
+        },
+        "summaryData": {
+          "type": "object",
+          "description": "Structured astrological synthesis data payload"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when summary was generated"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "nativeName",
+        "summaryData",
+        "createdAt"
+      ]
+    },
     "MatchSubmission": {
       "title": "MatchSubmission",
       "description": "Vedic Kundli Match Finder calculation record stored for 24 hours with automatic expiration.",
@@ -59,6 +144,14 @@
     "/matchSubmissions/{matchId}": {
       "schema": "MatchSubmission",
       "description": "Temporary 24-hour collection of partner matching submissions with automated TTL policy."
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile document owned by the authenticated user."
+    },
+    "/users/{userId}/aiSummaries/{summaryId}": {
+      "schema": "AiSummary",
+      "description": "Collection of saved AI astrological summaries belonging to the user."
     }
   }
 }

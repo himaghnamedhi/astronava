@@ -223,3 +223,110 @@ export async function deleteMatchSubmission(id: string): Promise<void> {
     handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
+
+// AI Summary & User Profile interfaces
+export interface StoredAiSummary {
+  id: string;
+  userId: string;
+  nativeName: string;
+  lagnaSign?: string;
+  summaryData: any;
+  createdAt: any;
+}
+
+export interface UserProfileData {
+  id: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  phoneNumber?: string;
+  createdAt?: any;
+}
+
+/**
+ * Sync user profile to Firestore on login
+ */
+export async function syncUserProfile(user: { 
+  uid: string; 
+  email: string | null; 
+  displayName: string | null; 
+  photoURL: string | null;
+  phoneNumber?: string | null;
+}): Promise<void> {
+  if (!user || !user.uid || !user.email) return;
+  const path = `users/${user.uid}`;
+  const data: UserProfileData = {
+    id: user.uid,
+    email: user.email,
+    displayName: user.displayName || user.email.split('@')[0] || 'Vedic Seeker',
+    photoURL: user.photoURL || '',
+    ...(user.phoneNumber ? { phoneNumber: user.phoneNumber } : {}),
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    await setDoc(doc(db, 'users', user.uid), data, { merge: true });
+  } catch (error) {
+    console.warn('Could not sync user profile:', error);
+  }
+}
+
+/**
+ * Save an AI Astrological Summary to the user's subcollection
+ */
+export async function saveAiSummary(data: {
+  id: string;
+  userId: string;
+  nativeName: string;
+  lagnaSign?: string;
+  summaryData: any;
+}): Promise<string> {
+  const path = `users/${data.userId}/aiSummaries/${data.id}`;
+  const payload = {
+    id: data.id,
+    userId: data.userId,
+    nativeName: data.nativeName || 'Chart Native',
+    lagnaSign: data.lagnaSign || '',
+    summaryData: data.summaryData,
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    await setDoc(doc(db, 'users', data.userId, 'aiSummaries', data.id), payload);
+    return data.id;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+/**
+ * Retrieve all saved AI summaries for the authenticated user
+ */
+export async function getUserAiSummaries(userId: string): Promise<StoredAiSummary[]> {
+  const path = `users/${userId}/aiSummaries`;
+  try {
+    const q = query(collection(db, 'users', userId, 'aiSummaries'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const list: StoredAiSummary[] = [];
+    snap.forEach((d) => {
+      list.push(d.data() as StoredAiSummary);
+    });
+    return list;
+  } catch (error) {
+    console.warn('Could not fetch user AI summaries:', error);
+    return [];
+  }
+}
+
+/**
+ * Delete a saved AI summary
+ */
+export async function deleteAiSummary(userId: string, summaryId: string): Promise<void> {
+  const path = `users/${userId}/aiSummaries/${summaryId}`;
+  try {
+    await deleteDoc(doc(db, 'users', userId, 'aiSummaries', summaryId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
