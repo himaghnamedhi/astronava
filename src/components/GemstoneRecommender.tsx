@@ -284,16 +284,6 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
               <FileText className="w-4 h-4 text-amber-200 shrink-0" />
               <span>Generate Report</span>
             </button>
-            {onNavigateToTab && (
-              <button
-                id="btn-gemstone-open-kundli-reader"
-                onClick={() => onNavigateToTab('builder')}
-                className="flex-1 sm:flex-initial px-3 sm:px-4 py-2.5 rounded-xl bg-white hover:bg-amber-50 text-stone-800 border border-amber-900/20 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
-              >
-                <Compass className="w-4 h-4 text-amber-800 shrink-0" />
-                <span>Open Kundli Reader</span>
-              </button>
-            )}
           </div>
         </div>
 
@@ -403,7 +393,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-amber-950 font-vedic">
-                  Free Gemstone Calculator by Date of Birth &amp; Kundali
+                  Free Gemstone Calculator by Date of Birth &amp; Kundli
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-600 mt-1">
                   Accurately calculates your Vedic Ascendant (Lagna), Moon Sign, Nakshatra, and exact Gemstone Weight (Ratti/Carats) calibrated to your body weight and constitutional prana threshold.
@@ -1457,34 +1447,16 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
               </div>
             </div>
 
-            {/* Foundational Jyotish Rules Callout */}
-            <div className="bg-[#FAF8F5] rounded-3xl border border-amber-900/15 p-6 sm:p-8 shadow-xs space-y-4 text-center sm:text-left">
-              <h3 className="text-base font-bold text-amber-950 font-vedic flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
-                <ShieldAlert className="w-5 h-5 text-amber-800 shrink-0" />
-                <span>Important Jyotish Rules Before Wearing Any Gemstone</span>
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-stone-700">
-                <div className="p-4 rounded-xl bg-white border border-stone-200/80 space-y-1.5 text-center sm:text-left">
-                  <strong className="text-amber-950 font-bold block text-sm font-vedic text-center sm:text-left">1. Cosmic Antennas, Not Absorbers</strong>
-                  <p className="leading-relaxed text-stone-600 text-justify sm:text-left hyphens-auto">
-                    Gemstones never absorb or neutralize negative energy; they radiate and amplify planetary light into your subtle body. Never wear a gemstone for an enemy or functional malefic planet.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-white border border-stone-200/80 space-y-1.5 text-center sm:text-left">
-                  <strong className="text-amber-950 font-bold block text-sm font-vedic text-center sm:text-left">2. Ascendant (Lagna) Priority</strong>
-                  <p className="leading-relaxed text-stone-600 text-justify sm:text-left hyphens-auto">
-                    Authentic prescriptions depend on your precise Ascendant (Lagna) degree and house lordship, rather than generic Western monthly birthstones.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-white border border-stone-200/80 space-y-1.5 text-center sm:text-left">
-                  <strong className="text-amber-950 font-bold block text-sm font-vedic text-center sm:text-left">3. Constitutional Weight (Ratti)</strong>
-                  <p className="leading-relaxed text-stone-600 text-justify sm:text-left hyphens-auto">
-                    A gemstone's weight must be calibrated to your physical body mass (minimum 1 Ratti per 10-12 kg body weight) to ensure the proper biological prana threshold.
-                  </p>
-                </div>
+            {/* Gemstone Guidance Advisory */}
+            <div className="bg-amber-50/60 rounded-2xl border border-amber-200/80 p-5 shadow-2xs flex items-start gap-3.5 text-xs text-stone-700">
+              <ShieldAlert className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold text-amber-950 block text-sm font-vedic">
+                  Vedic Gemstone Wearing Guidelines
+                </span>
+                <p className="text-stone-600 leading-relaxed">
+                  Authentic Vedic prescriptions are calculated from your exact Ascendant (Lagna) degree and benefic house lordships (Trikona 1st, 5th, 9th). Always ensure a stone is suited to your personal chart before wearing, and verify recommendations with a qualified astrologer.
+                </p>
               </div>
             </div>
           </div>

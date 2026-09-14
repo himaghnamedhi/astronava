@@ -3,6 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { generateKundliAiSummary } from './src/server/geminiAstrology';
+import { generateClientSitemapXml } from './src/utils/sitemap';
 
 dotenv.config();
 
@@ -15,6 +16,18 @@ async function startServer() {
   // API health check
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Dynamic XML Sitemap Endpoint for Web Crawlers and Search Engines
+  app.get('/sitemap.xml', (req, res) => {
+    try {
+      const xml = generateClientSitemapXml();
+      res.header('Content-Type', 'application/xml; charset=utf-8');
+      res.send(xml);
+    } catch (error) {
+      console.error('Failed to generate sitemap.xml:', error);
+      res.status(500).send('Error generating sitemap');
+    }
   });
 
   // AI Kundli Summary Endpoint

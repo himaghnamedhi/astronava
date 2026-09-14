@@ -362,7 +362,7 @@ export const CustomReportModal: React.FC<CustomReportModalProps> = ({
       } else if (activeReportType === 'match') {
         const p1 = (p1Details.name || 'Partner_1').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
         const p2 = (p2Details.name || 'Partner_2').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-        fileName = `Kundali_Milan_Match_Report_${p1}_and_${p2}.pdf`;
+        fileName = `Kundli_Milan_Match_Report_${p1}_and_${p2}.pdf`;
       } else {
         const nameClean = (gemNativeName || 'Native').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
         fileName = `Vedic_Gemstone_Prescription_${nameClean}.pdf`;
@@ -677,7 +677,7 @@ export const CustomReportModal: React.FC<CustomReportModalProps> = ({
                   className="w-full bg-white border border-stone-300 rounded-lg px-2 py-1 text-xs text-stone-800 focus:ring-1 focus:ring-amber-800 focus:outline-none"
                   defaultValue=""
                 >
-                  <option value="" disabled>Load Kundali Preset...</option>
+                  <option value="" disabled>Load Kundli Preset...</option>
                   {MATCH_PRESETS.map((p) => (
                     <option key={p.id} value={p.id}>{p.title}</option>
                   ))}

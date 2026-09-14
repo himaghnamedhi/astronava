@@ -108,7 +108,7 @@ export const TraditionalPatrikaModal: React.FC<TraditionalPatrikaModalProps> = (
 
       setGenerationProgress('Finalizing PDF file...');
       const cleanName = (kundliData.birthDetails.name || 'Native').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-      pdf.save(`Vedic_Kundali_${cleanName}.pdf`);
+      pdf.save(`Vedic_Kundli_${cleanName}.pdf`);
     } catch (err) {
       console.error('PDF generation error:', err);
       // Fallback to browser print
@@ -136,7 +136,7 @@ export const TraditionalPatrikaModal: React.FC<TraditionalPatrikaModalProps> = (
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-bold text-amber-100 font-vedic">
-                  Vedic Kundali PDF
+                  Vedic Kundli PDF
                 </h2>
                 <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   {totalSelectedCount} Page{totalSelectedCount > 1 ? 's' : ''} Selected
@@ -421,10 +421,10 @@ export const TraditionalPatrikaModal: React.FC<TraditionalPatrikaModalProps> = (
               onClick={handleNativePrint}
               disabled={isGenerating || totalSelectedCount === 0}
               className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60"
-              title="Print Vedic Kundali directly or save as PDF"
+              title="Print Vedic Kundli directly or save as PDF"
             >
               <Printer className="w-3.5 h-3.5 text-amber-400" />
-              <span>Print Vedic Kundali</span>
+              <span>Print Vedic Kundli</span>
             </button>
 
             {/* Instant High-Res Download PDF */}
@@ -441,7 +441,7 @@ export const TraditionalPatrikaModal: React.FC<TraditionalPatrikaModalProps> = (
               ) : (
                 <>
                   <Download className="w-3.5 h-3.5 text-amber-200" />
-                  <span>Download Vedic Kundali PDF ({totalSelectedCount} Pgs)</span>
+                  <span>Download Vedic Kundli PDF ({totalSelectedCount} Pgs)</span>
                 </>
               )}
             </button>

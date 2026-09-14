@@ -37,13 +37,13 @@ export const MatchReportPages: React.FC<MatchReportPagesProps> = ({
             <div className="flex items-center justify-between text-[11px] text-amber-950 font-serif tracking-wide px-2 mb-1">
               <span>॥ श्री राधाकृष्णाभ्यां नमः ॥</span>
               <span className="font-bold uppercase tracking-widest text-[10px] text-amber-900 font-vedic">
-                Vedic Horoscope Match &amp; Kundali Milan
+                Vedic Horoscope Match &amp; Kundli Milan
               </span>
               <span>॥ ॐ गं गणपतये नमः ॥</span>
             </div>
 
             <h1 className="text-xl sm:text-2xl font-black font-vedic text-amber-950 tracking-tight leading-tight">
-              VEDIC KUNDALI MILAN &amp; ASHTAKOOTA COMPATIBILITY
+              VEDIC KUNDLI MILAN &amp; ASHTAKOOTA COMPATIBILITY
             </h1>
             <p className="text-[10px] text-stone-600 max-w-xl mx-auto mt-0.5">
               Comprehensive 36 Gunas Ashtakoota Analysis, Manglik Compatibility &amp; Marital Destiny Evaluation
@@ -226,7 +226,7 @@ export const MatchReportPages: React.FC<MatchReportPagesProps> = ({
 
           {/* Page 1 Footer */}
           <div className="pt-2 border-t border-amber-900/30 flex items-center justify-between text-[9.5px] text-stone-500">
-            <span>Astronava • Vedic Kundali Milan &amp; Ashtakoota Compatibility Dossier</span>
+            <span>Astronava • Vedic Kundli Milan &amp; Ashtakoota Compatibility Dossier</span>
             <span className="font-serif italic text-amber-900 font-semibold">॥ परस्परं भावयन्तः श्रेयः परमवाप्स्यथ ॥</span>
             <span className="font-bold text-amber-950">Page 1 of 2</span>
           </div>
@@ -400,7 +400,7 @@ export const MatchReportPages: React.FC<MatchReportPagesProps> = ({
           {/* Section 5: Astrologer Certification & Seal Block */}
           <div className="mt-1 pt-2 border-t border-amber-900/30 grid grid-cols-12 gap-3 items-center text-[10px]">
             <div className="col-span-8 space-y-1">
-              <span className="font-bold text-amber-950 block">Kundali Milan Verification &amp; Certification:</span>
+              <span className="font-bold text-amber-950 block">Kundli Milan Verification &amp; Certification:</span>
               <p className="text-stone-600 text-[9px] leading-snug">
                 This marriage compatibility analysis conforms to the authentic Shastras of Maharishi Narada and Muhurta Chintamani. Astrological synergy is a guiding framework for mutual patience, emotional devotion, and dharmic unity.
               </p>
@@ -416,7 +416,7 @@ export const MatchReportPages: React.FC<MatchReportPagesProps> = ({
 
           {/* Page 2 Footer */}
           <div className="pt-2 border-t border-amber-900/30 flex items-center justify-between text-[9.5px] text-stone-500">
-            <span>Astronava • Kundali Milan &amp; Ashtakoota Marriage Dossier</span>
+            <span>Astronava • Kundli Milan &amp; Ashtakoota Marriage Dossier</span>
             <span className="font-semibold text-stone-700">Himaghna Medhi • Vedic Astrological Milan</span>
             <span className="font-bold text-amber-950">Page 2 of 2</span>
           </div>

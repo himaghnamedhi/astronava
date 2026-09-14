@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HouseNumber, PlanetId, ChartStyle } from './types/astrology';
 import { Header } from './components/Header';
 import { KundliBuilder } from './components/KundliBuilder';
@@ -10,14 +10,16 @@ import { SearchModal } from './components/SearchModal';
 import { CustomReportModal } from './components/CustomReportModal';
 import { LegalModal } from './components/LegalModal';
 import { LegalPage } from './components/LegalPage';
+import { SitemapModal } from './components/SitemapModal';
 import { LegalDocType } from './data/legalPolicies';
 import { CompleteKundliData } from './data/vedicEphemeris';
-import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
+import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal'>('generator');
+  const [activeTab, setActiveTab] = useState<AppTabType>('generator');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>('sun');
   const [chartStyle, setChartStyle] = useState<ChartStyle>('north');
@@ -38,6 +40,7 @@ export default function App() {
   // Modal states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isSitemapOpen, setIsSitemapOpen] = useState(false);
   const [legalModalOpen, setLegalModalOpen] = useState(false);
   const [selectedLegalDoc, setSelectedLegalDoc] = useState<LegalDocType>('privacy');
   const [reportType, setReportType] = useState<'kundli' | 'match' | 'gemstone'>('kundli');
@@ -48,60 +51,55 @@ export default function App() {
   // Helper to map pathname to view state
   const parsePathname = (path: string) => {
     const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+    if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html') {
+      setIsSitemapOpen(true);
+      return true;
+    }
     if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy') {
       setSelectedLegalDoc('privacy');
       setActiveTab('legal');
-      document.title = 'Privacy Policy — astronava.com';
       return true;
     }
     if (cleanPath === '/terms-and-conditions' || cleanPath === '/terms' || cleanPath === '/terms-of-service' || cleanPath === '/legal/terms') {
       setSelectedLegalDoc('terms');
       setActiveTab('legal');
-      document.title = 'Terms & Conditions — astronava.com';
       return true;
     }
     if (cleanPath === '/disclaimer' || cleanPath === '/legal/disclaimer') {
       setSelectedLegalDoc('disclaimer');
       setActiveTab('legal');
-      document.title = 'Disclaimer — astronava.com';
       return true;
     }
     if (cleanPath === '/contact' || cleanPath === '/contact-us' || cleanPath === '/legal/contact') {
       setSelectedLegalDoc('contact');
       setActiveTab('legal');
-      document.title = 'Contact Us — astronava.com';
       return true;
     }
     if (cleanPath === '/builder') {
       setActiveTab('builder');
-      document.title = 'Kundli Reader & Builder — astronava.com';
       return true;
     }
     if (cleanPath === '/gemstones') {
       setActiveTab('gemstones');
-      document.title = 'Gemstone Recommendations — astronava.com';
       return true;
     }
     if (cleanPath === '/match') {
       setActiveTab('match');
-      document.title = 'Kundali Milan (Match Finder) — astronava.com';
       return true;
     }
     if (cleanPath === '/numerology') {
       setActiveTab('numerology');
-      document.title = 'Vedic Numerology Calculator — astronava.com';
       return true;
     }
     if (cleanPath === '' || cleanPath === '/' || cleanPath === '/generator' || cleanPath === '/kundli') {
       setActiveTab('generator');
-      document.title = 'astronava.com — Vedic Kundli House Chart & Planetary Guide';
       return true;
     }
     return false;
   };
 
   // Sync route on mount and browser back/forward (popstate)
-  React.useEffect(() => {
+  useEffect(() => {
     parsePathname(window.location.pathname);
 
     const handlePopState = () => {
@@ -112,55 +110,30 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Dynamically inject descriptive meta tags and Open Graph data whenever the active tab or document changes
+  useEffect(() => {
+    injectDynamicMetaTags(activeTab, activeTab === 'legal' ? selectedLegalDoc : undefined);
+  }, [activeTab, selectedLegalDoc]);
+
   const handleOpenLegal = (doc: LegalDocType) => {
     setSelectedLegalDoc(doc);
     setActiveTab('legal');
 
-    let path = '/privacy-policy';
-    let title = 'Privacy Policy — astronava.com';
-    if (doc === 'terms') {
-      path = '/terms-and-conditions';
-      title = 'Terms & Conditions — astronava.com';
-    } else if (doc === 'disclaimer') {
-      path = '/disclaimer';
-      title = 'Disclaimer — astronava.com';
-    } else if (doc === 'contact') {
-      path = '/contact';
-      title = 'Contact Us — astronava.com';
+    const route = findRouteByTab('legal', doc);
+    if (window.location.pathname !== route.path) {
+      window.history.pushState(null, '', route.path);
     }
-
-    if (window.location.pathname !== path) {
-      window.history.pushState(null, '', path);
-    }
-    document.title = title;
+    injectDynamicMetaTags('legal', doc);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleTabChange = (tab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal') => {
+  const handleTabChange = (tab: AppTabType) => {
     setActiveTab(tab);
-    let path = '/';
-    let title = 'astronava.com — Vedic Kundli House Chart & Planetary Guide';
-    if (tab === 'builder') {
-      path = '/builder';
-      title = 'Kundli Reader & Builder — astronava.com';
-    } else if (tab === 'gemstones') {
-      path = '/gemstones';
-      title = 'Gemstone Recommendations — astronava.com';
-    } else if (tab === 'match') {
-      path = '/match';
-      title = 'Kundali Milan (Match Finder) — astronava.com';
-    } else if (tab === 'numerology') {
-      path = '/numerology';
-      title = 'Vedic Numerology Calculator — astronava.com';
-    } else if (tab === 'legal') {
-      path = selectedLegalDoc === 'terms' ? '/terms-and-conditions' : selectedLegalDoc === 'disclaimer' ? '/disclaimer' : selectedLegalDoc === 'contact' ? '/contact' : '/privacy-policy';
-      title = `${selectedLegalDoc === 'terms' ? 'Terms & Conditions' : selectedLegalDoc === 'disclaimer' ? 'Disclaimer' : selectedLegalDoc === 'contact' ? 'Contact Us' : 'Privacy Policy'} — astronava.com`;
+    const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
+    if (window.location.pathname !== route.path) {
+      window.history.pushState(null, '', route.path);
     }
-
-    if (window.location.pathname !== path) {
-      window.history.pushState(null, '', path);
-    }
-    document.title = title;
+    injectDynamicMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
   };
 
   const handleReturnHome = () => {
@@ -322,7 +295,7 @@ export default function App() {
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">1.</span>
-                    <span>Kundali Maker &amp; Janam Patrika</span>
+                    <span>Kundli Maker &amp; Janam Patrika</span>
                   </button>
                 </li>
                 <li>
@@ -334,7 +307,7 @@ export default function App() {
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">2.</span>
-                    <span>Kundli Reader &amp; Planetary Builder</span>
+                    <span>Kundli Builder &amp; Visualizer</span>
                   </button>
                 </li>
                 <li>
@@ -358,7 +331,7 @@ export default function App() {
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">4.</span>
-                    <span>Match Finder (Kundali Milan)</span>
+                    <span>Match Finder (Kundli Milan)</span>
                   </button>
                 </li>
                 <li>
@@ -418,6 +391,15 @@ export default function App() {
                     <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Disclaimer</span>
                   </a>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setIsSitemapOpen(true)}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Sitemap &amp; Index</span>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -487,6 +469,22 @@ export default function App() {
               >
                 Contact Us
               </a>
+              <span>&bull;</span>
+              <button
+                onClick={() => setIsSitemapOpen(true)}
+                className="hover:text-amber-400 transition-colors cursor-pointer font-medium"
+              >
+                Sitemap
+              </button>
+              <span>&bull;</span>
+              <a
+                href="/sitemap.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-400 transition-colors cursor-pointer font-mono text-[11px]"
+              >
+                sitemap.xml
+              </a>
             </div>
 
             <p className="text-center w-full max-w-sm sm:max-w-none">
@@ -555,6 +553,20 @@ export default function App() {
         isOpen={legalModalOpen}
         onClose={() => setLegalModalOpen(false)}
         initialDoc={selectedLegalDoc}
+      />
+
+      {/* Client-Side Sitemap & Astrological Directory Modal */}
+      <SitemapModal
+        isOpen={isSitemapOpen}
+        onClose={() => setIsSitemapOpen(false)}
+        onNavigate={(tab, doc) => {
+          if (doc) {
+            handleOpenLegal(doc);
+          } else {
+            handleTabChange(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }}
       />
 
       {/* User Authentication & Sign-Up Modal */}

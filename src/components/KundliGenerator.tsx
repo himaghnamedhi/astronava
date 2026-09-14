@@ -634,12 +634,12 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               <span>॥ श्री गणेशाय नमः ॥</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold font-vedic text-amber-100 tracking-tight">
-              {hasGenerated ? 'Janam Kundali & Natal Dossier' : 'Kundali Maker'}
+              {hasGenerated ? 'Janam Kundli & Natal Dossier' : 'Kundli Maker'}
             </h1>
             <p className="text-xs sm:text-sm text-stone-300/90 w-full mt-1 leading-relaxed">
               {hasGenerated
-                ? 'Sidereal Vedic horoscope with Lahiri Ayanamsha, 7 divisional charts (D1–D12), Vimshottari Dasha, and Ashtakavarga.'
-                : 'Calculate full Vedic Janam Kundali with Lahiri Ayanamsha, planetary positions, D1–D12 charts, and Vimshottari Dasha.'}
+                ? 'Sidereal Vedic horoscope with Lahiri Ayanamsha, divisional charts, Vimshottari Dasha, and Ashtakavarga.'
+                : 'Calculate your Vedic Janam Kundli with planetary positions, divisional charts, and Vimshottari Dasha.'}
             </p>
           </div>
 
@@ -668,10 +668,10 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                   id="btn-download-kundli-pdf"
                   onClick={() => setShowPatrikaPdfModal(true)}
                   className="px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
-                  title="Vedic Kundali PDF"
+                  title="Vedic Kundli PDF"
                 >
                   <Download className="w-3.5 h-3.5 text-amber-200" />
-                  <span>Vedic Kundali PDF</span>
+                  <span>Vedic Kundli PDF</span>
                 </button>
               </>
             )}
@@ -1131,10 +1131,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                                 </span>
                               </div>
                               <div className="text-right shrink-0">
-                                <span className="text-[10px] text-stone-400 font-mono block">
-                                  {formatCoordinates(c.lat, c.lng)}
-                                </span>
-                                <span className="text-[9px] text-stone-400 font-mono">
+                                <span className="text-[10px] text-stone-400 font-mono">
                                   UTC {c.timezone >= 0 ? `+${c.timezone}` : c.timezone}
                                 </span>
                               </div>
@@ -1161,17 +1158,14 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
             </div>
 
             {/* Submit Action Button */}
-            <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <span className="text-xs text-stone-500 text-center sm:text-left">
-                Calculated using Parashari Vedic Sidereal with Lahiri Ayanamsha
-              </span>
+            <div className="pt-3 border-t border-stone-100 flex items-center justify-end">
               <button
                 type="submit"
                 id="btn-submit-kundli-calc"
                 className="w-full sm:w-auto px-7 py-3 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Generate Janam Kundali (कुंडली गणना करें)</span>
+                <span>Generate Janam Kundli</span>
               </button>
             </div>
           </form>
@@ -1267,13 +1261,15 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-amber-100 font-vedic flex items-center gap-2">
                     Famous People Kundli Directory
-                    <span className="text-xs font-normal text-amber-300/80">
-                      (प्रसिद्ध हस्तियों की जन्म कुंडली)
-                    </span>
                   </h3>
-                  <p className="text-xs text-stone-400">
-                    Historically verified Vedic birth charts (Rodden Rating AA/A) with classical Yogas &amp; planetary alignments
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-semibold border border-amber-500/30">
+                      Verified Charts
+                    </span>
+                    <p className="text-xs text-stone-400">
+                      Historically verified Vedic birth charts with classical Yogas &amp; planetary alignments
+                    </p>
+                  </div>
                 </div>
               </div>
               <button
@@ -1361,17 +1357,21 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                     return (
                       <div
                         key={prof.id}
-                        className={`rounded-xl border p-4 transition-all flex flex-col justify-between gap-3 ${
+                        onClick={() => {
+                          handleApplySampleProfile(prof);
+                          setIsFamousModalOpen(false);
+                        }}
+                        className={`rounded-xl border p-4 transition-all flex flex-col justify-between gap-3 cursor-pointer group hover:scale-[1.01] ${
                           isCurrentlyActive
                             ? 'bg-amber-50/70 border-amber-300 ring-2 ring-amber-400/40 shadow-xs'
-                            : 'bg-white border-stone-200 hover:border-amber-300 hover:shadow-xs'
+                            : 'bg-white border-stone-200 hover:border-amber-400 hover:shadow-xs'
                         }`}
                       >
                         <div className="space-y-2">
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <div className="flex items-center gap-2">
-                                <h4 className="font-bold text-stone-900 text-sm sm:text-base font-vedic">
+                                <h4 className="font-bold text-stone-900 text-sm sm:text-base font-vedic group-hover:text-amber-900 transition-colors">
                                   {prof.label}
                                 </h4>
                                 {isCurrentlyActive && (
@@ -1382,9 +1382,11 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                               </div>
                               <p className="text-xs text-amber-800 font-medium">{prof.role}</p>
                             </div>
-                            <span className="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-semibold uppercase tracking-wider shrink-0">
-                              {prof.category}
-                            </span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-semibold uppercase tracking-wider">
+                                {prof.category}
+                              </span>
+                            </div>
                           </div>
 
                           {/* Birth Details row */}
@@ -1411,23 +1413,14 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                           </div>
                         </div>
 
-                        {/* Action Button */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            handleApplySampleProfile(prof);
-                            setIsFamousModalOpen(false);
-                          }}
-                          className={`w-full py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs ${
-                            isCurrentlyActive
-                              ? 'bg-amber-800 hover:bg-amber-900 text-amber-100'
-                              : 'bg-amber-900 hover:bg-amber-800 text-amber-50'
-                          }`}
-                        >
-                          <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                          <span>{isCurrentlyActive ? 'Recalculate This Kundli' : 'Generate & Analyze This Kundli'}</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
+                        {/* Clean Footer Link */}
+                        <div className="flex items-center justify-between text-xs text-amber-900 font-semibold pt-2 border-t border-stone-100 group-hover:text-amber-700">
+                          <span className="flex items-center gap-1.5">
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            {isCurrentlyActive ? 'Active Chart' : 'Load This Kundli'}
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     );
                   })}
@@ -1445,117 +1438,6 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               >
                 Close
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ------------------------------------------------------------- */}
-      {/* EDUCATIONAL PREVIEW (When no chart is generated yet) */}
-      {/* ------------------------------------------------------------- */}
-      {!hasGenerated && (
-        <div className="bg-stone-50 rounded-2xl border border-stone-200/80 p-5 sm:p-7 space-y-6">
-          <div className="text-center max-w-2xl mx-auto space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-800 font-vedic">
-              Comprehensive Jyotish System
-            </span>
-            <h3 className="text-xl font-extrabold text-stone-900 font-vedic">
-              What Your Calculated Janam Kundali Includes
-            </h3>
-            <p className="text-xs sm:text-sm text-stone-600">
-              Please enter birth details above or select a verified profile to generate complete astrological charts and interpretations.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-amber-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-amber-200/80 bg-amber-50">
-                <img
-                  src="/icons/divisional_charts.svg"
-                  alt="7 Divisional Charts"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">7 Divisional Charts (Shodashvarga)</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Rashi (D1), Navamsha (D9), Dasamsha (D10 Career), Drekkana (D3 Siblings), Saptamsha (D7 Children), Chaturthamsha (D4 Property), and Dwadasamsha (D12 Lineage) rendered in North &amp; South Indian styles.
-              </p>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-indigo-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-indigo-200/80 bg-indigo-50">
-                <img
-                  src="/icons/vimshottari_dasha.svg"
-                  alt="Vimshottari Dasha System"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">Vimshottari Dasha System</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                120-year planetary periods computed from the exact Moon nakshatra degree. Includes current active Mahadasha, Antardasha, Pratyantardasha, and balance at birth.
-              </p>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-emerald-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-emerald-200/80 bg-emerald-50">
-                <img
-                  src="/icons/ashtakavarga.svg"
-                  alt="Sarvashtakavarga 337 Bindus"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">Sarvashtakavarga 337 Bindus</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Exact benefic bindu matrix across all 12 rashis from all 7 planets plus Lagna, highlighting strongest houses for wealth, career, and auspicious ventures.
-              </p>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-amber-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-amber-200/80 bg-amber-50">
-                <img
-                  src="/icons/yogas_doshas.svg"
-                  alt="Parashari Yogas &amp; Doshas"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">Parashari Yogas &amp; Doshas</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Identifies Raja Yogas, Gajakesari Yoga, Budhaditya, Pancha Mahapurusha Yogas, plus thorough Manglik Dosha diagnostics with classical cancellation principles.
-              </p>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-purple-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-purple-200/80 bg-purple-50">
-                <img
-                  src="/icons/gemstones_remedies.svg"
-                  alt="Gemstone &amp; Upaya Remedies"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">Gemstone &amp; Upaya Remedies</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Weight-calibrated Vedic gemstone recommendations based on Lagna Lord, 5th, and 9th Trikona lords, auspicious wearing days, metals, mantras, and Rudraksha guidance.
-              </p>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2.5 hover:border-rose-300 transition-colors">
-              <div className="w-11 h-11 rounded-xl shadow-xs overflow-hidden shrink-0 border border-rose-200/80 bg-rose-50">
-                <img
-                  src="/icons/patrika_pdf.svg"
-                  alt="Printable Janam Patrika PDF"
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h4 className="text-sm font-bold text-stone-900">Printable Janam Patrika PDF</h4>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Direct export to high-resolution multi-page A4 format containing colorful decorative traditional borders, both D1 &amp; D9 charts, and complete planetary matrices.
-              </p>
             </div>
           </div>
         </div>
@@ -2216,7 +2098,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                 ) : (
                   <>
                     <Download className="w-4 h-4 text-amber-200" />
-                    <span>Download Vedic Kundali PDF</span>
+                    <span>Download Vedic Kundli PDF</span>
                   </>
                 )}
               </button>
@@ -2232,7 +2114,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
         <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
           <div ref={printablePdfRef} id="printable-pdf-document" className="w-[794px] bg-white text-stone-900 font-sans">
             
-            {/* PAGE 1: AUTHENTIC VEDIC KUNDALI */}
+            {/* PAGE 1: AUTHENTIC VEDIC KUNDLI */}
             <TraditionalPatrikaPage
               kundliData={kundliData}
               brandName="Astronava"

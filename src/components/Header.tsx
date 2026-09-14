@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, Search, Share2, Gem, Heart, Hash, Check, User, LogOut, Sparkles, ChevronDown } from 'lucide-react';
+import { Gem, Heart, Hash, User, LogOut, Sparkles, ChevronDown } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
 
@@ -14,19 +14,9 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
-  chartStyle,
-  setChartStyle,
-  onOpenSearch,
 }) => {
-  const [copied, setCopied] = React.useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, openAuthModal, signOut } = useAuth();
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
@@ -50,7 +40,6 @@ export const Header: React.FC<HeaderProps> = ({
                   ASTR<span className="relative inline-flex items-center justify-center">O<span className="absolute inset-0 flex items-center justify-center text-[9px] sm:text-[11px] text-amber-500 select-none pointer-events-none">✦</span></span>NAVA
                 </span>
               </div>
-              <p className="text-[11px] text-stone-500 font-medium tracking-wide hidden sm:block">Vedic Astrology &amp; Horoscopes</p>
             </div>
           </div>
 
@@ -67,11 +56,11 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <img
                 src="/icons/app_logo.svg"
-                alt="Kundali Maker"
+                alt="Kundli Maker"
                 className="w-3.5 h-3.5 rounded-xs shrink-0 object-cover"
                 referrerPolicy="no-referrer"
               />
-              <span>Kundali Maker</span>
+              <span>Kundli Maker</span>
             </button>
 
             <button
@@ -112,43 +101,10 @@ export const Header: React.FC<HeaderProps> = ({
               <Hash className="w-3.5 h-3.5 text-amber-700 shrink-0" />
               <span>Numerology</span>
             </button>
-
-            <button
-              id="nav-tab-builder"
-              onClick={() => setActiveTab('builder')}
-              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'builder'
-                  ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
-                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5 shrink-0" />
-              <span>Kundli Reader</span>
-            </button>
           </nav>
 
           {/* Quick Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button
-              id="btn-search-topics"
-              onClick={onOpenSearch}
-              title="Search life query or symptom"
-              aria-label="Search topics"
-              className="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-colors flex items-center justify-center active:scale-95 shrink-0 cursor-pointer"
-            >
-              <Search className="w-4 h-4 text-amber-800" />
-            </button>
-
-            <button
-              id="btn-share-link"
-              onClick={handleShare}
-              title={copied ? 'Copied link!' : 'Share Astronava'}
-              aria-label={copied ? 'Copied link to clipboard' : 'Share Astronava'}
-              className="w-9 h-9 rounded-xl bg-amber-100/70 hover:bg-amber-200 text-amber-900 border border-amber-300/80 transition-colors flex items-center justify-center active:scale-95 shrink-0 cursor-pointer"
-            >
-              {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Share2 className="w-4 h-4 text-amber-800" />}
-            </button>
-
             {/* User Account / Membership Control */}
             {user ? (
               <div className="relative">
@@ -222,11 +178,10 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Mobile Navigation Row */}
         <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-stone-200/80 no-scrollbar -mx-4 px-4">
           {[
-            { id: 'generator', label: 'Kundali Maker', icon: Compass },
-            { id: 'numerology', label: 'Numerology', icon: Hash },
+            { id: 'generator', label: 'Kundli Maker', icon: Sparkles },
             { id: 'gemstones', label: 'Gemstones', icon: Gem },
             { id: 'match', label: 'Match Finder', icon: Heart },
-            { id: 'builder', label: 'Kundli Reader', icon: Compass },
+            { id: 'numerology', label: 'Numerology', icon: Hash },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;

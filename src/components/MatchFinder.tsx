@@ -347,7 +347,7 @@ export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpe
   }, [p2CitySearch]);
 
   const handleCopySummary = () => {
-    const text = `Kundali Match Report:
+    const text = `Kundli Match Report:
 ${matchReport.partner1.name} & ${matchReport.partner2.name}
 Total Score: ${matchReport.totalObtainedGunas} / 36 Gunas (${matchReport.percentageScore}%)
 Verdict: ${matchReport.verdict}
@@ -368,7 +368,7 @@ Calculated via Astronava Match Finder`;
         <div className="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="space-y-3 max-w-3xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-amber-100 font-vedic tracking-tight leading-tight flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-              <span>Kundali Match Finder</span>
+              <span>Kundli Match Finder</span>
               <span className="text-amber-300/80 text-xl sm:text-2xl lg:text-3xl font-medium tracking-normal whitespace-nowrap">
                 (कुंडली मिलान)
               </span>
@@ -636,9 +636,7 @@ Calculated via Astronava Match Finder`;
                   className="w-full p-2.5 rounded-xl border border-stone-300 bg-stone-50 text-left flex items-center justify-between text-sm shadow-2xs hover:bg-white transition-colors cursor-pointer"
                 >
                   <span className="font-bold text-stone-900 truncate pr-2">{p1Details.city}</span>
-                  <span className="text-[10px] bg-amber-100/70 text-amber-900 font-semibold px-2 py-0.5 rounded shrink-0">
-                    {p1Details.latitude.toFixed(1)}°N
-                  </span>
+                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                 </button>
 
                 {p1CityDropdown && (
@@ -917,9 +915,7 @@ Calculated via Astronava Match Finder`;
                   className="w-full p-2.5 rounded-xl border border-stone-300 bg-stone-50 text-left flex items-center justify-between text-sm shadow-2xs hover:bg-white transition-colors cursor-pointer"
                 >
                   <span className="font-bold text-stone-900 truncate pr-2">{p2Details.city}</span>
-                  <span className="text-[10px] bg-amber-100/70 text-amber-900 font-semibold px-2 py-0.5 rounded shrink-0">
-                    {p2Details.latitude.toFixed(1)}°N
-                  </span>
+                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                 </button>
 
                 {p2CityDropdown && (
@@ -1000,8 +996,8 @@ Calculated via Astronava Match Finder`;
           onClick={handleCalculateMatch}
           className="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 font-extrabold text-base tracking-wide font-vedic shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center gap-3 cursor-pointer border border-amber-600/30"
         >
-          <Heart className="w-5 h-5 text-rose-400 fill-rose-400 animate-pulse" />
-          <span>{hasCalculated ? 'Recalculate Kundali Match (पुनर्गणना करें)' : 'Calculate Kundali Match (कुंडली मिलान करें)'}</span>
+          <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
+          <span>{hasCalculated ? 'Recalculate Kundli Match' : 'Calculate Kundli Match'}</span>
           <Sparkles className="w-4 h-4 text-amber-300" />
         </button>
 
@@ -1642,10 +1638,10 @@ Calculated via Astronava Match Finder`;
                 <span>Foundational Ashtakoota Milan</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-amber-950 font-vedic">
-                Basic Kundali Milan &amp; Ashtakoota Guide (कुंडली एवं अष्टकूट मिलान परिचय)
+                Basic Kundli Milan &amp; Ashtakoota Guide (कुंडली एवं अष्टकूट मिलान परिचय)
               </h2>
               <p className="text-xs sm:text-sm text-stone-600 max-w-3xl leading-relaxed">
-                In classical Vedic Jyotish (Sage Parashara &amp; Varahamihira), marriage compatibility evaluates subtle energetic vibrations, karmic ties, emotional chemistry, and physiological harmony across <strong>8 sacred dimensions (Ashtakoota)</strong> totaling <strong>36 Gunas</strong>. Enter both partners' birth details above or select a curated sample match, then click <strong>"Calculate Kundali Match"</strong> to generate your complete compatibility dossier.
+                In classical Vedic Jyotish (Sage Parashara &amp; Varahamihira), marriage compatibility evaluates subtle energetic vibrations, karmic ties, emotional chemistry, and physiological harmony across <strong>8 sacred dimensions (Ashtakoota)</strong> totaling <strong>36 Gunas</strong>. Enter both partners' birth details above or select a curated sample match, then click <strong>"Calculate Kundli Match"</strong> to generate your complete compatibility dossier.
               </p>
             </div>
           </div>
@@ -1881,7 +1877,7 @@ Calculated via Astronava Match Finder`;
             <div className="flex items-center justify-between pb-4 border-b border-stone-200">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-amber-700" />
-                <h3 className="text-lg font-bold font-vedic text-amber-950">Vedic Kundali Match Certificate</h3>
+                <h3 className="text-lg font-bold font-vedic text-amber-950">Vedic Kundli Match Certificate</h3>
               </div>
               <button
                 type="button"
@@ -1895,7 +1891,7 @@ Calculated via Astronava Match Finder`;
             {/* Printable Content Area */}
             <div id="printable-match-report" className="space-y-6 text-xs text-stone-800">
               <div className="text-center space-y-1 pb-4 border-b border-stone-200">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-800">Astronava • Vedic Kundali Milan</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-800">Astronava • Vedic Kundli Milan</span>
                 <h2 className="text-xl font-extrabold text-stone-900 font-vedic">
                   {matchReport.partner1.name} &amp; {matchReport.partner2.name}
                 </h2>

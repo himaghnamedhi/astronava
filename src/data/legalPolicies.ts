@@ -19,7 +19,7 @@ By accessing or using Astronava, you acknowledge that you have read, understood,
 
 # 1. Informational and Educational Purposes Only
 
-Astronava provides Vedic astrology tools, birth chart analysis, Kundali Milan (Match Finder), gemstone recommendations, articles, and other astrology-related content for **informational and educational purposes only**.
+Astronava provides Vedic astrology tools, birth chart analysis, Kundli Milan (Match Finder), gemstone recommendations, articles, and other astrology-related content for **informational and educational purposes only**.
 
 The content available on this website is intended to help users understand traditional Vedic astrology principles and should not be interpreted as factual certainty or guaranteed outcomes.
 
@@ -151,7 +151,7 @@ These Terms & Conditions ("Terms") govern your access to and use of the Astronav
 
 # 1. About Astronava
 
-Astronava is an online platform that provides Vedic astrology tools, educational resources, birth chart analysis, Kundali Milan (Match Finder), gemstone recommendations, and other astrology-related content based on traditional Vedic astrology principles.
+Astronava is an online platform that provides Vedic astrology tools, educational resources, birth chart analysis, Kundli Milan (Match Finder), gemstone recommendations, and other astrology-related content based on traditional Vedic astrology principles.
 
 The information and services provided on this website are intended for informational and educational purposes only.
 
@@ -345,7 +345,7 @@ The content and services provided by Astronava are **not intended to diagnose, t
 
 Most features of Astronava can be accessed without creating an account.
 
-For our **Match Finder (Kundali Milan)** feature, we collect the following information for **both Partner 1 and Partner 2**:
+For our **Match Finder (Kundli Milan)** feature, we collect the following information for **both Partner 1 and Partner 2**:
 
 * Name
 * Gender
@@ -375,7 +375,7 @@ If paid services are introduced in the future, this Privacy Policy will be updat
 
 We collect personal information only to:
 
-* Generate Kundali Milan (Match Finder) compatibility reports
+* Generate Kundli Milan (Match Finder) compatibility reports
 * Perform Vedic astrology calculations requested by users
 * Improve the reliability and performance of our services
 * Detect abuse, spam, or misuse of the platform
