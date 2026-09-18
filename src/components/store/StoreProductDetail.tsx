@@ -515,7 +515,7 @@ export const StoreProductDetail: React.FC = () => {
                 </div>
                 <div className="p-2.5 rounded-lg bg-stone-50 border border-stone-200">
                   <span className="text-stone-400 block text-[10px]">Category</span>
-                  <span className="font-bold text-stone-800 capitalize">{product.categoryName || 'Astrological Remedial'}</span>
+                  <span className="font-bold text-stone-800 capitalize">{product.categoryName || 'Store Catalog'}</span>
                 </div>
               </div>
             </div>

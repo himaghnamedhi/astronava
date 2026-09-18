@@ -205,8 +205,8 @@ adminRouter.get('/products', requireAdmin, async (req: AuthRequest, res: Respons
 adminRouter.post('/products', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const { product, images, variations } = req.body;
-    if (!product || !product.name || !product.categoryId || !product.price || !product.sku) {
-      return res.status(400).json({ error: 'Missing required product fields' });
+    if (!product || !product.name?.trim() || product.price === undefined || product.price === '') {
+      return res.status(400).json({ error: 'Product name and price are mandatory.' });
     }
 
     const created = await createProduct(product, images || [], variations || []);

@@ -107,7 +107,7 @@ export const StoreProductMedia: React.FC<StoreProductMediaProps> = ({
       ) : (
         <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-stone-950 text-amber-300 space-y-2">
           <Gem className="w-10 h-10 opacity-70 animate-pulse" />
-          <span className="text-[11px] font-semibold text-stone-400">Vedic Remedial Artifact</span>
+          <span className="text-[11px] font-semibold text-stone-400">Vedic Store Collection</span>
         </div>
       )}
 

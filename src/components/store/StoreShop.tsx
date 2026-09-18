@@ -137,7 +137,7 @@ export const StoreShop: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-amber-900 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Remedial Store Catalog</span>
+            <span>Store Catalog</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-vedic">
             {shopFilters.categorySlug

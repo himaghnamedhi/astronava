@@ -80,7 +80,7 @@ export const StoreHome: React.FC = () => {
         <div className="relative max-w-4xl mx-auto px-5 py-6 sm:py-8 text-center space-y-3.5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
             <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>100% Certified Vedic Remedial Authentic Collection</span>
+            <span>100% Certified Vedic Authentic Store Collection</span>
           </div>
 
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-amber-50 font-vedic tracking-tight leading-snug">
@@ -279,7 +279,7 @@ export const StoreHome: React.FC = () => {
               Hand-Selected Treasures
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-vedic">
-              Featured Remedial Products
+              Featured Store Products
             </h2>
           </div>
           <button

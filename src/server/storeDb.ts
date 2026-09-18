@@ -516,38 +516,120 @@ export async function createProduct(
   imagesData: any[] = [],
   variationsData: any[] = []
 ) {
-  // Generate unique slug if not provided
-  let slug = productData.slug;
-  if (!slug) {
-    slug = productData.name
+  // 1. Validate & Ensure Category exists
+  let targetCategoryId = Number(productData.categoryId) || 1;
+  const foundCat = await db
+    .select({ id: categories.id })
+    .from(categories)
+    .where(eq(categories.id, targetCategoryId))
+    .limit(1);
+
+  if (foundCat.length === 0) {
+    // Fallback to first available category
+    const defaultCat = await db.select({ id: categories.id }).from(categories).limit(1);
+    targetCategoryId = defaultCat[0]?.id || 1;
+  }
+
+  // 2. Generate and ensure unique slug
+  let rawSlug = productData.slug;
+  if (!rawSlug || !rawSlug.trim()) {
+    rawSlug = (productData.name || 'product')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+      .replace(/(^-|-$)/g, '');
+  } else {
+    rawSlug = rawSlug
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/(^-|-$)/g, '');
   }
+
+  let finalSlug = rawSlug || `product-${Date.now().toString(36)}`;
+  let slugExists = true;
+  let counter = 1;
+  while (slugExists) {
+    const existing = await db
+      .select({ id: products.id })
+      .from(products)
+      .where(eq(products.slug, finalSlug))
+      .limit(1);
+    if (existing.length === 0) {
+      slugExists = false;
+    } else {
+      counter++;
+      finalSlug = `${rawSlug}-${counter}`;
+    }
+  }
+
+  // 3. Ensure unique SKU
+  let rawSku = (productData.sku || '').trim();
+  if (!rawSku) {
+    rawSku = `ASTRO-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+  const existingSku = await db
+    .select({ id: products.id, name: products.name })
+    .from(products)
+    .where(eq(products.sku, rawSku))
+    .limit(1);
+  if (existingSku.length > 0) {
+    rawSku = `${rawSku}-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+  }
+
+  // 4. Clean strings & fallback descriptions
+  const cleanName = (productData.name || 'Untitled Product').trim();
+  const shortDesc = (productData.shortDescription || '').trim() || `${cleanName} - Authentic Vedic Astrological Item`;
+  const fullDesc = (productData.fullDescription || '').trim() || shortDesc || `${cleanName} - Certified Authentic Vedic Astrological Item`;
+
+  const cleanProduct = {
+    name: cleanName,
+    slug: finalSlug,
+    categoryId: targetCategoryId,
+    brand: (productData.brand || 'Astronava Vedic Authentics').trim(),
+    shortDescription: shortDesc,
+    fullDescription: fullDesc,
+    price: String(productData.price || '999'),
+    salePrice: productData.salePrice ? String(productData.salePrice).trim() : null,
+    sku: rawSku,
+    stock: Number(productData.stock) || 0,
+    weight: productData.weight ? String(productData.weight).trim() : null,
+    tags: productData.tags ? String(productData.tags).trim() : null,
+    planet: productData.planet ? String(productData.planet).trim() : null,
+    zodiac: productData.zodiac ? String(productData.zodiac).trim() : null,
+    certification: productData.certification ? String(productData.certification).trim() : 'Lab Certified',
+    benefits: productData.benefits ? String(productData.benefits).trim() : null,
+    specifications: productData.specifications ? String(productData.specifications).trim() : null,
+    careInstructions: productData.careInstructions ? String(productData.careInstructions).trim() : null,
+    isFeatured: Boolean(productData.isFeatured),
+    isBestSeller: Boolean(productData.isBestSeller),
+    isNewArrival: Boolean(productData.isNewArrival),
+    isPublished: productData.isPublished !== undefined ? Boolean(productData.isPublished) : true,
+    updatedAt: new Date(),
+  };
 
   const [inserted] = await db
     .insert(products)
-    .values({
-      ...productData,
-      slug,
-      updatedAt: new Date(),
-    })
+    .values(cleanProduct)
     .returning();
 
-  // Variations
+  // 5. Handle Variations
   if (variationsData && variationsData.length > 0) {
-    for (const v of variationsData) {
+    for (let i = 0; i < variationsData.length; i++) {
+      const v = variationsData[i];
+      const varVal = (v.variationValue || `Option ${i + 1}`).trim();
+      const varSku = (v.sku || `${inserted.sku}-${varVal.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`).trim();
+
       const [insertedVar] = await db
         .insert(productVariations)
         .values({
           productId: inserted.id,
-          variationType: v.variationType || 'Option',
-          variationValue: v.variationValue,
-          sku: v.sku || `${inserted.sku}-${v.variationValue.toLowerCase().replace(/\s+/g, '-')}`,
-          price: v.price || inserted.price,
-          salePrice: v.salePrice || null,
-          stock: v.stock || 0,
-          imageUrl: v.imageUrl || null,
+          variationType: (v.variationType || 'Option').trim(),
+          variationValue: varVal,
+          sku: varSku,
+          price: v.price ? String(v.price).trim() : inserted.price,
+          salePrice: v.salePrice ? String(v.salePrice).trim() : null,
+          stock: Number(v.stock) || 0,
+          imageUrl: v.imageUrl ? String(v.imageUrl).trim() : null,
         })
         .returning();
 
@@ -560,7 +642,7 @@ export async function createProduct(
       });
     }
   } else {
-    // Inventory
+    // Single inventory item for product
     await db.insert(inventory).values({
       productId: inserted.id,
       sku: inserted.sku,
@@ -569,18 +651,28 @@ export async function createProduct(
     });
   }
 
-  // Images
-  if (imagesData && imagesData.length > 0) {
-    for (let i = 0; i < imagesData.length; i++) {
-      const img = imagesData[i];
+  // 6. Handle Images
+  const validImages = (imagesData || []).filter((img) => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+  if (validImages.length > 0) {
+    for (let i = 0; i < validImages.length; i++) {
+      const img = validImages[i];
       await db.insert(productImages).values({
         productId: inserted.id,
-        url: img.url,
-        altText: img.altText || inserted.name,
-        isPrimary: i === 0 || img.isPrimary,
+        url: img.url.trim(),
+        altText: (img.altText || inserted.name).trim(),
+        isPrimary: i === 0 || Boolean(img.isPrimary),
         displayOrder: i + 1,
       });
     }
+  } else {
+    // Provide a quality default placeholder image
+    await db.insert(productImages).values({
+      productId: inserted.id,
+      url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80',
+      altText: inserted.name,
+      isPrimary: true,
+      displayOrder: 1,
+    });
   }
 
   return getProductBySlug(inserted.slug);
@@ -592,12 +684,40 @@ export async function updateProduct(
   imagesData?: any[],
   variationsData?: any[]
 ) {
+  // Validate Category if updated
+  let targetCategoryId = productData.categoryId ? Number(productData.categoryId) : undefined;
+  if (targetCategoryId) {
+    const foundCat = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.id, targetCategoryId))
+      .limit(1);
+    if (foundCat.length === 0) {
+      targetCategoryId = undefined;
+    }
+  }
+
+  const updateFields: any = {
+    ...productData,
+    updatedAt: new Date(),
+  };
+
+  if (targetCategoryId) {
+    updateFields.categoryId = targetCategoryId;
+  }
+  if (productData.price) {
+    updateFields.price = String(productData.price).trim();
+  }
+  if (productData.salePrice !== undefined) {
+    updateFields.salePrice = productData.salePrice ? String(productData.salePrice).trim() : null;
+  }
+  if (productData.stock !== undefined) {
+    updateFields.stock = Number(productData.stock) || 0;
+  }
+
   const [updated] = await db
     .update(products)
-    .set({
-      ...productData,
-      updatedAt: new Date(),
-    })
+    .set(updateFields)
     .where(eq(products.id, id))
     .returning();
 
@@ -605,29 +725,43 @@ export async function updateProduct(
 
   // Update variations if passed
   if (variationsData !== undefined) {
-    // replace or sync variations
     await db.delete(productVariations).where(eq(productVariations.productId, id));
-    for (const v of variationsData) {
-      const [insertedVar] = await db
-        .insert(productVariations)
-        .values({
-          productId: id,
-          variationType: v.variationType,
-          variationValue: v.variationValue,
-          sku: v.sku,
-          price: v.price,
-          salePrice: v.salePrice,
-          stock: v.stock,
-          imageUrl: v.imageUrl,
-        })
-        .returning();
+    await db.delete(inventory).where(eq(inventory.productId, id));
 
+    if (variationsData.length > 0) {
+      for (let i = 0; i < variationsData.length; i++) {
+        const v = variationsData[i];
+        const varVal = (v.variationValue || `Option ${i + 1}`).trim();
+        const varSku = (v.sku || `${updated.sku}-${varVal.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`).trim();
+
+        const [insertedVar] = await db
+          .insert(productVariations)
+          .values({
+            productId: id,
+            variationType: (v.variationType || 'Option').trim(),
+            variationValue: varVal,
+            sku: varSku,
+            price: v.price ? String(v.price).trim() : updated.price,
+            salePrice: v.salePrice ? String(v.salePrice).trim() : null,
+            stock: Number(v.stock) || 0,
+            imageUrl: v.imageUrl ? String(v.imageUrl).trim() : null,
+          })
+          .returning();
+
+        await db.insert(inventory).values({
+          productId: id,
+          variationId: insertedVar.id,
+          sku: insertedVar.sku,
+          stockQuantity: insertedVar.stock,
+          lowStockThreshold: 3,
+        });
+      }
+    } else {
       await db.insert(inventory).values({
         productId: id,
-        variationId: insertedVar.id,
-        sku: insertedVar.sku,
-        stockQuantity: insertedVar.stock,
-        lowStockThreshold: 3,
+        sku: updated.sku,
+        stockQuantity: updated.stock,
+        lowStockThreshold: 5,
       });
     }
   }
@@ -635,15 +769,18 @@ export async function updateProduct(
   // Update images if passed
   if (imagesData !== undefined) {
     await db.delete(productImages).where(eq(productImages.productId, id));
-    for (let i = 0; i < imagesData.length; i++) {
-      const img = imagesData[i];
-      await db.insert(productImages).values({
-        productId: id,
-        url: img.url,
-        altText: img.altText,
-        isPrimary: i === 0 || img.isPrimary,
-        displayOrder: i + 1,
-      });
+    const validImages = imagesData.filter((img) => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+    if (validImages.length > 0) {
+      for (let i = 0; i < validImages.length; i++) {
+        const img = validImages[i];
+        await db.insert(productImages).values({
+          productId: id,
+          url: img.url.trim(),
+          altText: (img.altText || updated.name).trim(),
+          isPrimary: i === 0 || Boolean(img.isPrimary),
+          displayOrder: i + 1,
+        });
+      }
     }
   }
 
