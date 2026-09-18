@@ -4,7 +4,7 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal';
+export type AppTabType = 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal' | 'store';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
 
 export interface AppViewRoute {
@@ -148,6 +148,30 @@ export const APP_ROUTES: AppViewRoute[] = [
     changefreq: 'weekly',
     category: 'Astrological Tools',
     lastmod: '2026-09-14',
+  },
+  {
+    id: 'sacred-store',
+    tab: 'store',
+    path: '/store',
+    aliases: ['/shop', '/products'],
+    title: 'Certified Vedic Gemstones, Nepali Rudraksha & Crystals | Sacred Store | astronava.com',
+    shortTitle: 'Sacred Store (Gemstones & Rudraksha)',
+    description: 'Shop energized, lab-certified Vedic gemstones (Pukhraj, Neelam, Manik), authentic Himalayan Rudraksha beads, and sacred energizing crystals with complimentary Vedic Prana Pratishtha rituals.',
+    keywords: [
+      'vedic store',
+      'certified gemstones',
+      'buy pukhraj',
+      'blue sapphire',
+      'nepali rudraksha',
+      'crystals for planetary remedies',
+      'energized talismans',
+      'prana pratishtha'
+    ],
+    ogType: 'website',
+    priority: 0.9,
+    changefreq: 'daily',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-18',
   },
   {
     id: 'privacy-policy',
@@ -382,6 +406,8 @@ export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): strin
       return 'Kundli Milan | astronava.com';
     case 'numerology':
       return 'Numerology Calculator | astronava.com';
+    case 'store':
+      return 'Sacred Store | astronava.com';
     case 'legal':
       switch (legalDoc) {
         case 'terms':

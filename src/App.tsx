@@ -16,6 +16,8 @@ import { CompleteKundliData } from './data/vedicEphemeris';
 import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
+import { StoreProvider } from './context/StoreContext';
+import { StoreModule } from './components/store/StoreModule';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 /**
@@ -29,6 +31,7 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
   gemstones: 'Gemstone Recommender | astronava.com',
   match: 'Kundli Milan | astronava.com',
   numerology: 'Numerology Calculator | astronava.com',
+  store: 'Store | astronava.com',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
@@ -54,6 +57,7 @@ export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) =>
   gemstones: 'Vedic Ratna Calculator & Remedies',
   match: '36 Guna Horoscope Matching & Compatibility',
   numerology: 'Mulank, Bhagyank & Destiny Number Analysis',
+  store: 'Certified Gemstones, Nepali Rudraksha & Crystals',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
@@ -202,6 +206,10 @@ export default function App() {
       setActiveTab('numerology');
       return true;
     }
+    if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/admin' || cleanPath === '/store/admin') {
+      setActiveTab('store');
+      return true;
+    }
     if (cleanPath === '' || cleanPath === '/' || cleanPath === '/generator' || cleanPath === '/kundli') {
       setActiveTab('generator');
       return true;
@@ -294,7 +302,8 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950">
+      <StoreProvider>
+        <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950">
       
       {/* Top Header */}
       <Header
@@ -373,6 +382,8 @@ export default function App() {
             onBack={handleReturnHome}
           />
         )}
+
+        {activeTab === 'store' && <StoreModule />}
 
       </main>
 
@@ -460,6 +471,18 @@ export default function App() {
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">5.</span>
                     <span>Numerology Calculator</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      handleTabChange('store');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">6.</span>
+                    <span>Store</span>
                   </button>
                 </li>
               </ul>
@@ -586,6 +609,18 @@ export default function App() {
                 Contact Us
               </a>
               <span>&bull;</span>
+              <a
+                href="/store"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTabChange('store');
+                  scrollToTop();
+                }}
+                className="hover:text-amber-400 transition-colors cursor-pointer"
+              >
+                Store
+              </a>
+              <span>&bull;</span>
               <button
                 onClick={() => setIsSitemapOpen(true)}
                 className="hover:text-amber-400 transition-colors cursor-pointer font-medium"
@@ -680,7 +715,8 @@ export default function App() {
       {/* User Authentication & Sign-Up Modal */}
       <AuthModal />
 
-    </div>
+        </div>
+      </StoreProvider>
     </AuthProvider>
   );
 }

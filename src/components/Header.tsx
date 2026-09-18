@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Gem, Heart, Hash, User, LogOut, Sparkles, ChevronDown } from 'lucide-react';
+import { Gem, Heart, Hash, User, LogOut, Sparkles, ChevronDown, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
+import { useStore } from '../context/StoreContext.tsx';
+import { AppTabType } from '../utils/sitemap';
 
 interface HeaderProps {
-  activeTab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal';
-  setActiveTab: (tab: 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal') => void;
+  activeTab: AppTabType;
+  setActiveTab: (tab: AppTabType) => void;
   chartStyle: ChartStyle;
   setChartStyle: (style: ChartStyle) => void;
   onOpenSearch: () => void;
@@ -17,6 +19,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, openAuthModal, signOut } = useAuth();
+  const { navigateToAdmin } = useStore();
+
+  const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
+  const isAdminUser = Boolean(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase().trim()));
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
@@ -101,6 +107,19 @@ export const Header: React.FC<HeaderProps> = ({
               <Hash className="w-3.5 h-3.5 text-amber-700 shrink-0" />
               <span>Numerology</span>
             </button>
+
+            <button
+              id="nav-tab-store"
+              onClick={() => setActiveTab('store')}
+              className={`px-2.5 lg:px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'store'
+                  ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
+                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
+              }`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Store</span>
+            </button>
           </nav>
 
           {/* Quick Actions */}
@@ -142,6 +161,23 @@ export const Header: React.FC<HeaderProps> = ({
                       )}
                     </div>
 
+                    {isAdminUser && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('store');
+                          navigateToAdmin();
+                          setUserDropdownOpen(false);
+                        }}
+                        className="w-full px-2.5 py-2 text-left text-xs font-bold text-amber-950 bg-amber-500/15 hover:bg-amber-500/25 rounded-xl transition-colors flex items-center gap-2 cursor-pointer border border-amber-500/30"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate">Store Management</span>
+                          <span className="text-[10px] font-medium text-amber-800">Inventory &amp; Orders</span>
+                        </div>
+                      </button>
+                    )}
+
                     <button
                       onClick={() => {
                         setActiveTab('generator');
@@ -182,6 +218,7 @@ export const Header: React.FC<HeaderProps> = ({
             { id: 'gemstones', label: 'Gemstones', icon: Gem },
             { id: 'match', label: 'Match Finder', icon: Heart },
             { id: 'numerology', label: 'Numerology', icon: Hash },
+            { id: 'store', label: 'Store', icon: ShoppingBag },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;

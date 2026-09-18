@@ -4,6 +4,8 @@ import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { generateKundliAiSummary } from './src/server/geminiAstrology';
 import { generateClientSitemapXml } from './src/utils/sitemap';
+import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
+import { seedStoreIfEmpty } from './src/server/storeDb.ts';
 
 dotenv.config();
 
@@ -13,10 +15,19 @@ async function startServer() {
 
   app.use(express.json({ limit: '10mb' }));
 
+  // Initialize seed data for the store
+  seedStoreIfEmpty().catch((err) => {
+    console.error('Initial store database seeding note:', err);
+  });
+
   // API health check
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
+
+  // Astronava Store API Routes
+  app.use('/api/store', storeRouter);
+  app.use('/api/admin', adminRouter);
 
   // Dynamic XML Sitemap Endpoint for Web Crawlers and Search Engines
   app.get('/sitemap.xml', (req, res) => {
