@@ -35,7 +35,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     tab: 'generator',
     path: '/',
     aliases: ['/generator', '/kundli'],
-    title: 'astronava.com — Vedic Kundli House Chart & Planetary Guide',
+    title: 'Free Janam Kundli & Vedic Birth Chart | Kundli Maker | astronava.com',
     shortTitle: 'Kundli Maker & Janam Patrika',
     description: 'Generate authentic Vedic Janam Kundli birth charts with Lahiri Ayanamsha, 7 divisional charts (D1 to D12), Vimshottari Dasha timeline, Sarvashtakavarga 337 bindus, and Parashari Yoga diagnostics.',
     keywords: [
@@ -60,7 +60,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     tab: 'builder',
     path: '/builder',
     aliases: ['/reader'],
-    title: 'Kundli Builder & Visualizer — astronava.com',
+    title: 'Interactive House & Planetary Visualizer | Kundli Builder | astronava.com',
     shortTitle: 'Kundli Builder & Visualizer',
     description: 'Interactive Vedic Kundli house builder and planetary visualizer. Customize Lagna, explore house placements (Bhavas), planetary aspects (Drishti), and classical Parashari planetary combinations in real-time.',
     keywords: [
@@ -83,7 +83,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     tab: 'gemstones',
     path: '/gemstones',
     aliases: ['/ratna', '/gemstone-calculator'],
-    title: 'Gemstone Recommendations & Ratna Calculator — astronava.com',
+    title: 'Vedic Ratna Calculator & Remedies | Gemstone Recommender | astronava.com',
     shortTitle: 'Gemstone Recommendations',
     description: 'Personalized Vedic Gemstone recommendations calculated from Lagna Lord, 5th and 9th Trikona lords. Discover your auspicious Life Stone (Jeevan Ratna), Lucky Stone (Bhagya Ratna), wearing days, metals, mantras, and body weight calibrated Ratti dosage.',
     keywords: [
@@ -107,7 +107,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     tab: 'match',
     path: '/match',
     aliases: ['/kundli-milan', '/compatibility'],
-    title: 'Kundli Milan & Horoscope Match Finder — astronava.com',
+    title: '36 Guna Horoscope Matching & Compatibility | Kundli Milan | astronava.com',
     shortTitle: 'Match Finder (Kundli Milan)',
     description: 'Authentic Vedic Kundli Milan and marriage compatibility calculator based on the 8 sacred Ashta Kuta dimensions (36 Gunas), Manglik (Kuja) Dosha diagnostics, Rajju longevity, and Nadi harmony.',
     keywords: [
@@ -131,7 +131,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     tab: 'numerology',
     path: '/numerology',
     aliases: ['/mulank', '/bhagyank'],
-    title: 'Vedic Numerology Calculator & Mulank Analysis — astronava.com',
+    title: 'Mulank, Bhagyank & Destiny Number Analysis | Numerology Calculator | astronava.com',
     shortTitle: 'Numerology Calculator',
     description: 'Calculate your Vedic Psychic Root number (Mulank), Destiny Life Path number (Bhagyank), Name number (Namank), ruling planet, and favorable dates, colors, and compatible life partners according to Cheiro and Vedic Sankhya Shastra.',
     keywords: [
@@ -155,7 +155,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     legalDoc: 'privacy',
     path: '/privacy-policy',
     aliases: ['/privacy', '/legal/privacy'],
-    title: 'Privacy Policy — astronava.com',
+    title: 'Data Protection & Privacy Notice | Privacy Policy | astronava.com',
     shortTitle: 'Privacy Policy',
     description: 'Official Privacy Policy for astronava.com. Learn how we handle your birth data, Google authentication, and security protections across all Vedic astrology tools.',
     keywords: ['astronava privacy policy', 'vedic astrology privacy', 'data protection', 'user privacy'],
@@ -171,7 +171,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     legalDoc: 'terms',
     path: '/terms-and-conditions',
     aliases: ['/terms', '/terms-of-service', '/legal/terms'],
-    title: 'Terms & Conditions — astronava.com',
+    title: 'Astrology Service Terms of Use | Terms & Conditions | astronava.com',
     shortTitle: 'Terms & Conditions',
     description: 'Terms and conditions governing the use of astronava.com astrology software, Kundli generation, calculation algorithms, and educational resources.',
     keywords: ['terms and conditions', 'astronava terms of service', 'user agreement'],
@@ -187,7 +187,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     legalDoc: 'disclaimer',
     path: '/disclaimer',
     aliases: ['/legal/disclaimer'],
-    title: 'Disclaimer — astronava.com',
+    title: 'Educational Astrological Notice | Legal Disclaimer | astronava.com',
     shortTitle: 'Disclaimer',
     description: 'Astrological disclaimer and terms for astronava.com. Educational and informational Vedic Jyotish calculations provided without warranties or medical/financial advice.',
     keywords: ['astrology disclaimer', 'educational astrology notice', 'terms of information'],
@@ -203,7 +203,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     legalDoc: 'contact',
     path: '/contact',
     aliases: ['/contact-us', '/legal/contact'],
-    title: 'Contact Us — astronava.com',
+    title: 'Customer Support & Inquiries | Contact Us | astronava.com',
     shortTitle: 'Contact Us',
     description: 'Get in touch with the Astronava development and Vedic research team for technical support, feedback, or astrological feature inquiries.',
     keywords: ['contact astronava', 'astrology support', 'feedback', 'inquiries'],
@@ -360,14 +360,55 @@ function setJsonLdScript(id: string, data: object): void {
   script.textContent = JSON.stringify(data);
 }
 
+export interface DynamicMetaOptions {
+  customTitle?: string;
+  customDescription?: string;
+  customSuffix?: string;
+}
+
+/**
+ * Returns the exact descriptive, CTR-optimized suffix for a specific active tab and optional legal document.
+ * (e.g. 'Kundli Maker | astronava.com' vs 'Gemstone Recommender | astronava.com')
+ */
+export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): string {
+  switch (tab) {
+    case 'generator':
+      return 'Kundli Maker | astronava.com';
+    case 'builder':
+      return 'Kundli Builder | astronava.com';
+    case 'gemstones':
+      return 'Gemstone Recommender | astronava.com';
+    case 'match':
+      return 'Kundli Milan | astronava.com';
+    case 'numerology':
+      return 'Numerology Calculator | astronava.com';
+    case 'legal':
+      switch (legalDoc) {
+        case 'terms':
+          return 'Terms & Conditions | astronava.com';
+        case 'disclaimer':
+          return 'Legal Disclaimer | astronava.com';
+        case 'contact':
+          return 'Contact Us | astronava.com';
+        case 'privacy':
+        default:
+          return 'Privacy Policy | astronava.com';
+      }
+    default:
+      return 'astronava.com';
+  }
+}
+
 /**
  * Dynamically updates all document title, meta tags, and Open Graph tags for the current active view.
  * Ensures search crawlers and social shares index page-specific content properly.
+ * Automatically respects or appends specific, descriptive tab suffixes to increase click-through rates.
  */
 export function injectDynamicMetaTags(
   tab: AppTabType,
   legalDoc?: LegalDocType,
-  baseUrl: string = CANONICAL_BASE_URL
+  baseUrl: string = CANONICAL_BASE_URL,
+  options?: DynamicMetaOptions
 ): AppViewRoute {
   const route = findRouteByTab(tab, legalDoc);
   if (typeof document === 'undefined') return route;
@@ -375,24 +416,36 @@ export function injectDynamicMetaTags(
   const normalizedBase = baseUrl.replace(/\/$/, '');
   const canonicalUrl = `${normalizedBase}${route.path === '/' ? '' : route.path}`;
 
+  // Automatically determine or format title with tab-specific descriptive suffix
+  const tabSuffix = options?.customSuffix || getTabSeoSuffix(tab, legalDoc);
+  let appliedTitle = options?.customTitle || route.title;
+  if (!options?.customTitle && !appliedTitle.includes(tabSuffix)) {
+    const cleanBase = appliedTitle
+      .replace(/\s*[—|]\s*astronava\.com.*$/i, '')
+      .replace(/^astronava\.com\s*[—|]\s*/i, '')
+      .trim();
+    appliedTitle = cleanBase ? `${cleanBase} | ${tabSuffix}` : tabSuffix;
+  }
+  const appliedDescription = options?.customDescription || route.description;
+
   // 1. Browser Tab Title
-  document.title = route.title;
+  document.title = appliedTitle;
 
   // 2. Standard Search Meta Tags
-  setMetaTag('meta[name="description"]', { name: 'description', content: route.description });
+  setMetaTag('meta[name="description"]', { name: 'description', content: appliedDescription });
   setMetaTag('meta[name="keywords"]', { name: 'keywords', content: route.keywords.join(', ') });
 
   // 3. Open Graph Tags
-  setMetaTag('meta[property="og:title"]', { property: 'og:title', content: route.title });
-  setMetaTag('meta[property="og:description"]', { property: 'og:description', content: route.description });
+  setMetaTag('meta[property="og:title"]', { property: 'og:title', content: appliedTitle });
+  setMetaTag('meta[property="og:description"]', { property: 'og:description', content: appliedDescription });
   setMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
   setMetaTag('meta[property="og:type"]', { property: 'og:type', content: route.ogType });
   setMetaTag('meta[property="og:site_name"]', { property: 'og:site_name', content: 'astronava.com' });
 
   // 4. Twitter Card Tags
   setMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
-  setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: route.title });
-  setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: route.description });
+  setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: appliedTitle });
+  setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: appliedDescription });
 
   // 5. Canonical Link
   setMetaTag('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl }, 'link');
@@ -402,8 +455,8 @@ export function injectDynamicMetaTags(
     '@context': 'https://schema.org',
     '@type': route.tab === 'legal' ? 'WebPage' : 'SoftwareApplication',
     name: route.shortTitle,
-    headline: route.title,
-    description: route.description,
+    headline: appliedTitle,
+    description: appliedDescription,
     url: canonicalUrl,
     applicationCategory: 'LifestyleApplication',
     operatingSystem: 'All',

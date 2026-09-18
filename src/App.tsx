@@ -18,6 +18,117 @@ import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
+/**
+ * Tab-specific descriptive suffixes engineered for high organic Click-Through Rates (CTR).
+ * Each tab features a clear, keyword-targeted brand identifier.
+ * (e.g. 'Kundli Maker | astronava.com' vs 'Gemstone Recommender | astronava.com')
+ */
+export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType) => string)> = {
+  generator: 'Kundli Maker | astronava.com',
+  builder: 'Kundli Builder | astronava.com',
+  gemstones: 'Gemstone Recommender | astronava.com',
+  match: 'Kundli Milan | astronava.com',
+  numerology: 'Numerology Calculator | astronava.com',
+  legal: (doc?: LegalDocType) => {
+    switch (doc) {
+      case 'terms':
+        return 'Terms & Conditions | astronava.com';
+      case 'disclaimer':
+        return 'Legal Disclaimer | astronava.com';
+      case 'contact':
+        return 'Contact Us | astronava.com';
+      case 'privacy':
+      default:
+        return 'Privacy Policy | astronava.com';
+    }
+  },
+};
+
+/**
+ * Tab-specific primary search intent lead hooks that combine with descriptive suffixes
+ * to craft compelling, high-converting SERP titles.
+ */
+export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) => string)> = {
+  generator: 'Free Janam Kundli & Vedic Birth Chart',
+  builder: 'Interactive House & Planetary Visualizer',
+  gemstones: 'Vedic Ratna Calculator & Remedies',
+  match: '36 Guna Horoscope Matching & Compatibility',
+  numerology: 'Mulank, Bhagyank & Destiny Number Analysis',
+  legal: (doc?: LegalDocType) => {
+    switch (doc) {
+      case 'terms':
+        return 'Astrology Service Terms of Use';
+      case 'disclaimer':
+        return 'Educational Astrological Notice';
+      case 'contact':
+        return 'Customer Support & Inquiries';
+      case 'privacy':
+      default:
+        return 'Data Protection & Privacy Notice';
+    }
+  },
+};
+
+/**
+ * Resolves the descriptive tab suffix string.
+ */
+export function getDescriptiveTabSuffix(tab: AppTabType, legalDoc?: LegalDocType): string {
+  const entry = TAB_SEO_SUFFIXES[tab];
+  return typeof entry === 'function' ? entry(legalDoc) : entry;
+}
+
+/**
+ * Resolves the primary CTR lead hook string.
+ */
+export function getDescriptiveTabLead(tab: AppTabType, legalDoc?: LegalDocType): string {
+  const entry = TAB_SEO_LEADS[tab];
+  return typeof entry === 'function' ? entry(legalDoc) : entry;
+}
+
+/**
+ * Refactored dynamic meta tag injection logic:
+ * Automatically formats and injects document title, description, Open Graph, and Twitter metadata,
+ * appending specific, descriptive suffixes based on the active tab
+ * (e.g. 'Kundli Maker | astronava.com' vs 'Gemstone Recommender | astronava.com')
+ * to maximize click-through rates (CTR) on organic search and social platforms.
+ */
+export function updateTabMetaTags(
+  tab: AppTabType,
+  legalDoc?: LegalDocType,
+  options?: {
+    customPrefix?: string;
+    isReportOpen?: boolean;
+    reportType?: 'kundli' | 'match' | 'gemstone';
+    personName?: string;
+    isSitemapOpen?: boolean;
+  }
+) {
+  const suffix = getDescriptiveTabSuffix(tab, legalDoc);
+  const baseLead = options?.customPrefix || getDescriptiveTabLead(tab, legalDoc);
+
+  let fullTitle = `${baseLead} | ${suffix}`;
+
+  // If specialized overlays or reports are actively open, reflect that in the document title
+  if (options?.isReportOpen) {
+    if (options.reportType === 'kundli') {
+      const person = options.personName ? `${options.personName}'s ` : '';
+      fullTitle = `${person}Comprehensive Janam Kundli Report & Horoscopic Analysis | ${suffix}`;
+    } else if (options.reportType === 'match') {
+      fullTitle = `36 Guna Horoscope Milan & Compatibility Analysis Report | ${suffix}`;
+    } else if (options.reportType === 'gemstone') {
+      fullTitle = `Personalized Ratna & Gemstone Remedies Dosage Report | ${suffix}`;
+    }
+  } else if (options?.isSitemapOpen) {
+    fullTitle = `Astrological Directory & Tools Index | ${suffix}`;
+  }
+
+  // Inject meta tags, canonical URL, and JSON-LD structured data
+  return injectDynamicMetaTags(tab, legalDoc, undefined, {
+    customTitle: fullTitle,
+    customSuffix: suffix,
+  });
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<AppTabType>('generator');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
@@ -110,10 +221,15 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Dynamically inject descriptive meta tags and Open Graph data whenever the active tab or document changes
+  // Dynamically inject descriptive meta tags and Open Graph data whenever activeTab, legalDoc, or report context changes
   useEffect(() => {
-    injectDynamicMetaTags(activeTab, activeTab === 'legal' ? selectedLegalDoc : undefined);
-  }, [activeTab, selectedLegalDoc]);
+    updateTabMetaTags(activeTab, activeTab === 'legal' ? selectedLegalDoc : undefined, {
+      isReportOpen,
+      reportType,
+      personName: reportKundliData?.personDetails?.name,
+      isSitemapOpen,
+    });
+  }, [activeTab, selectedLegalDoc, isReportOpen, reportType, reportKundliData, isSitemapOpen]);
 
   const handleOpenLegal = (doc: LegalDocType) => {
     setSelectedLegalDoc(doc);
@@ -123,7 +239,7 @@ export default function App() {
     if (window.location.pathname !== route.path) {
       window.history.pushState(null, '', route.path);
     }
-    injectDynamicMetaTags('legal', doc);
+    updateTabMetaTags('legal', doc);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -133,7 +249,7 @@ export default function App() {
     if (window.location.pathname !== route.path) {
       window.history.pushState(null, '', route.path);
     }
-    injectDynamicMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
+    updateTabMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
   };
 
   const handleReturnHome = () => {
@@ -476,15 +592,7 @@ export default function App() {
               >
                 Sitemap
               </button>
-              <span>&bull;</span>
-              <a
-                href="/sitemap.xml"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-amber-400 transition-colors cursor-pointer font-mono text-[11px]"
-              >
-                sitemap.xml
-              </a>
+
             </div>
 
             <p className="text-center w-full max-w-sm sm:max-w-none">
@@ -519,16 +627,16 @@ export default function App() {
         onClose={() => setIsSearchOpen(false)}
         onNavigateToTab={(tab) => {
           if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
-            setActiveTab(tab);
+            handleTabChange(tab as AppTabType);
           }
         }}
         onSelectHouse={(h) => {
           setSelectedHouse(h);
-          setActiveTab('builder');
+          handleTabChange('builder');
         }}
         onSelectPlanet={(p) => {
           setSelectedPlanet(p);
-          setActiveTab('builder');
+          handleTabChange('builder');
         }}
       />
 
