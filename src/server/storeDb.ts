@@ -1030,6 +1030,7 @@ export async function createOrder(payload: CreateOrderPayload) {
 export async function getOrders(options: {
   status?: string;
   search?: string;
+  customerEmail?: string;
   limit?: number;
   page?: number;
 } = {}) {
@@ -1038,6 +1039,10 @@ export async function getOrders(options: {
   const offset = (page - 1) * limit;
 
   const conditions = [];
+
+  if (options.customerEmail && options.customerEmail.trim()) {
+    conditions.push(eq(sql`lower(${orders.customerEmail})`, options.customerEmail.trim().toLowerCase()));
+  }
 
   if (options.status && options.status !== 'all') {
     conditions.push(eq(orders.orderStatus, options.status));
@@ -1111,6 +1116,23 @@ export async function getOrderById(id: number) {
 
   const order = orderList[0];
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+
+  return {
+    ...order,
+    items,
+  };
+}
+
+export async function getOrderByOrderNumber(orderNumber: string) {
+  const orderList = await db
+    .select()
+    .from(orders)
+    .where(eq(sql`lower(${orders.orderNumber})`, orderNumber.trim().toLowerCase()))
+    .limit(1);
+  if (orderList.length === 0) return null;
+
+  const order = orderList[0];
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
 
   return {
     ...order,

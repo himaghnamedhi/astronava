@@ -394,28 +394,6 @@ Calculated via Astronava (www.astronava.com)`;
       {/* ========================================================================= */}
       {(activeSection === 'overview' || typeof window === 'undefined') && (
         <div className="space-y-5 sm:space-y-8">
-          {/* 17 September Special Alignment Card */}
-          {day === 17 && month === 9 && (
-            <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-100/90 via-amber-50 to-stone-50 border border-amber-300 shadow-2xs flex items-start sm:items-center gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-900 text-amber-100 flex items-center justify-center shrink-0 shadow-2xs">
-                <Sparkles className="w-4 h-4 text-amber-300" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wide text-amber-900">
-                    Special Significance: 17 September
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[10px] font-bold">
-                    Mulank 8 (Saturn)
-                  </span>
-                </div>
-                <p className="text-xs text-stone-700 mt-1 leading-relaxed">
-                  Coincides with <strong>Vishwakarma Jayanti</strong> &amp; the birth date of Narendra Modi (Mulank 8, Saturn) — archetype of monumental perseverance, karmic discipline, and builder vibration.
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* Top 2 Primary Cards: Mulank & Bhagyank */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             

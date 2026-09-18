@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { saveUserOrderToFirestore } from '../../lib/firebase.ts';
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -166,6 +167,29 @@ export const StoreCheckout: React.FC = () => {
       }
 
       const createdOrder = await res.json();
+
+      // Mirror order to Firestore if authenticated
+      if (user?.uid) {
+        try {
+          await saveUserOrderToFirestore(user.uid, {
+            id: createdOrder.id,
+            orderNumber: createdOrder.orderNumber,
+            totalAmount: Number(createdOrder.totalAmount),
+            orderStatus: createdOrder.orderStatus || 'Confirmed',
+            items: (createdOrder.items || []).map((it: any) => ({
+              productId: it.productId,
+              productName: it.productName,
+              variantName: it.variantName,
+              quantity: it.quantity,
+              price: Number(it.price),
+              imageUrl: it.imageUrl,
+            })),
+          });
+        } catch (fbErr) {
+          console.warn('Could not mirror order to Firestore:', fbErr);
+        }
+      }
+
       setOrderSuccess(createdOrder);
     } catch (err: any) {
       console.error('Checkout error:', err);

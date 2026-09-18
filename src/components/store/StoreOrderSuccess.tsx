@@ -8,11 +8,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Calendar,
+  Package,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 
 export const StoreOrderSuccess: React.FC = () => {
-  const { lastCompletedOrder, navigateToHome, navigateToShop } = useStore();
+  const { lastCompletedOrder, navigateToHome, navigateToShop, navigateToProfile } = useStore();
 
   if (!lastCompletedOrder) {
     return (
@@ -187,6 +188,14 @@ export const StoreOrderSuccess: React.FC = () => {
         >
           <Printer className="w-3.5 h-3.5" />
           <span>Print Receipt</span>
+        </button>
+
+        <button
+          onClick={navigateToProfile}
+          className="px-5 py-2.5 rounded-xl border border-amber-900/30 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+        >
+          <Package className="w-3.5 h-3.5 text-amber-800" />
+          <span>Track in Order History</span>
         </button>
 
         <button

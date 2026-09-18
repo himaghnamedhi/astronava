@@ -80,6 +80,20 @@ export interface CartItem {
   stock: number;
 }
 
+export interface WishlistItem {
+  id: string;
+  userId?: string;
+  productId: number;
+  productSlug: string;
+  name: string;
+  price: number;
+  salePrice?: number | null;
+  imageUrl?: string;
+  categoryName?: string;
+  inStock?: boolean;
+  createdAt?: string;
+}
+
 export interface OrderItem {
   id: number;
   orderId: number;

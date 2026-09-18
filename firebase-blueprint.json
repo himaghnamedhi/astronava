@@ -138,6 +138,121 @@
         "createdAt",
         "expiresAt"
       ]
+    },
+    "WishlistItem": {
+      "title": "WishlistItem",
+      "description": "Bookmarked store product saved to the user's wishlist for later purchase.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique item identifier, matches product id as string",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "productId": {
+          "type": "number",
+          "description": "Numeric product ID"
+        },
+        "productSlug": {
+          "type": "string",
+          "description": "Product URL slug",
+          "maxLength": 150
+        },
+        "name": {
+          "type": "string",
+          "description": "Product title",
+          "maxLength": 200
+        },
+        "price": {
+          "type": "number",
+          "description": "Current item price"
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "Optional discounted sale price"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Primary product image URL",
+          "maxLength": 500
+        },
+        "categoryName": {
+          "type": "string",
+          "description": "Product category name",
+          "maxLength": 100
+        },
+        "inStock": {
+          "type": "boolean",
+          "description": "Stock availability flag"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when added to wishlist"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "productId",
+        "productSlug",
+        "name",
+        "price",
+        "createdAt"
+      ]
+    },
+    "UserOrder": {
+      "title": "UserOrder",
+      "description": "User purchase order record with tracking status and item line details.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order record identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "orderNumber": {
+          "type": "string",
+          "description": "Human-readable order number (e.g. ASTRO-2026-4892)",
+          "maxLength": 64
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total order amount paid"
+        },
+        "orderStatus": {
+          "type": "string",
+          "description": "Current fulfillment status",
+          "maxLength": 50
+        },
+        "itemCount": {
+          "type": "number",
+          "description": "Total quantity of items in order"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Order placement timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "orderNumber",
+        "totalAmount",
+        "orderStatus",
+        "createdAt"
+      ]
     }
   },
   "firestore": {
@@ -152,6 +267,14 @@
     "/users/{userId}/aiSummaries/{summaryId}": {
       "schema": "AiSummary",
       "description": "Collection of saved AI astrological summaries belonging to the user."
+    },
+    "/users/{userId}/wishlist/{itemId}": {
+      "schema": "WishlistItem",
+      "description": "Collection of bookmarked store items saved by the user for later purchase."
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": "UserOrder",
+      "description": "User purchase orders mirror collection for real-time tracking."
     }
   }
 }

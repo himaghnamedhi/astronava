@@ -28,6 +28,8 @@ export const StoreProductDetail: React.FC = () => {
     navigateToShop,
     addToCart,
     navigateToCheckout,
+    isWishlisted,
+    toggleWishlist,
   } = useStore();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -276,14 +278,46 @@ export const StoreProductDetail: React.FC = () => {
                 {product.brand || 'Astronava Vedic Authentics'}
               </span>
 
-              <button
-                onClick={handleShare}
-                className="text-stone-400 hover:text-stone-700 p-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs"
-                title="Share link"
-              >
-                <Share2 className="w-4 h-4" />
-                <span>{copiedLink ? 'Copied!' : 'Share'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!product) return;
+                    await toggleWishlist({
+                      id: product.id,
+                      slug: product.slug,
+                      name: product.name,
+                      price: product.price,
+                      salePrice: product.salePrice,
+                      primaryImage: product.primaryImage,
+                      categoryName: product.categoryName,
+                      stock: product.stock,
+                    });
+                  }}
+                  className={`p-1.5 px-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    product && isWishlisted(product.id)
+                      ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-2xs'
+                      : 'border-stone-200 text-stone-600 hover:text-rose-600 hover:bg-stone-50'
+                  }`}
+                  title={product && isWishlisted(product.id) ? 'Remove from wishlist' : 'Save to wishlist'}
+                >
+                  <Heart
+                    className={`w-3.5 h-3.5 ${
+                      product && isWishlisted(product.id) ? 'fill-rose-500 text-rose-500' : ''
+                    }`}
+                  />
+                  <span>{product && isWishlisted(product.id) ? 'Wishlisted' : 'Wishlist'}</span>
+                </button>
+
+                <button
+                  onClick={handleShare}
+                  className="text-stone-400 hover:text-stone-700 p-1.5 px-2.5 rounded-xl border border-stone-200 hover:bg-stone-50 transition-colors cursor-pointer flex items-center gap-1 text-xs"
+                  title="Share link"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>{copiedLink ? 'Copied!' : 'Share'}</span>
+                </button>
+              </div>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-vedic leading-snug">
@@ -426,6 +460,36 @@ export const StoreProductDetail: React.FC = () => {
                 className="py-3 px-5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 active:scale-98 text-stone-950 text-xs sm:text-sm font-extrabold shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 Buy Now
+              </button>
+
+              {/* Wishlist Button */}
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!product) return;
+                  await toggleWishlist({
+                    id: product.id,
+                    slug: product.slug,
+                    name: product.name,
+                    price: product.price,
+                    salePrice: product.salePrice,
+                    primaryImage: product.primaryImage,
+                    categoryName: product.categoryName,
+                    stock: product.stock,
+                  });
+                }}
+                title={product && isWishlisted(product.id) ? 'Remove from wishlist' : 'Save to wishlist'}
+                className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-center shrink-0 ${
+                  product && isWishlisted(product.id)
+                    ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-2xs'
+                    : 'border-stone-300 hover:border-rose-300 hover:bg-rose-50/60 text-stone-600 hover:text-rose-600'
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    product && isWishlisted(product.id) ? 'fill-rose-500 text-rose-500' : ''
+                  }`}
+                />
               </button>
             </div>
           </div>

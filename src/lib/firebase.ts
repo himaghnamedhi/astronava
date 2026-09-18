@@ -12,7 +12,8 @@ import {
   deleteDoc, 
   serverTimestamp, 
   Timestamp,
-  getDocFromServer
+  getDocFromServer,
+  onSnapshot
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -329,4 +330,206 @@ export async function deleteAiSummary(userId: string, summaryId: string): Promis
     handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
+
+// =============================================================
+// WISHLIST INTERFACES & FIREBASE METHODS
+// =============================================================
+
+export interface FirebaseWishlistItem {
+  id: string; // product id as string
+  userId: string;
+  productId: number;
+  productSlug: string;
+  name: string;
+  price: number;
+  salePrice?: number | null;
+  imageUrl?: string;
+  categoryName?: string;
+  inStock?: boolean;
+  createdAt: any;
+}
+
+/**
+ * Save an item to the user's wishlist in Firestore
+ */
+export async function saveWishlistItemToFirestore(
+  userId: string,
+  item: {
+    productId: number;
+    productSlug: string;
+    name: string;
+    price: number;
+    salePrice?: number | null;
+    imageUrl?: string;
+    categoryName?: string;
+    inStock?: boolean;
+  }
+): Promise<void> {
+  const itemId = String(item.productId);
+  const path = `users/${userId}/wishlist/${itemId}`;
+  const payload: any = {
+    id: itemId,
+    userId,
+    productId: item.productId,
+    productSlug: String(item.productSlug || '').substring(0, 150),
+    name: String(item.name || 'Store Item').substring(0, 200),
+    price: Number(item.price) || 0,
+    createdAt: serverTimestamp(),
+  };
+
+  if (item.salePrice !== undefined && item.salePrice !== null) {
+    payload.salePrice = Number(item.salePrice);
+  }
+  if (item.imageUrl) {
+    payload.imageUrl = String(item.imageUrl).substring(0, 500);
+  }
+  if (item.categoryName) {
+    payload.categoryName = String(item.categoryName).substring(0, 100);
+  }
+  if (item.inStock !== undefined) {
+    payload.inStock = Boolean(item.inStock);
+  }
+
+  try {
+    await setDoc(doc(db, 'users', userId, 'wishlist', itemId), payload);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+/**
+ * Remove an item from the user's wishlist in Firestore
+ */
+export async function removeWishlistItemFromFirestore(userId: string, productId: number | string): Promise<void> {
+  const itemId = String(productId);
+  const path = `users/${userId}/wishlist/${itemId}`;
+  try {
+    await deleteDoc(doc(db, 'users', userId, 'wishlist', itemId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+/**
+ * Fetch all items in user's wishlist from Firestore
+ */
+export async function getUserWishlistFromFirestore(userId: string): Promise<FirebaseWishlistItem[]> {
+  const path = `users/${userId}/wishlist`;
+  try {
+    const q = query(collection(db, 'users', userId, 'wishlist'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const items: FirebaseWishlistItem[] = [];
+    snap.forEach((d) => {
+      items.push(d.data() as FirebaseWishlistItem);
+    });
+    return items;
+  } catch (error) {
+    console.warn('Could not fetch user wishlist:', error);
+    return [];
+  }
+}
+
+/**
+ * Real-time listener for user wishlist
+ */
+export function subscribeUserWishlist(
+  userId: string,
+  onUpdate: (items: FirebaseWishlistItem[]) => void,
+  onError?: (error: any) => void
+): () => void {
+  const path = `users/${userId}/wishlist`;
+  const q = query(collection(db, 'users', userId, 'wishlist'), orderBy('createdAt', 'desc'));
+
+  return onSnapshot(
+    q,
+    (snap) => {
+      const items: FirebaseWishlistItem[] = [];
+      snap.forEach((d) => {
+        items.push(d.data() as FirebaseWishlistItem);
+      });
+      onUpdate(items);
+    },
+    (error) => {
+      if (onError) onError(error);
+      handleFirestoreError(error, OperationType.GET, path);
+    }
+  );
+}
+
+// =============================================================
+// USER ORDERS MIRRORING & TRACKING IN FIRESTORE
+// =============================================================
+
+export interface FirebaseUserOrder {
+  id: string;
+  userId: string;
+  orderNumber: string;
+  totalAmount: number;
+  orderStatus: string;
+  itemCount: number;
+  items?: any[];
+  createdAt: any;
+}
+
+/**
+ * Save user order to Firestore for real-time tracking
+ */
+export async function saveUserOrderToFirestore(
+  userId: string,
+  order: {
+    id: number | string;
+    orderNumber: string;
+    totalAmount: number | string;
+    orderStatus: string;
+    items?: any[];
+  }
+): Promise<void> {
+  const orderId = String(order.id);
+  const path = `users/${userId}/orders/${orderId}`;
+  const totalAmountNum = typeof order.totalAmount === 'string' ? parseFloat(order.totalAmount) : order.totalAmount;
+  const items = (order.items || []).slice(0, 50).map((it) => ({
+    productId: it.productId,
+    productName: String(it.productName || it.name || '').substring(0, 150),
+    quantity: Number(it.quantity) || 1,
+    price: Number(it.price) || 0,
+    imageUrl: it.imageUrl ? String(it.imageUrl).substring(0, 500) : null,
+  }));
+
+  const payload: any = {
+    id: orderId,
+    userId,
+    orderNumber: String(order.orderNumber).substring(0, 64),
+    totalAmount: isNaN(totalAmountNum) ? 0 : totalAmountNum,
+    orderStatus: String(order.orderStatus || 'Confirmed').substring(0, 50),
+    itemCount: items.reduce((acc, it) => acc + (it.quantity || 1), 0),
+    items,
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    await setDoc(doc(db, 'users', userId, 'orders', orderId), payload);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+/**
+ * Fetch all past orders from user subcollection in Firestore
+ */
+export async function getUserOrdersFromFirestore(userId: string): Promise<FirebaseUserOrder[]> {
+  const path = `users/${userId}/orders`;
+  try {
+    const q = query(collection(db, 'users', userId, 'orders'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const list: FirebaseUserOrder[] = [];
+    snap.forEach((d) => {
+      list.push(d.data() as FirebaseUserOrder);
+    });
+    return list;
+  } catch (error) {
+    console.warn('Could not fetch user orders from firestore:', error);
+    return [];
+  }
+}
+
 

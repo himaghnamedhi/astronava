@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Star, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Star, Sparkles, CheckCircle2, ArrowRight, Heart } from 'lucide-react';
 import { Product } from '../../types/store.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StoreProductMedia } from './StoreProductMedia.tsx';
@@ -9,7 +9,9 @@ interface StoreProductCardProps {
 }
 
 export const StoreProductCard: React.FC<StoreProductCardProps> = ({ product }) => {
-  const { navigateToProduct, addToCart } = useStore();
+  const { navigateToProduct, addToCart, isWishlisted, toggleWishlist } = useStore();
+
+  const wishlisted = isWishlisted(product.id);
 
   const priceNum = Number(product.price);
   const salePriceNum = product.salePrice ? Number(product.salePrice) : null;
@@ -19,6 +21,20 @@ export const StoreProductCard: React.FC<StoreProductCardProps> = ({ product }) =
       : null;
 
   const currentPrice = salePriceNum || priceNum;
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await toggleWishlist({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice,
+      primaryImage: product.primaryImage,
+      categoryName: product.categoryName,
+      stock: product.stock,
+    });
+  };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,9 +84,25 @@ export const StoreProductCard: React.FC<StoreProductCardProps> = ({ product }) =
         )}
       </div>
 
+      {/* Wishlist Heart Button (Top Right) */}
+      <div className="absolute top-2.5 right-2.5 z-20">
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          title={wishlisted ? 'Remove from wishlist' : 'Bookmark to wishlist'}
+          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-2xs backdrop-blur-md cursor-pointer ${
+            wishlisted
+              ? 'bg-rose-50 border border-rose-200 text-rose-600 scale-105 shadow-sm'
+              : 'bg-white/80 hover:bg-white text-stone-600 hover:text-rose-600 border border-stone-200/80 hover:scale-105'
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${wishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
+        </button>
+      </div>
+
       {/* Planetary Aura Tag */}
       {product.planet && (
-        <div className="absolute top-2.5 right-2.5 z-10">
+        <div className="absolute top-11.5 right-2.5 z-10">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#FAF8F5]/90 backdrop-blur-md text-amber-950 border border-amber-900/10 shadow-2xs">
             <Sparkles className="w-2.5 h-2.5 text-amber-600" />
             <span>{product.planet}</span>

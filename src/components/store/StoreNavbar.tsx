@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Search, Sparkles, Gem, Heart, Compass } from 'lucide-react';
+import { ShoppingBag, Search, Sparkles, Gem, Heart, Compass, Package, User } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 
 export const StoreNavbar: React.FC = () => {
@@ -9,6 +9,9 @@ export const StoreNavbar: React.FC = () => {
     openCart,
     navigateToHome,
     navigateToShop,
+    navigateToWishlist,
+    navigateToProfile,
+    wishlistCount,
     shopFilters,
   } = useStore();
 
@@ -70,7 +73,7 @@ export const StoreNavbar: React.FC = () => {
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
               }`}
             >
-              <Heart className="w-3.5 h-3.5 text-rose-600" />
+              <Sparkles className="w-3.5 h-3.5 text-rose-500" />
               <span>Crystals</span>
             </button>
 
@@ -82,17 +85,55 @@ export const StoreNavbar: React.FC = () => {
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
               }`}
             >
-              <span>All Catalog</span>
+              <span>Catalog</span>
             </button>
           </div>
 
-          {/* Quick Actions (Cart Drawer Trigger & Authenticity note) */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Quick Actions (Wishlist, Orders & Cart) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Wishlist Button */}
+            <button
+              onClick={navigateToWishlist}
+              title="View Wishlist"
+              className={`relative h-9 px-2.5 sm:px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer ${
+                activeStoreView === 'wishlist'
+                  ? 'bg-rose-50 border-rose-300 text-rose-800 shadow-2xs'
+                  : 'bg-white border-stone-200/90 text-stone-700 hover:text-rose-700 hover:border-rose-200 hover:bg-rose-50/50'
+              }`}
+            >
+              <Heart
+                className={`w-3.5 h-3.5 ${
+                  wishlistCount > 0 ? 'fill-rose-500 text-rose-500' : 'text-stone-500'
+                }`}
+              />
+              <span className="hidden sm:inline">Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-black">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+
+            {/* Orders & Profile Button */}
+            <button
+              onClick={navigateToProfile}
+              title="Track Orders & Profile"
+              className={`relative h-9 px-2.5 sm:px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer ${
+                activeStoreView === 'profile'
+                  ? 'bg-amber-900 border-amber-950 text-amber-50 shadow-2xs'
+                  : 'bg-white border-stone-200/90 text-stone-700 hover:text-amber-900 hover:border-amber-200 hover:bg-amber-50/50'
+              }`}
+            >
+              <Package className="w-3.5 h-3.5 text-stone-500" />
+              <span className="hidden sm:inline">Orders</span>
+            </button>
+
+            {/* Cart Button */}
             <button
               onClick={openCart}
               className="relative h-9 px-3.5 rounded-xl bg-amber-950 hover:bg-stone-900 text-amber-100 flex items-center gap-2 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
             >
-              <ShoppingBag className="w-4 h-4 text-amber-400" />
+              <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden sm:inline">Cart</span>
               {cartCount > 0 && (
                 <span className="w-5 h-5 rounded-full bg-amber-500 text-amber-950 text-[11px] font-black flex items-center justify-center">

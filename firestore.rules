@@ -71,6 +71,33 @@ service cloud.firestore {
         data.createdAt == request.time;
     }
 
+    function isValidWishlistItem(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'productId', 'productSlug', 'name', 'price', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.userId is string && data.userId == userId &&
+        data.productId is number &&
+        data.productSlug is string && data.productSlug.size() <= 150 &&
+        data.name is string && data.name.size() <= 200 &&
+        data.price is number && data.price >= 0 &&
+        (!('salePrice' in data) || (data.salePrice is number && data.salePrice >= 0)) &&
+        (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 500)) &&
+        (!('categoryName' in data) || (data.categoryName is string && data.categoryName.size() <= 100)) &&
+        (!('inStock' in data) || data.inStock is bool) &&
+        data.createdAt == request.time;
+    }
+
+    function isValidUserOrder(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'orderNumber', 'totalAmount', 'orderStatus', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.userId is string && data.userId == userId &&
+        data.orderNumber is string && data.orderNumber.size() <= 64 &&
+        data.totalAmount is number && data.totalAmount >= 0 &&
+        data.orderStatus is string && data.orderStatus.size() <= 50 &&
+        (!('itemCount' in data) || (data.itemCount is number && data.itemCount >= 0)) &&
+        (!('items' in data) || (data.items is list && data.items.size() <= 50)) &&
+        data.createdAt == request.time;
+    }
+
     // Match Finder 24-hour collection
     match /matchSubmissions/{matchId} {
       // Creation: strict validation, immutable calculation, exact 24h expiration ceiling
@@ -108,6 +135,22 @@ service cloud.firestore {
         allow create: if request.auth != null && request.auth.uid == userId && isValidId(summaryId) && summaryId == incoming().id && isValidAiSummary(incoming(), userId);
         allow update: if false; // AI Summaries are immutable records
         allow delete: if request.auth != null && request.auth.uid == userId && isValidId(summaryId);
+      }
+
+      // Wishlist subcollection
+      match /wishlist/{itemId} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId && isValidId(itemId) && itemId == incoming().id && isValidWishlistItem(incoming(), userId);
+        allow update: if false; // Wishlist items are toggled add/remove
+        allow delete: if request.auth != null && request.auth.uid == userId && isValidId(itemId);
+      }
+
+      // Orders subcollection
+      match /orders/{orderId} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId && isValidId(orderId) && orderId == incoming().id && isValidUserOrder(incoming(), userId);
+        allow update: if false; // Orders are immutable once placed
+        allow delete: if false; // Orders are permanently retained for accounting and delivery tracking
       }
     }
   }

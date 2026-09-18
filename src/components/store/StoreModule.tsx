@@ -8,6 +8,8 @@ import { StoreProductDetail } from './StoreProductDetail.tsx';
 import { StoreCart } from './StoreCart.tsx';
 import { StoreCheckout } from './StoreCheckout.tsx';
 import { StoreOrderSuccess } from './StoreOrderSuccess.tsx';
+import { StoreWishlist } from './StoreWishlist.tsx';
+import { StoreUserProfile } from './StoreUserProfile.tsx';
 import { AdminPanel } from './admin/AdminPanel.tsx';
 import { CartDrawer } from './CartDrawer.tsx';
 
@@ -31,6 +33,8 @@ export const StoreModule: React.FC = () => {
         {activeStoreView === 'cart' && <StoreCart />}
         {activeStoreView === 'checkout' && <StoreCheckout />}
         {activeStoreView === 'order-success' && <StoreOrderSuccess />}
+        {activeStoreView === 'wishlist' && <StoreWishlist />}
+        {activeStoreView === 'profile' && <StoreUserProfile />}
         {activeStoreView === 'admin' && (isAdmin ? <AdminPanel /> : <StoreHome />)}
       </main>
 

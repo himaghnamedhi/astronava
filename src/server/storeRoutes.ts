@@ -16,6 +16,7 @@ import {
   createOrder,
   getOrders,
   getOrderById,
+  getOrderByOrderNumber,
   updateOrderStatus,
   getAdminMetrics,
   validateCouponCode,
@@ -138,6 +139,54 @@ storeRouter.post('/orders', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Order creation failed:', error);
     res.status(500).json({ error: error.message || 'Failed to complete order' });
+  }
+});
+
+// Get customer order history by email
+storeRouter.get('/orders/my-orders', async (req: Request, res: Response) => {
+  try {
+    const email = req.query.email as string;
+    const search = req.query.search as string;
+    const status = req.query.status as string;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: 'Customer email query parameter is required' });
+    }
+
+    const result = await getOrders({
+      customerEmail: email.trim(),
+      search: search ? String(search) : undefined,
+      status: status ? String(status) : undefined,
+      page,
+      limit,
+    });
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Failed to get customer orders:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch customer orders' });
+  }
+});
+
+// Track order by public order number (e.g. ASTRO-2026-XXXX)
+storeRouter.get('/orders/track/:orderNumber', async (req: Request, res: Response) => {
+  try {
+    const orderNumber = req.params.orderNumber;
+    if (!orderNumber || !orderNumber.trim()) {
+      return res.status(400).json({ error: 'Order number is required' });
+    }
+
+    const order = await getOrderByOrderNumber(orderNumber);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found with provided reference' });
+    }
+
+    res.json(order);
+  } catch (error: any) {
+    console.error('Failed to track order:', error);
+    res.status(500).json({ error: error.message || 'Failed to track order' });
   }
 });
 
