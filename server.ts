@@ -41,6 +41,12 @@ async function startServer() {
     }
   });
 
+  // Google AdSense Authorized Digital Sellers (ads.txt)
+  app.get('/ads.txt', (req, res) => {
+    res.header('Content-Type', 'text/plain; charset=utf-8');
+    res.send('google.com, pub-2625017224504863, DIRECT, f08c47fec0942fa0\n');
+  });
+
   // AI Kundli Summary Endpoint
   app.post('/api/ai/summarize-kundli', async (req, res) => {
     try {
