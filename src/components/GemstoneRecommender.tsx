@@ -46,6 +46,7 @@ import {
 } from '../data/vedicAstrologyCalculator';
 import { PlanetId, ChartPlacement } from '../types/astrology';
 import { GemstoneImage } from './GemstoneImage';
+import { useAuth } from '../context/AuthContext';
 
 interface GemstoneRecommenderProps {
   initialLagna?: number;
@@ -60,6 +61,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
   onNavigateToTab,
   onOpenCustomReport,
 }) => {
+  const { user, openAuthModal } = useAuth();
   const [activeSubTab, setActiveSubTab] = useState<'birth_calc' | 'lagna' | 'goals' | 'synergy' | 'directory' | 'calculator'>('birth_calc');
   const [selectedLagna, setSelectedLagna] = useState<number>(initialLagna);
   const [selectedGemId, setSelectedGemId] = useState<string | null>(null);
@@ -213,6 +215,13 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
   };
 
   const handleCalculateBirthChart = () => {
+    // Guest seekers can explore 12 ascendants, navaratna encyclopedia, & vidhis.
+    // To compute a personalized birth chart prescription, prompt to sign up.
+    if (!user || user.isAnonymous) {
+      openAuthModal('Sign up as an Astronava Member to calculate your personalized Vedic gemstone prescription.');
+      return;
+    }
+
     let timeToUse = birthDetails.tob;
     if (isTimeUnknown || !birthHour || !birthMinute || !birthPeriod) {
       timeToUse = '12:00';
@@ -268,6 +277,10 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
             <button
               id="btn-gemstone-generate-report"
               onClick={() => {
+                if (!user || user.isAnonymous) {
+                  openAuthModal('Sign up as an Astronava Member to generate and print your full gemstone recommendation dossier.');
+                  return;
+                }
                 if (onOpenCustomReport) {
                   onOpenCustomReport({
                     lagna: selectedLagna,
@@ -806,7 +819,11 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-stone-100">
               <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-stone-600 text-center sm:text-left w-full sm:w-auto">
                 <Scale className="w-4 h-4 text-amber-800 shrink-0" />
-                <span>Includes personalized gemstone dosage calculation by constitutional body weight.</span>
+                <span>
+                  {(!user || user.isAnonymous)
+                    ? 'Guest Seeker: Explore 12 Ascendants & gems above. Sign up to compute personalized dosage.'
+                    : 'Includes personalized gemstone dosage calculation by constitutional body weight.'}
+                </span>
               </div>
               <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
                 {hasCalculated && (
@@ -828,7 +845,11 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                   className="px-6 py-3 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer text-center"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>{hasCalculated ? 'Recalculate My Gemstones' : 'Calculate My Gemstones'}</span>
+                  <span>
+                    {(!user || user.isAnonymous)
+                      ? 'Sign Up to Calculate Prescription'
+                      : (hasCalculated ? 'Recalculate My Gemstones' : 'Calculate My Gemstones')}
+                  </span>
                 </button>
               </div>
             </div>

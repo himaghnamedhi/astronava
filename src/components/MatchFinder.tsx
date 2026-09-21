@@ -36,6 +36,7 @@ import {
   deleteMatchSubmission, 
   StoredMatchSubmission 
 } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
 import { WorldCoordinateMap } from './WorldCoordinateMap';
 import { 
   POPULAR_CITIES, 
@@ -59,6 +60,8 @@ interface MatchFinderProps {
 }
 
 export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpenCustomReport }) => {
+  const { user, openAuthModal } = useAuth();
+
   // Partner 1 (Groom / Boy) State - Initialized to Nalbari, Assam
   const [p1Details, setP1Details] = useState<BirthDetails>({
     name: '',
@@ -205,6 +208,13 @@ export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpe
 
   // Recalculate match report & sync to Firebase Firestore (24-hour TTL)
   const handleCalculateMatch = async () => {
+    // Guest seekers can explore all sample match presets above.
+    // To compute compatibility between two custom horoscopes, prompt to sign up.
+    if (!user || user.isAnonymous) {
+      openAuthModal('Sign up as an Astronava Member to compute Ashtakoota 36-Guna Kundli Milan & Manglik dosha analysis.');
+      return;
+    }
+
     // Format tob for partner 1
     let p1Tob = p1Details.tob;
     if (p1TimeUnknown || !p1Hour || !p1Minute) {
@@ -979,45 +989,62 @@ Calculated via Astronava Match Finder`;
       </div>
 
       {/* CALCULATE & REPORT ACTION ROW */}
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        {hasCalculated && (
-          <button
-            type="button"
-            onClick={() => setHasCalculated(false)}
-            className="px-5 py-4 rounded-2xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
-          >
-            <RotateCcw className="w-4 h-4 text-stone-600" />
-            <span>View Basic Information</span>
-          </button>
+      <div className="flex flex-col items-center justify-center gap-3">
+        {(!user || user.isAnonymous) && (
+          <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/90 px-4 py-2 rounded-xl border border-amber-200/80 max-w-xl text-center">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span>Guest Seeker: Explore preset matches above freely. Sign up as an Astronava Member to calculate compatibility between two custom horoscopes.</span>
+          </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleCalculateMatch}
-          className="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 font-extrabold text-base tracking-wide font-vedic shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center gap-3 cursor-pointer border border-amber-600/30"
-        >
-          <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
-          <span>{hasCalculated ? 'Recalculate Kundli Match' : 'Calculate Kundli Match'}</span>
-          <Sparkles className="w-4 h-4 text-amber-300" />
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {hasCalculated && (
+            <button
+              type="button"
+              onClick={() => setHasCalculated(false)}
+              className="px-5 py-4 rounded-2xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4 text-stone-600" />
+              <span>View Basic Information</span>
+            </button>
+          )}
 
-        {hasCalculated && (
           <button
-            id="btn-match-generate-report-top"
             type="button"
-            onClick={() => {
-              if (onOpenCustomReport) {
-                onOpenCustomReport({ report: matchReport, p1: p1Details, p2: p2Details });
-              } else {
-                setShowPrintModal(true);
-              }
-            }}
-            className="px-6 py-4 rounded-2xl bg-stone-900 hover:bg-black text-amber-100 font-bold text-sm tracking-wide shadow-md hover:shadow-lg transition-all flex items-center gap-2.5 cursor-pointer border border-stone-700"
+            onClick={handleCalculateMatch}
+            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 font-extrabold text-base tracking-wide font-vedic shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center gap-3 cursor-pointer border border-amber-600/30"
           >
-            <FileText className="w-4 h-4 text-amber-300" />
-            <span>Generate Report</span>
+            <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
+            <span>
+              {(!user || user.isAnonymous) 
+                ? 'Sign Up to Calculate Match' 
+                : (hasCalculated ? 'Recalculate Kundli Match' : 'Calculate Kundli Match')}
+            </span>
+            <Sparkles className="w-4 h-4 text-amber-300" />
           </button>
-        )}
+
+          {hasCalculated && (
+            <button
+              id="btn-match-generate-report-top"
+              type="button"
+              onClick={() => {
+                if (!user || user.isAnonymous) {
+                  openAuthModal('Sign up as an Astronava Member to generate and download comprehensive Kundli Milan reports.');
+                  return;
+                }
+                if (onOpenCustomReport) {
+                  onOpenCustomReport({ report: matchReport, p1: p1Details, p2: p2Details });
+                } else {
+                  setShowPrintModal(true);
+                }
+              }}
+              className="px-6 py-4 rounded-2xl bg-stone-900 hover:bg-black text-amber-100 font-bold text-sm tracking-wide shadow-md hover:shadow-lg transition-all flex items-center gap-2.5 cursor-pointer border border-stone-700"
+            >
+              <FileText className="w-4 h-4 text-amber-300" />
+              <span>Generate Report</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {hasCalculated ? (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Search, Sparkles, Gem, Heart, Compass, Package, User } from 'lucide-react';
+import { ShoppingBag, Sparkles, Gem, Heart, Compass, Package, Layers } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 
 export const StoreNavbar: React.FC = () => {
@@ -13,15 +13,24 @@ export const StoreNavbar: React.FC = () => {
     navigateToProfile,
     wishlistCount,
     shopFilters,
+    categories,
+    loadingCategories,
   } = useStore();
 
   const activeCategory = shopFilters.categorySlug || 'all';
+
+  // Dynamic top-level categories from database, sorted by displayOrder
+  const topLevelCategories = React.useMemo(() => {
+    return (categories || [])
+      .filter((c) => !c.parentId)
+      .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+  }, [categories]);
 
   return (
     <div className="border-b border-amber-900/10 bg-[#FAF8F5]/90 backdrop-blur-md sticky top-18 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-13 gap-2 sm:gap-4">
-          {/* Category Tabs */}
+          {/* Dynamic Category Tabs from Database */}
           <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1 text-xs font-semibold">
             <button
               onClick={() => {
@@ -41,42 +50,7 @@ export const StoreNavbar: React.FC = () => {
               <span>Store Home</span>
             </button>
 
-            <button
-              onClick={() => navigateToShop('gemstones')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeStoreView === 'shop' && activeCategory === 'gemstones'
-                  ? 'bg-amber-900 text-amber-50 shadow-2xs'
-                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
-              }`}
-            >
-              <Gem className="w-3.5 h-3.5 text-amber-700" />
-              <span>Gemstones</span>
-            </button>
-
-            <button
-              onClick={() => navigateToShop('rudraksha')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeStoreView === 'shop' && activeCategory === 'rudraksha'
-                  ? 'bg-amber-900 text-amber-50 shadow-2xs'
-                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Rudraksha</span>
-            </button>
-
-            <button
-              onClick={() => navigateToShop('crystals')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
-                activeStoreView === 'shop' && activeCategory === 'crystals'
-                  ? 'bg-amber-900 text-amber-50 shadow-2xs'
-                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-              <span>Crystals</span>
-            </button>
-
+            {/* All Products */}
             <button
               onClick={() => navigateToShop(undefined)}
               className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
@@ -85,8 +59,32 @@ export const StoreNavbar: React.FC = () => {
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
               }`}
             >
-              <span>Catalog</span>
+              <Layers className="w-3.5 h-3.5" />
+              <span>All Catalog</span>
             </button>
+
+            {/* Dynamic categories loaded directly from database */}
+            {topLevelCategories.map((cat) => {
+              const isActive = activeStoreView === 'shop' && activeCategory === cat.slug;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => navigateToShop(cat.slug)}
+                  className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
+                    isActive
+                      ? 'bg-amber-900 text-amber-50 shadow-2xs'
+                      : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
+                  }`}
+                >
+                  {cat.slug.includes('gem') ? (
+                    <Gem className="w-3.5 h-3.5 text-amber-700" />
+                  ) : (
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  )}
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Quick Actions (Wishlist, Orders & Cart) */}

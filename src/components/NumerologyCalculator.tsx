@@ -28,6 +28,7 @@ import {
   Lightbulb,
   ArrowRight,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import {
   calculateMulank,
   calculateBhagyank,
@@ -54,6 +55,7 @@ export const NumerologyCalculator: React.FC<NumerologyCalculatorProps> = ({
   initialName = '',
   initialDob = { day: 17, month: 9, year: 1950 },
 }) => {
+  const { user, openAuthModal } = useAuth();
   // User Input States
   const [name, setName] = useState(initialName);
   const [day, setDay] = useState<number>(initialDob.day);
@@ -196,6 +198,10 @@ Calculated via Astronava (www.astronava.com)`;
   };
 
   const handlePrint = () => {
+    if (!user || user.isAnonymous) {
+      openAuthModal('Sign up as an Astronava Member to print or export your personalized Vedic numerology dossier.');
+      return;
+    }
     window.print();
   };
 

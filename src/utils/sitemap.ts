@@ -4,7 +4,7 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal' | 'store';
+export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal' | 'store' | 'profile';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
 
 export interface AppViewRoute {
@@ -31,10 +31,59 @@ export const CANONICAL_BASE_URL = 'https://www.astronava.com';
  */
 export const APP_ROUTES: AppViewRoute[] = [
   {
+    id: 'home',
+    tab: 'home',
+    path: '/',
+    aliases: ['/home'],
+    title: 'Astronava | Authentic Vedic Astrology, Kundli Maker, Gemstones, Match & Store',
+    shortTitle: 'Home',
+    description: 'Explore authentic Vedic astrology tools on Astronava: Janam Kundli Maker, Gemstone Recommender, 36 Guna Kundli Milan Match Finder, Numerology Calculator, and Certified Sacred Store.',
+    keywords: [
+      'vedic astrology',
+      'kundli maker',
+      'gemstone recommender',
+      'kundli milan',
+      'match finder',
+      'numerology calculator',
+      'astrology store',
+      'certified gemstones'
+    ],
+    ogType: 'website',
+    priority: 1.0,
+    changefreq: 'daily',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-19',
+  },
+  {
+    id: 'daily-horoscope',
+    tab: 'horoscope',
+    path: '/horoscope',
+    aliases: ['/daily-horoscope', '/today-horoscope'],
+    title: 'Personalized Daily Horoscope & Vedic Transits | astronava.com',
+    shortTitle: 'Daily Horoscope',
+    description: 'Accurate personalized daily Vedic horoscope predictions calculated with real planetary transits (Gochar), Vimshottari Dasha, Sarvashtakavarga, Panchang, and 20 life domain scores.',
+    keywords: [
+      'daily horoscope',
+      'personalized horoscope',
+      'vedic daily predictions',
+      'astrology transits',
+      'gochar today',
+      'panchang today',
+      'choghadiya muhurat',
+      'career horoscope today',
+      'astronava horoscope'
+    ],
+    ogType: 'website',
+    priority: 0.95,
+    changefreq: 'daily',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-21',
+  },
+  {
     id: 'kundli-maker',
     tab: 'generator',
-    path: '/',
-    aliases: ['/generator', '/kundli'],
+    path: '/generator',
+    aliases: ['/kundli'],
     title: 'Free Janam Kundli & Vedic Birth Chart | Kundli Maker | astronava.com',
     shortTitle: 'Kundli Maker & Janam Patrika',
     description: 'Generate authentic Vedic Janam Kundli birth charts with Lahiri Ayanamsha, 7 divisional charts (D1 to D12), Vimshottari Dasha timeline, Sarvashtakavarga 337 bindus, and Parashari Yoga diagnostics.',
@@ -50,7 +99,7 @@ export const APP_ROUTES: AppViewRoute[] = [
       'lagna chart'
     ],
     ogType: 'website',
-    priority: 1.0,
+    priority: 0.9,
     changefreq: 'daily',
     category: 'Astrological Tools',
     lastmod: '2026-09-14',
@@ -172,6 +221,21 @@ export const APP_ROUTES: AppViewRoute[] = [
     changefreq: 'daily',
     category: 'Astrological Tools',
     lastmod: '2026-09-18',
+  },
+  {
+    id: 'user-profile',
+    tab: 'profile',
+    path: '/profile',
+    aliases: ['/account', '/dashboard'],
+    title: 'Astronava Member Profile & Dashboard | astronava.com',
+    shortTitle: 'My Member Profile',
+    description: 'Manage your Astronava member profile, permanent birth coordinates, horoscope history, wishlist, and consecrated orders in one centralized dashboard.',
+    keywords: ['astronava member', 'user dashboard', 'birth details', 'astronava account'],
+    ogType: 'website',
+    priority: 0.8,
+    changefreq: 'daily',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-21',
   },
   {
     id: 'privacy-policy',
@@ -396,6 +460,8 @@ export interface DynamicMetaOptions {
  */
 export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): string {
   switch (tab) {
+    case 'horoscope':
+      return 'Daily Horoscope | astronava.com';
     case 'generator':
       return 'Kundli Maker | astronava.com';
     case 'builder':

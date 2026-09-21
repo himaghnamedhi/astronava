@@ -58,7 +58,59 @@ service cloud.firestore {
         (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
         (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500)) &&
         (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 30)) &&
+        (!('dob' in data) || (data.dob is string && data.dob.size() == 10)) &&
+        (!('tob' in data) || (data.tob is string && data.tob.size() <= 10)) &&
+        (!('isTobUnknown' in data) || data.isTobUnknown is bool) &&
+        (!('birthPlace' in data) || (data.birthPlace is string && data.birthPlace.size() <= 150)) &&
+        (!('latitude' in data) || (data.latitude is number && data.latitude >= -90.0 && data.latitude <= 90.0)) &&
+        (!('longitude' in data) || (data.longitude is number && data.longitude >= -180.0 && data.longitude <= 180.0)) &&
+        (!('timezoneOffset' in data) || (data.timezoneOffset is number && data.timezoneOffset >= -14.0 && data.timezoneOffset <= 14.0)) &&
+        (!('gender' in data) || (data.gender is string && (data.gender == 'male' || data.gender == 'female' || data.gender == 'other'))) &&
+        (!('preferredLanguage' in data) || (data.preferredLanguage is string && data.preferredLanguage.size() <= 20)) &&
+        (!('notificationTime' in data) || (data.notificationTime is string && data.notificationTime.size() <= 10)) &&
+        (!('notificationsEnabled' in data) || data.notificationsEnabled is bool) &&
+        (!('notificationChannels' in data) || (data.notificationChannels is list && data.notificationChannels.size() <= 5)) &&
+        (!('consentGiven' in data) || data.consentGiven is bool) &&
+        (!('consentTimestamp' in data) || (data.consentTimestamp is string && data.consentTimestamp.size() <= 50)) &&
         data.createdAt is timestamp;
+    }
+
+    function isValidDailyHoroscope(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'date', 'overallScore', 'summary', 'createdAt']) &&
+        data.id is string && data.id.size() == 10 &&
+        data.userId is string && data.userId == userId &&
+        data.date is string && data.date.size() == 10 &&
+        data.overallScore is number && data.overallScore >= 0 && data.overallScore <= 100 &&
+        data.summary is string && data.summary.size() <= 2000 &&
+        (!('scores' in data) || data.scores is map) &&
+        (!('categoryDetails' in data) || data.categoryDetails is map) &&
+        (!('astrologicalHighlights' in data) || data.astrologicalHighlights is map) &&
+        (!('confidenceScore' in data) || (data.confidenceScore is number && data.confidenceScore >= 0 && data.confidenceScore <= 100)) &&
+        data.createdAt == request.time;
+    }
+
+    function isValidHoroscopeFeedback(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'date', 'rating', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.userId is string && data.userId == userId &&
+        data.date is string && data.date.size() == 10 &&
+        data.rating is number && data.rating >= 1 && data.rating <= 4 &&
+        (!('accuracyVerdict' in data) || (data.accuracyVerdict is string && data.accuracyVerdict.size() <= 50)) &&
+        (!('comment' in data) || (data.comment is string && data.comment.size() <= 500)) &&
+        data.createdAt == request.time;
+    }
+
+    function isValidHoroscopeSubscription(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'email', 'preferredTime', 'channels', 'active', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.userId is string && data.userId == userId &&
+        data.email is string && data.email.size() <= 150 &&
+        data.preferredTime is string && data.preferredTime.size() <= 10 &&
+        data.channels is list && data.channels.size() <= 5 &&
+        data.active is bool &&
+        (!('consentGiven' in data) || data.consentGiven is bool) &&
+        (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 30)) &&
+        data.createdAt == request.time;
     }
 
     function isValidAiSummary(data, userId) {
@@ -135,6 +187,28 @@ service cloud.firestore {
         allow create: if request.auth != null && request.auth.uid == userId && isValidId(summaryId) && summaryId == incoming().id && isValidAiSummary(incoming(), userId);
         allow update: if false; // AI Summaries are immutable records
         allow delete: if request.auth != null && request.auth.uid == userId && isValidId(summaryId);
+      }
+
+      // Daily Horoscope Archive subcollection
+      match /dailyHoroscopes/{date} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null && request.auth.uid == userId && date.size() == 10 && date == incoming().id && isValidDailyHoroscope(incoming(), userId);
+        allow delete: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // User Accuracy Feedback subcollection
+      match /horoscopeFeedback/{feedbackId} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId && isValidId(feedbackId) && feedbackId == incoming().id && isValidHoroscopeFeedback(incoming(), userId);
+        allow update: if false; // Feedback records are immutable
+        allow delete: if request.auth != null && request.auth.uid == userId && isValidId(feedbackId);
+      }
+
+      // Horoscope Delivery Subscriptions subcollection
+      match /horoscopeSubscriptions/{subId} {
+        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null && request.auth.uid == userId && isValidId(subId) && subId == incoming().id && isValidHoroscopeSubscription(incoming(), userId);
+        allow delete: if request.auth != null && request.auth.uid == userId && isValidId(subId);
       }
 
       // Wishlist subcollection

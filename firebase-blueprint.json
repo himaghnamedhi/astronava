@@ -253,6 +253,217 @@
         "orderStatus",
         "createdAt"
       ]
+    },
+    "DailyHoroscope": {
+      "title": "DailyHoroscope",
+      "description": "Calculated and interpreted daily Vedic horoscope record for a user on a given date.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Date of horoscope in YYYY-MM-DD format",
+          "maxLength": 10
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "date": {
+          "type": "string",
+          "description": "Calendar date string YYYY-MM-DD",
+          "maxLength": 10
+        },
+        "overallScore": {
+          "type": "number",
+          "description": "Overall cosmic alignment score from 0 to 100"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive astrological summary for the day",
+          "maxLength": 1000
+        },
+        "strongestPlanet": {
+          "type": "string",
+          "description": "Strongest benefic or activating planet today",
+          "maxLength": 50
+        },
+        "biggestOpportunity": {
+          "type": "string",
+          "description": "Highest scoring domain and favorable transit opportunity",
+          "maxLength": 200
+        },
+        "biggestChallenge": {
+          "type": "string",
+          "description": "Most sensitive domain requiring mindfulness and remedy",
+          "maxLength": 200
+        },
+        "dailyAdvice": {
+          "type": "string",
+          "description": "Practical and actionable daily Jyotish guidance",
+          "maxLength": 500
+        },
+        "mantra": {
+          "type": "string",
+          "description": "Recommended daily Vedic chant or Beej mantra",
+          "maxLength": 200
+        },
+        "luckyNumber": {
+          "type": "number",
+          "description": "Numerologically calculated auspicious number for the day"
+        },
+        "luckyColor": {
+          "type": "string",
+          "description": "Auspicious planetary color for the day",
+          "maxLength": 50
+        },
+        "luckyDirection": {
+          "type": "string",
+          "description": "Auspicious directional alignment (Digbala)",
+          "maxLength": 50
+        },
+        "luckyTime": {
+          "type": "string",
+          "description": "Auspicious Choghadiya or Shubh Hora window",
+          "maxLength": 100
+        },
+        "confidenceScore": {
+          "type": "number",
+          "description": "Astrological confidence rating percentage (0-100)"
+        },
+        "scores": {
+          "type": "object",
+          "description": "Scores across 20 distinct life categories"
+        },
+        "categoryDetails": {
+          "type": "object",
+          "description": "Detailed category explanations with astrological drivers and advice"
+        },
+        "astrologicalHighlights": {
+          "type": "object",
+          "description": "Transits, Vimshottari dasha rulers, and Panchang parameters"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Generation timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "date",
+        "overallScore",
+        "summary",
+        "createdAt"
+      ]
+    },
+    "HoroscopeFeedback": {
+      "title": "HoroscopeFeedback",
+      "description": "User accuracy rating and feedback for a daily horoscope prediction.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique feedback ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "User UID submitting feedback",
+          "maxLength": 128
+        },
+        "date": {
+          "type": "string",
+          "description": "Horoscope date evaluated",
+          "maxLength": 10
+        },
+        "rating": {
+          "type": "number",
+          "description": "Accuracy rating from 1 to 4 stars"
+        },
+        "accuracyVerdict": {
+          "type": "string",
+          "description": "Label matching rating (Very Accurate, Accurate, Partly Accurate, Not Accurate)",
+          "maxLength": 50
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional user reflections or observations",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Feedback timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "date",
+        "rating",
+        "createdAt"
+      ]
+    },
+    "HoroscopeSubscription": {
+      "title": "HoroscopeSubscription",
+      "description": "Daily horoscope delivery schedule and notification channel preferences.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Subscription identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Subscriber user UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Delivery email address",
+          "maxLength": 150
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Optional telephone or WhatsApp number",
+          "maxLength": 30
+        },
+        "preferredTime": {
+          "type": "string",
+          "description": "Preferred delivery time in HH:mm format",
+          "maxLength": 10
+        },
+        "channels": {
+          "type": "array",
+          "description": "Enabled notification channels",
+          "items": { "type": "string" }
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Subscription status flag"
+        },
+        "consentGiven": {
+          "type": "boolean",
+          "description": "Explicit user consent flag for receiving daily updates"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Subscription timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "email",
+        "preferredTime",
+        "channels",
+        "active",
+        "createdAt"
+      ]
     }
   },
   "firestore": {
@@ -267,6 +478,18 @@
     "/users/{userId}/aiSummaries/{summaryId}": {
       "schema": "AiSummary",
       "description": "Collection of saved AI astrological summaries belonging to the user."
+    },
+    "/users/{userId}/dailyHoroscopes/{date}": {
+      "schema": "DailyHoroscope",
+      "description": "User daily horoscope archive collection partitioned by calendar date."
+    },
+    "/users/{userId}/horoscopeFeedback/{feedbackId}": {
+      "schema": "HoroscopeFeedback",
+      "description": "User accuracy feedback records on daily horoscope predictions."
+    },
+    "/users/{userId}/horoscopeSubscriptions/{subId}": {
+      "schema": "HoroscopeSubscription",
+      "description": "Daily horoscope delivery channel configuration."
     },
     "/users/{userId}/wishlist/{itemId}": {
       "schema": "WishlistItem",

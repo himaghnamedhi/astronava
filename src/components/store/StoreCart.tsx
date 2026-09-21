@@ -13,8 +13,10 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { useAuth } from '../../context/AuthContext';
 
 export const StoreCart: React.FC = () => {
+  const { user, openAuthModal } = useAuth();
   const {
     cart,
     cartCount,
@@ -295,10 +297,16 @@ export const StoreCart: React.FC = () => {
 
             {/* Checkout Button */}
             <button
-              onClick={navigateToCheckout}
+              onClick={() => {
+                if (!user || user.isAnonymous) {
+                  openAuthModal('Sign up as an Astronava Member to complete checkout and order your consecrated items.');
+                  return;
+                }
+                navigateToCheckout();
+              }}
               className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950 hover:from-amber-600 hover:to-amber-900 text-amber-50 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-98 cursor-pointer"
             >
-              <span>Proceed to Checkout</span>
+              <span>{(!user || user.isAnonymous) ? 'Sign Up to Checkout' : 'Proceed to Checkout'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

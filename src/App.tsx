@@ -18,6 +18,9 @@ import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { StoreProvider } from './context/StoreContext';
 import { StoreModule } from './components/store/StoreModule';
+import { HomePage } from './components/HomePage';
+import { HoroscopeDashboard } from './components/horoscope/HoroscopeDashboard';
+import { UserDashboard } from './components/user/UserDashboard';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 /**
@@ -26,12 +29,15 @@ import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitem
  * (e.g. 'Kundli Maker | astronava.com' vs 'Gemstone Recommender | astronava.com')
  */
 export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType) => string)> = {
+  home: 'Astronava | Authentic Vedic Astrology, Kundli, Gemstones & Store',
+  horoscope: 'Daily Horoscope | astronava.com',
   generator: 'Kundli Maker | astronava.com',
   builder: 'Kundli Builder | astronava.com',
   gemstones: 'Gemstone Recommender | astronava.com',
   match: 'Kundli Milan | astronava.com',
   numerology: 'Numerology Calculator | astronava.com',
   store: 'Store | astronava.com',
+  profile: 'My Profile & Account Dashboard | astronava.com',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
@@ -52,12 +58,15 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
  * to craft compelling, high-converting SERP titles.
  */
 export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) => string)> = {
+  home: 'Astronava — Vedic Astrology & Sacred Offerings Hub',
+  horoscope: 'Personalized Daily Horoscope & Vedic Transits',
   generator: 'Free Janam Kundli & Vedic Birth Chart',
   builder: 'Interactive House & Planetary Visualizer',
   gemstones: 'Vedic Ratna Calculator & Remedies',
   match: '36 Guna Horoscope Matching & Compatibility',
   numerology: 'Mulank, Bhagyank & Destiny Number Analysis',
   store: 'Certified Gemstones, Nepali Rudraksha & Crystals',
+  profile: 'Astronava Member Dashboard & Astrological Records',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
@@ -134,7 +143,7 @@ export function updateTabMetaTags(
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<AppTabType>('generator');
+  const [activeTab, setActiveTab] = useState<AppTabType>('home');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>('sun');
   const [chartStyle, setChartStyle] = useState<ChartStyle>('north');
@@ -210,7 +219,15 @@ export default function App() {
       setActiveTab('store');
       return true;
     }
-    if (cleanPath === '' || cleanPath === '/' || cleanPath === '/generator' || cleanPath === '/kundli') {
+    if (cleanPath === '/profile' || cleanPath === '/account' || cleanPath === '/dashboard') {
+      setActiveTab('profile');
+      return true;
+    }
+    if (cleanPath === '' || cleanPath === '/' || cleanPath === '/home') {
+      setActiveTab('home');
+      return true;
+    }
+    if (cleanPath === '/generator' || cleanPath === '/kundli') {
       setActiveTab('generator');
       return true;
     }
@@ -261,7 +278,7 @@ export default function App() {
   };
 
   const handleReturnHome = () => {
-    handleTabChange('generator');
+    handleTabChange('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -318,6 +335,17 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
         
         {/* Dynamic Content Views based on activeTab */}
+        {activeTab === 'home' && (
+          <HomePage
+            onSelectTab={(tab) => {
+              handleTabChange(tab);
+              scrollToTop();
+            }}
+          />
+        )}
+
+        {activeTab === 'horoscope' && <HoroscopeDashboard />}
+
         {activeTab === 'generator' && (
           <KundliGenerator
             onOpenReportModal={(kData) => handleOpenReport('kundli', kData)}
@@ -385,6 +413,10 @@ export default function App() {
 
         {activeTab === 'store' && <StoreModule />}
 
+        {activeTab === 'profile' && (
+          <UserDashboard onNavigateTab={handleTabChange} />
+        )}
+
       </main>
 
       {/* Footer */}
@@ -416,12 +448,24 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      handleTabChange('generator');
+                      handleTabChange('horoscope');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">1.</span>
+                    <span>Personalized Daily Horoscope</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      handleTabChange('generator');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">2.</span>
                     <span>Kundli Maker &amp; Janam Patrika</span>
                   </button>
                 </li>
@@ -433,7 +477,7 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">2.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">3.</span>
                     <span>Kundli Builder &amp; Visualizer</span>
                   </button>
                 </li>
@@ -445,7 +489,7 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">3.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">4.</span>
                     <span>Find Gemstone You Need</span>
                   </button>
                 </li>
@@ -457,7 +501,7 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">4.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">5.</span>
                     <span>Match Finder (Kundli Milan)</span>
                   </button>
                 </li>
@@ -469,7 +513,7 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">5.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">6.</span>
                     <span>Numerology Calculator</span>
                   </button>
                 </li>
@@ -481,8 +525,20 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">6.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">7.</span>
                     <span>Store</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      handleTabChange('profile');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">8.</span>
+                    <span>My Profile &amp; Dashboard</span>
                   </button>
                 </li>
               </ul>

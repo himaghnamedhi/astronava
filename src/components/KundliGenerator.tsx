@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
+import { useAuth } from '../context/AuthContext';
 
 import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology';
 import { 
@@ -311,6 +312,8 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   onApplyPlacementsToBuilder,
   onKundliGenerated,
 }) => {
+  const { user, openAuthModal } = useAuth();
+
   // 1. Birth Form State - Defaulting to not generated until user enters details
   const [birthDetails, setBirthDetails] = useState<BirthDetails>({
     name: '',
@@ -537,6 +540,14 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
   const handleGenerate = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
+    // Guest seekers can explore all famous historical charts below.
+    // To compute a personalized natal chart, prompt them to sign up.
+    if (!user || user.isAnonymous) {
+      openAuthModal('Sign up as an Astronava Member to compute, store, and access your personal Janam Kundli.');
+      return;
+    }
+
     if (!birthDetails.name.trim()) {
       setFormError('Please enter the native\'s full name.');
       return;
@@ -562,6 +573,12 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   // Direct High-Resolution Multi-Page PDF Exporter
   const handleDirectDownloadPdf = async () => {
     if (!kundliData) return;
+
+    if (!user || user.isAnonymous) {
+      openAuthModal('Sign up as an Astronava Member to download high-resolution Janam Patrika PDF reports.');
+      return;
+    }
+
     setIsGeneratingPdf(true);
     const safeTithiName = kundliData.tithi?.name || kundliData.tithi?.tithi?.name || 'Vedic Tithi';
     const safePaksha = kundliData.tithi?.paksha || kundliData.tithi?.tithi?.paksha || '';
@@ -666,7 +683,13 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
                 <button
                   id="btn-download-kundli-pdf"
-                  onClick={() => setShowPatrikaPdfModal(true)}
+                  onClick={() => {
+                    if (!user || user.isAnonymous) {
+                      openAuthModal('Sign up as an Astronava Member to download high-resolution Janam Patrika PDF reports.');
+                      return;
+                    }
+                    setShowPatrikaPdfModal(true);
+                  }}
                   className="px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
                   title="Vedic Kundli PDF"
                 >
@@ -1158,14 +1181,22 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
             </div>
 
             {/* Submit Action Button */}
-            <div className="pt-3 border-t border-stone-100 flex items-center justify-end">
+            <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+              {(!user || user.isAnonymous) ? (
+                <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/80 px-3 py-2 rounded-xl border border-amber-200/80 w-full sm:w-auto">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                  <span>Guest Seeker: Explore famous horoscopes below. Sign up to compute your personal chart.</span>
+                </div>
+              ) : (
+                <div />
+              )}
               <button
                 type="submit"
                 id="btn-submit-kundli-calc"
                 className="w-full sm:w-auto px-7 py-3 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Generate Janam Kundli</span>
+                <span>{(!user || user.isAnonymous) ? 'Sign Up to Calculate Kundli' : 'Generate Janam Kundli'}</span>
               </button>
             </div>
           </form>

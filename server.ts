@@ -6,6 +6,7 @@ import { generateKundliAiSummary } from './src/server/geminiAstrology';
 import { generateClientSitemapXml } from './src/utils/sitemap';
 import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
 import { seedStoreIfEmpty } from './src/server/storeDb.ts';
+import { horoscopeRouter } from './src/server/horoscopeRoutes';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ async function startServer() {
   // Astronava Store API Routes
   app.use('/api/store', storeRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/horoscope', horoscopeRouter);
 
   // Dynamic XML Sitemap Endpoint for Web Crawlers and Search Engines
   app.get('/sitemap.xml', (req, res) => {
