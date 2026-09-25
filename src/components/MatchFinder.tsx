@@ -28,6 +28,7 @@ import {
   Database,
   Trash2,
   RefreshCw,
+  Eye,
   Cloud
 } from 'lucide-react';
 import { 
@@ -370,10 +371,10 @@ Calculated via Astronava Match Finder`;
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn w-full max-w-full min-w-0 box-border">
       
       {/* 1. HERO HEADER */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-stone-900 via-amber-950 to-stone-950 text-white p-6 sm:p-8 border border-amber-500/20 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-stone-900 via-amber-950 to-stone-950 text-white p-4 sm:p-6 lg:p-8 border border-amber-500/20 shadow-xl w-full min-w-0 box-border">
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="space-y-3 max-w-3xl">
@@ -405,8 +406,8 @@ Calculated via Astronava Match Finder`;
           </div>
         </div>
 
-        {/* 1-Click Test Presets */}
-        <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center gap-3">
+        {/* 1-Click Test Presets - Clean whitespace without border clutter */}
+        <div className="mt-5 pt-1 flex flex-col sm:flex-row sm:items-center gap-3">
           <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5 shrink-0">
             <Users className="w-3.5 h-3.5 text-amber-400" />
             <span>Try Curated Sample Matches:</span>
@@ -417,7 +418,7 @@ Calculated via Astronava Match Finder`;
                 key={preset.id}
                 type="button"
                 onClick={() => handleLoadPreset(preset.id)}
-                className="px-3 py-1.5 rounded-xl bg-stone-800/80 hover:bg-amber-900/60 border border-stone-700 hover:border-amber-400/50 text-stone-200 hover:text-amber-100 text-xs font-medium transition-all cursor-pointer shadow-xs active:scale-95"
+                className="px-3 py-1.5 rounded-xl bg-stone-800/80 hover:bg-amber-900/60 border border-stone-700 hover:border-amber-400/50 text-stone-200 hover:text-amber-100 text-xs font-medium transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-xs active:scale-95"
               >
                 {preset.title}
               </button>
@@ -426,18 +427,101 @@ Calculated via Astronava Match Finder`;
         </div>
       </div>
 
+      {/* GUEST SEEKER PREVIEW & WHAT YOU WILL GET PANEL */}
+      {(!user || user.isAnonymous) && (
+        <div className="bg-gradient-to-br from-amber-50/90 via-[#FAF7F2] to-amber-50/40 rounded-3xl p-6 sm:p-7 border border-amber-200/80 shadow-xs space-y-5 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/60 text-amber-950 text-[11px] font-bold tracking-wider uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                <span>Guest Seeker Preview</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold font-vedic text-stone-900">
+                What You Will Get with 36-Guna Kundli Milan
+              </h3>
+              <p className="text-xs text-stone-600 max-w-2xl leading-relaxed">
+                As a guest seeker, you can test curated compatibility presets freely. Astronava Members unlock customized partner birth chart pairing with full Kuja Dosha diagnostics and printable reports.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                type="button"
+                onClick={() => handleLoadPreset(MATCH_PRESETS[0].id)}
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-xs font-semibold border border-stone-300 shadow-2xs hover:shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Eye className="w-3.5 h-3.5 text-stone-600" />
+                <span>Preview Sample Match</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => openAuthModal('Create your free Astronava Member account to compute 36-Guna Kundli Milan & Manglik dosha analysis.')}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 text-xs font-bold shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5 border border-amber-600/40"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                <span>Sign Up to Unlock</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 Core Milan Deliverables Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            {[
+              {
+                title: '36-Guna Ashta Kuta Score',
+                desc: 'Complete points distribution across Varna, Vashya, Tara, Yoni, Graha, Gana, Bhakoot & Nadi',
+                icon: Award,
+              },
+              {
+                title: 'Manglik Dosha Analysis',
+                desc: 'Planetary Kuja placements for both charts with classical cancellation exceptions',
+                icon: Flame,
+              },
+              {
+                title: 'Rajju & Vedha Check',
+                desc: 'Comprehensive longevity, physical health resonance, and mutual spiritual affinity',
+                icon: ShieldCheck,
+              },
+              {
+                title: 'Printable Milan Patrika',
+                desc: 'Downloadable summary certificate with astrologer-grade synthesis for wedding records',
+                icon: FileText,
+              },
+            ].map((feature) => {
+              const FIcon = feature.icon;
+              return (
+                <div
+                  key={feature.title}
+                  className="p-3.5 rounded-2xl bg-white/90 border border-stone-200/80 shadow-2xs space-y-1.5 transition-all duration-300 hover:scale-[1.02] hover:border-amber-300"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-amber-100/70 text-amber-900 flex items-center justify-center">
+                    <FIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-stone-900 font-vedic leading-tight">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[11px] text-stone-500 leading-normal">
+                    {feature.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 2. TWO-PARTNER BIRTH INPUT FORMS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* PARTNER 1 */}
-        <div className={`rounded-3xl p-5 sm:p-6 border shadow-xs space-y-5 transition-all duration-200 ${
+        <div className={`rounded-3xl p-5 sm:p-6 border shadow-xs space-y-5 transition-all duration-300 hover:shadow-md ${
           p1Details.gender === 'male'
             ? 'bg-linear-to-b from-blue-50/30 via-white to-white border-blue-200/90'
             : p1Details.gender === 'female'
             ? 'bg-linear-to-b from-pink-50/30 via-white to-white border-pink-200/90'
             : 'bg-white border-amber-900/15'
         }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200/80">
+          <div className="flex items-center justify-between pb-1">
             <div className="flex items-center gap-2.5">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-2xs shrink-0 transition-colors ${
                 p1Details.gender === 'male'
@@ -709,14 +793,14 @@ Calculated via Astronava Match Finder`;
         </div>
 
         {/* PARTNER 2 */}
-        <div className={`rounded-3xl p-5 sm:p-6 border shadow-xs space-y-5 transition-all duration-200 ${
+        <div className={`rounded-3xl p-5 sm:p-6 border shadow-xs space-y-5 transition-all duration-300 hover:shadow-md ${
           p2Details.gender === 'female'
             ? 'bg-linear-to-b from-pink-50/30 via-white to-white border-pink-200/90'
             : p2Details.gender === 'male'
             ? 'bg-linear-to-b from-blue-50/30 via-white to-white border-blue-200/90'
             : 'bg-white border-amber-900/15'
         }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200/80">
+          <div className="flex items-center justify-between pb-1">
             <div className="flex items-center gap-2.5">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-2xs shrink-0 transition-colors ${
                 p2Details.gender === 'female'
@@ -988,11 +1072,11 @@ Calculated via Astronava Match Finder`;
         </div>
       </div>
 
-      {/* CALCULATE & REPORT ACTION ROW */}
-      <div className="flex flex-col items-center justify-center gap-3">
+      {/* CALCULATE & REPORT ACTION ROW - Clean whitespace without line clutter */}
+      <div className="flex flex-col items-center justify-center gap-3 pt-2">
         {(!user || user.isAnonymous) && (
-          <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/90 px-4 py-2 rounded-xl border border-amber-200/80 max-w-xl text-center">
-            <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+          <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/90 px-4 py-2.5 rounded-xl border border-amber-200/80 max-w-xl text-center shadow-2xs">
+            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
             <span>Guest Seeker: Explore preset matches above freely. Sign up as an Astronava Member to calculate compatibility between two custom horoscopes.</span>
           </div>
         )}
@@ -1002,7 +1086,7 @@ Calculated via Astronava Match Finder`;
             <button
               type="button"
               onClick={() => setHasCalculated(false)}
-              className="px-5 py-4 rounded-2xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+              className="px-5 py-4 rounded-2xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center gap-2 shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer"
             >
               <RotateCcw className="w-4 h-4 text-stone-600" />
               <span>View Basic Information</span>
@@ -1012,15 +1096,20 @@ Calculated via Astronava Match Finder`;
           <button
             type="button"
             onClick={handleCalculateMatch}
-            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 font-extrabold text-base tracking-wide font-vedic shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center gap-3 cursor-pointer border border-amber-600/30"
+            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 font-extrabold text-base tracking-wide font-vedic shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-3 cursor-pointer border border-amber-600/30"
           >
-            <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
-            <span>
-              {(!user || user.isAnonymous) 
-                ? 'Sign Up to Calculate Match' 
-                : (hasCalculated ? 'Recalculate Kundli Match' : 'Calculate Kundli Match')}
-            </span>
-            <Sparkles className="w-4 h-4 text-amber-300" />
+            {(!user || user.isAnonymous) ? (
+              <>
+                <ShieldCheck className="w-5 h-5 text-amber-300" />
+                <span>Sign Up to Calculate Match</span>
+              </>
+            ) : (
+              <>
+                <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
+                <span>{hasCalculated ? 'Recalculate Kundli Match' : 'Calculate Kundli Match'}</span>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </>
+            )}
           </button>
 
           {hasCalculated && (

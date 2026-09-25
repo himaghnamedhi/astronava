@@ -100,9 +100,9 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0 box-border">
       {/* 9 Planet House Placement Selectors */}
-      <div className="bg-white p-5 sm:p-7 rounded-3xl border border-amber-900/15 shadow-sm space-y-5">
+      <div className="bg-white p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-amber-900/15 shadow-sm space-y-4 sm:space-y-5 w-full min-w-0 box-border">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
           <div>

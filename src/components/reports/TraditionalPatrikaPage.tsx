@@ -181,7 +181,7 @@ export const TraditionalPatrikaPage: React.FC<TraditionalPatrikaPageProps> = ({
 
   return (
     <div
-      className={`pdf-report-page bg-white text-stone-900 mx-auto relative box-border overflow-hidden print:m-0 print:border-none print:shadow-none shadow-xl border border-stone-300 w-[794px] h-[1123px] max-h-[1123px] flex ${className}`}
+      className={`print-page-a4 pdf-report-page bg-white text-stone-900 mx-auto relative box-border overflow-hidden print:m-0 print:border-none print:shadow-none shadow-xl border border-stone-300 w-[794px] h-[1123px] max-h-[1123px] flex ${className}`}
       style={{
         pageBreakAfter: 'always',
         pageBreakInside: 'avoid',
@@ -363,7 +363,7 @@ export const TraditionalPatrikaPage: React.FC<TraditionalPatrikaPageProps> = ({
           <div className="flex items-center justify-between text-[9px] text-stone-600 pt-0.5">
             <span>{contactLine}</span>
             <span className="font-bold text-[#c0262d] underline tracking-tight">{websiteAddress}</span>
-            <span className="font-bold text-[#c0262d] text-xs font-mono">{pageNumber}</span>
+            <span className="font-bold text-[#c0262d] text-xs font-mono print:hidden">{pageNumber}</span>
           </div>
         </div>
       </div>

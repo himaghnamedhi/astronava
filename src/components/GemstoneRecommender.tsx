@@ -29,7 +29,9 @@ import {
   Search,
   Globe,
   FileText,
-  BookOpen
+  BookOpen,
+  ShieldCheck,
+  Eye
 } from 'lucide-react';
 import { 
   NAVARATNA_DATA, 
@@ -258,9 +260,9 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
   const nameDestinyGemData = Object.values(NAVARATNA_DATA).find(g => g.planet === calculatedProfile.destinyPlanet) || NAVARATNA_DATA['ruby'];
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn w-full max-w-full min-w-0 box-border">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-[#FAF5EE] via-[#F5EFE6] to-[#ECE3D5] rounded-3xl p-6 sm:p-8 border border-amber-900/15 shadow-sm relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#FAF5EE] via-[#F5EFE6] to-[#ECE3D5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-amber-900/15 shadow-sm relative overflow-hidden w-full min-w-0 box-border">
         <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
@@ -399,11 +401,99 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
 
       {/* SUB-VIEW 0: RECOMMENDATION BY NAME, DOB, TIME & PLACE */}
       {activeSubTab === 'birth_calc' && (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-fadeIn">
           
+          {/* GUEST SEEKER PREVIEW & WHAT YOU WILL GET PANEL */}
+          {(!user || user.isAnonymous) && (
+            <div className="bg-gradient-to-br from-amber-50/90 via-[#FAF7F2] to-amber-50/40 rounded-3xl p-6 sm:p-7 border border-amber-200/80 shadow-xs space-y-5 animate-in fade-in duration-300">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/60 text-amber-950 text-[11px] font-bold tracking-wider uppercase">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Guest Seeker Preview</span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold font-vedic text-stone-900">
+                    What You Will Get with Vedic Gemstone Prescription
+                  </h3>
+                  <p className="text-xs text-stone-600 max-w-2xl leading-relaxed">
+                    Explore the 9 sacred Navaratnas, 12 ascendants, and synergy rules freely. Astronava Members unlock personalized 3-tier gemstone analysis calibrated directly to their birth chart and body weight.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedLagna(1);
+                      setHasCalculated(true);
+                      const el = document.getElementById('section-basic-gemstone-info');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-xs font-semibold border border-stone-300 shadow-2xs hover:shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-stone-600" />
+                    <span>Preview Sample Prescription</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal('Create your free Astronava Member account to calculate your personalized Vedic gemstone prescription.')}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 text-xs font-bold shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5 border border-amber-600/40"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Sign Up to Unlock</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Core Gemstone Deliverables Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+                {[
+                  {
+                    title: '3-Tier Ratna Prescription',
+                    desc: 'Life Stone (Jeevan), Lucky Stone (Bhagya), & Career Karaka derived from Lagna & Trikona lords',
+                    icon: Crown,
+                  },
+                  {
+                    title: 'Body-Weight Ratti Dosage',
+                    desc: 'Calibrated weight-to-carat ratio ensuring optimal pranic absorption without planetary overload',
+                    icon: Scale,
+                  },
+                  {
+                    title: 'Consecration (Pran Pratishtha)',
+                    desc: 'Specific metal (gold/silver/panchdhatu), finger, auspicious day, and Vedic Beej Mantras',
+                    icon: Sparkles,
+                  },
+                  {
+                    title: 'Antagonistic Synergy Shield',
+                    desc: 'Automated conflict detector checking hostile planetary combinations (e.g. Ruby vs Blue Sapphire)',
+                    icon: Shield,
+                  },
+                ].map((feature) => {
+                  const FIcon = feature.icon;
+                  return (
+                    <div
+                      key={feature.title}
+                      className="p-3.5 rounded-2xl bg-white/90 border border-stone-200/80 shadow-2xs space-y-1.5 transition-all duration-300 hover:scale-[1.02] hover:border-amber-300"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-amber-100/70 text-amber-900 flex items-center justify-center">
+                        <FIcon className="w-3.5 h-3.5" />
+                      </div>
+                      <h4 className="text-xs font-bold text-stone-900 font-vedic leading-tight">
+                        {feature.title}
+                      </h4>
+                      <p className="text-[11px] text-stone-500 leading-normal">
+                        {feature.desc}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Input Form Card */}
-          <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
+          <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-8 shadow-sm space-y-6 transition-all duration-300 hover:shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-amber-950 font-vedic">
                   Free Gemstone Calculator by Date of Birth &amp; Kundli
@@ -815,8 +905,8 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
 
             </div>
 
-            {/* Calculate Action */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-stone-100">
+            {/* Calculate Action - Clean whitespace without border clutter */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3">
               <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-stone-600 text-center sm:text-left w-full sm:w-auto">
                 <Scale className="w-4 h-4 text-amber-800 shrink-0" />
                 <span>
@@ -833,7 +923,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                       const el = document.getElementById('section-basic-gemstone-info');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="px-4 py-3 rounded-xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+                    className="px-4 py-3 rounded-xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 font-semibold text-sm flex items-center justify-center gap-1.5 shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer"
                   >
                     <BookOpen className="w-4 h-4 text-stone-600" />
                     <span>View Basic Info Below</span>
@@ -842,14 +932,19 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                 <button
                   id="btn-calculate-my-gemstones"
                   onClick={handleCalculateBirthChart}
-                  className="px-6 py-3 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer text-center"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 hover:from-amber-700 hover:to-amber-900 text-amber-50 font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer text-center border border-amber-600/30"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>
-                    {(!user || user.isAnonymous)
-                      ? 'Sign Up to Calculate Prescription'
-                      : (hasCalculated ? 'Recalculate My Gemstones' : 'Calculate My Gemstones')}
-                  </span>
+                  {(!user || user.isAnonymous) ? (
+                    <>
+                      <ShieldCheck className="w-4 h-4 text-amber-300" />
+                      <span>Sign Up to Calculate Prescription</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 text-amber-300" />
+                      <span>{hasCalculated ? 'Recalculate My Gemstones' : 'Calculate My Gemstones'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

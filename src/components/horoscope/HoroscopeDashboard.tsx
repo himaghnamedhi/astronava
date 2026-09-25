@@ -339,12 +339,12 @@ export const HoroscopeDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn max-w-7xl mx-auto pb-8 sm:pb-12 w-full max-w-full min-w-0 box-border">
       
       {/* Session / Guest Notice Banner */}
       {!user && (
-        <div className="p-4 rounded-3xl bg-amber-500/10 border border-amber-600/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-2xs">
-          <div className="flex items-center gap-2.5">
+        <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-amber-500/10 border border-amber-600/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-2xs w-full min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Sparkles className="w-4 h-4 text-amber-700 shrink-0" />
             <span className="text-amber-950 font-medium">
               Horoscope calculated for <strong>{userProfile.name}</strong> ({userProfile.birthPlace}). Sign in to Astronava to link these birth coordinates to your permanent account.
@@ -352,7 +352,7 @@ export const HoroscopeDashboard: React.FC = () => {
           </div>
           <button
             onClick={() => openAuthModal('Sign in to save your birth coordinates permanently')}
-            className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-800 text-white font-bold whitespace-nowrap cursor-pointer shrink-0 transition-all shadow-xs"
+            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-800 text-white font-bold whitespace-nowrap cursor-pointer shrink-0 transition-all shadow-xs text-center"
           >
             Save to My Account
           </button>
@@ -360,7 +360,7 @@ export const HoroscopeDashboard: React.FC = () => {
       )}
 
       {/* 1. TOP PROFILE & NAVIGATION HEADER BAR */}
-      <section className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/90 shadow-sm relative overflow-hidden">
+      <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 border border-stone-200/90 shadow-sm relative overflow-hidden w-full min-w-0 box-border">
         <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 relative">
@@ -489,7 +489,7 @@ export const HoroscopeDashboard: React.FC = () => {
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             {/* Left Gauge Box (4 Cols) */}
-            <div className="lg:col-span-4 bg-gradient-to-b from-stone-900 to-amber-950 text-white rounded-3xl p-6 sm:p-7 shadow-xl border border-stone-800 flex flex-col justify-between relative overflow-hidden">
+            <div className="lg:col-span-4 bg-gradient-to-b from-stone-900 to-amber-950 text-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xl border border-stone-800 flex flex-col justify-between relative overflow-hidden w-full min-w-0">
               <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
 
               <div>
@@ -501,11 +501,11 @@ export const HoroscopeDashboard: React.FC = () => {
                 {/* Big Score Circular Display */}
                 <div className="text-center my-4">
                   <div className="relative inline-flex items-center justify-center">
-                    <div className="w-36 h-36 rounded-full border-4 border-amber-500/20 flex flex-col items-center justify-center bg-stone-950/40 backdrop-blur-xs">
-                      <span className="text-5xl font-black text-amber-300 font-vedic leading-none">
+                    <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full border-4 border-amber-500/20 flex flex-col items-center justify-center bg-stone-950/40 backdrop-blur-xs">
+                      <span className="text-4xl sm:text-5xl font-black text-amber-300 font-vedic leading-none">
                         {horoscope.overallScore}
                       </span>
-                      <span className="text-[11px] text-stone-400 font-bold uppercase tracking-wider mt-1">
+                      <span className="text-[10px] sm:text-[11px] text-stone-400 font-bold uppercase tracking-wider mt-1">
                         Out of 100
                       </span>
                     </div>
@@ -527,7 +527,7 @@ export const HoroscopeDashboard: React.FC = () => {
               <div className="mt-4 pt-4 border-t border-stone-800 space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-stone-300 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Astrological Confidence</span>
                   </span>
                   <button
@@ -569,7 +569,7 @@ export const HoroscopeDashboard: React.FC = () => {
             </div>
 
             {/* Right Flowing Synthesis (8 Cols) */}
-            <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/90 shadow-sm flex flex-col justify-between">
+            <div className="lg:col-span-8 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 border border-stone-200/90 shadow-sm flex flex-col justify-between w-full min-w-0">
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-stone-100 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
@@ -728,8 +728,8 @@ export const HoroscopeDashboard: React.FC = () => {
           </section>
 
           {/* 5. SACRED DAILY MANTRA CARD WITH INTERACTIVE CHANT COUNTER */}
-          <section className="bg-gradient-to-r from-amber-900 via-amber-950 to-stone-900 text-white rounded-3xl p-6 sm:p-7 shadow-lg border border-stone-800">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <section className="bg-gradient-to-r from-amber-900 via-amber-950 to-stone-900 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-lg border border-stone-800 w-full min-w-0">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
               
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2">
@@ -781,7 +781,7 @@ export const HoroscopeDashboard: React.FC = () => {
           </section>
 
           {/* 6. TWENTY ASTROLOGICAL CATEGORIES SHOWCASE */}
-          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/90 shadow-sm space-y-6">
+          <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/90 shadow-sm space-y-4 sm:space-y-6 w-full min-w-0">
             
             {/* Header & Filter Controls */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-stone-100">
@@ -940,7 +940,7 @@ export const HoroscopeDashboard: React.FC = () => {
           </section>
 
           {/* 7. LIVE PLANETARY TRANSITS BOARD (GOCHAR CHAKRA) */}
-          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/90 shadow-sm space-y-4">
+          <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/90 shadow-sm space-y-4 w-full min-w-0">
             <div className="flex items-center justify-between pb-3 border-b border-stone-100 flex-wrap gap-2">
               <div>
                 <span className="text-xs font-bold text-amber-700 uppercase tracking-widest font-vedic">
@@ -1021,7 +1021,7 @@ export const HoroscopeDashboard: React.FC = () => {
           </section>
 
           {/* 8. DAILY PANCHANG & 8 CHOGHADIYA MUHURAT SLOTS */}
-          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/90 shadow-sm space-y-6">
+          <section className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/90 shadow-sm space-y-4 sm:space-y-6 w-full min-w-0">
             <div className="flex items-center justify-between pb-3 border-b border-stone-100 flex-wrap gap-2">
               <div>
                 <span className="text-xs font-bold text-amber-700 uppercase tracking-widest font-vedic">

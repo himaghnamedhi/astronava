@@ -13,7 +13,8 @@ import {
   Sun,
   Search,
   ArrowRight,
-  X
+  X,
+  SpellCheck
 } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
@@ -40,6 +41,7 @@ interface ServiceItem {
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
+  onOpenSearch,
 }) => {
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [serviceSearch, setServiceSearch] = useState('');
@@ -108,6 +110,14 @@ export const Header: React.FC<HeaderProps> = ({
       icon: Hash,
       tab: 'numerology',
     },
+    {
+      id: 'name-correction',
+      name: 'Name Correction',
+      category: 'remedies',
+      tagline: 'Chaldean & Pythagorean spelling tuning for fortune & alignment',
+      icon: SpellCheck,
+      tab: 'name-correction',
+    },
   ];
 
   const filteredServices = servicesList.filter((s) => {
@@ -116,13 +126,13 @@ export const Header: React.FC<HeaderProps> = ({
     return s.name.toLowerCase().includes(q) || s.tagline.toLowerCase().includes(q);
   });
 
-  const isServicesActive = ['generator', 'horoscope', 'match', 'gemstones', 'numerology', 'builder'].includes(activeTab);
+  const isServicesActive = ['generator', 'horoscope', 'match', 'gemstones', 'numerology', 'name-correction', 'builder'].includes(activeTab);
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
+    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-amber-900/10 shadow-xs w-full max-w-full">
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18 gap-2 sm:gap-4">
           
           {/* Brand Logo */}
           <div 
@@ -146,7 +156,24 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Navigation: Home | Services ▼ | Store | Profile */}
+          {/* Global Search Bar (Prominent in header on desktop/tablet) */}
+          <button
+            id="btn-header-search"
+            type="button"
+            onClick={onOpenSearch}
+            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 lg:py-2 rounded-xl bg-stone-100/90 hover:bg-amber-50/80 text-stone-500 hover:text-amber-950 border border-stone-200/90 hover:border-amber-300 text-xs transition-all cursor-pointer shadow-2xs group flex-1 max-w-xs md:max-w-sm lg:max-w-md mx-1 sm:mx-2 lg:mx-4"
+            title="Search astrology topics, houses, planets & services (Ctrl+K)"
+          >
+            <Search className="w-3.5 h-3.5 text-amber-800/80 group-hover:text-amber-900 shrink-0 transition-colors" />
+            <span className="truncate text-stone-500 group-hover:text-stone-800 font-medium">
+              Search astrology, houses &amp; planets...
+            </span>
+            <kbd className="hidden lg:inline-flex items-center ml-auto px-1.5 py-0.5 text-[10px] font-mono text-stone-400 bg-white rounded border border-stone-200 shrink-0 shadow-2xs">
+              ⌘K
+            </kbd>
+          </button>
+
+          {/* Desktop Navigation: Home | Services ▼ | Store */}
           <nav className="hidden md:flex items-center gap-1 bg-stone-200/50 p-1 rounded-xl border border-stone-300/60 text-xs lg:text-sm font-medium shrink-0">
             {/* 1. Home */}
             <button
@@ -172,6 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                     : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
                 }`}
+                aria-expanded={servicesDropdownOpen}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span>Services</span>
@@ -184,22 +212,37 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Animated, Modern, Searchable Services Dropdown */}
               {servicesDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-stone-200 shadow-2xl p-3 z-50 animate-fadeIn space-y-3">
-                  {/* Search bar */}
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <div className="absolute top-[calc(100%+14px)] sm:top-[calc(100%+16px)] left-0 sm:left-1/2 sm:-translate-x-1/2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl border border-stone-200 shadow-2xl p-3 z-50 animate-fadeIn space-y-3">
+                  {/* Subtle top indicator arrow */}
+                  <div className="hidden sm:block absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-stone-200 rotate-45" />
+
+                  {/* Dropdown Header & Service Count */}
+                  <div className="flex items-center justify-between pb-1.5 border-b border-stone-100 px-1 relative z-10">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950 font-vedic">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Vedic Astrology Services</span>
+                    </div>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">
+                      {filteredServices.length} {filteredServices.length === 1 ? 'service' : 'services'}
+                    </span>
+                  </div>
+
+                  {/* Search bar inside Services Dropdown */}
+                  <div className="relative z-10">
+                    <Search className="w-3.5 h-3.5 text-amber-800/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={serviceSearch}
                       onChange={(e) => setServiceSearch(e.target.value)}
                       placeholder="Search astrology services..."
-                      className="w-full pl-8 pr-7 py-1.5 text-xs rounded-xl border border-stone-200 bg-stone-50 focus:outline-none focus:ring-1 focus:ring-amber-800 focus:bg-white transition-all"
+                      className="w-full pl-8.5 pr-8 py-2 text-xs rounded-xl border border-stone-200 bg-stone-50/80 focus:outline-none focus:ring-2 focus:ring-amber-800/20 focus:border-amber-800 focus:bg-white transition-all text-stone-900 placeholder:text-stone-400 font-medium"
                       autoFocus
                     />
                     {serviceSearch && (
                       <button
                         onClick={() => setServiceSearch('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-stone-400 hover:text-stone-600 transition-colors"
+                        title="Clear search"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -207,7 +250,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Services List Grouped */}
-                  <div className="max-h-80 overflow-y-auto space-y-1 divide-y divide-stone-100 pr-1">
+                  <div className="max-h-72 overflow-y-auto space-y-1 divide-y divide-stone-100 pr-1 relative z-10">
                     {filteredServices.length === 0 ? (
                       <div className="p-4 text-center text-xs text-stone-400">
                         No service found matching "{serviceSearch}"
@@ -250,6 +293,21 @@ export const Header: React.FC<HeaderProps> = ({
                       })
                     )}
                   </div>
+
+                  {/* Footer link to Global Life Topics Search */}
+                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between px-1 relative z-10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setServicesDropdownOpen(false);
+                        onOpenSearch();
+                      }}
+                      className="text-[11px] font-semibold text-amber-800 hover:text-amber-950 flex items-center gap-1.5 transition-colors cursor-pointer group"
+                    >
+                      <Search className="w-3 h-3 text-amber-700 group-hover:scale-110 transition-transform" />
+                      <span>Search life topics (marriage, career, wealth) &rarr;</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -267,30 +325,21 @@ export const Header: React.FC<HeaderProps> = ({
               <ShoppingBag className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Store</span>
             </button>
-
-            {/* 4. Profile (Astronava Member Dashboard) */}
-            <button
-              id="nav-tab-profile"
-              onClick={() => {
-                if (user) {
-                  setActiveTab('profile');
-                } else {
-                  openAuthModal('Sign in to access your Astronava Member Profile & Birth Details');
-                }
-              }}
-              className={`px-3 lg:px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                activeTab === 'profile'
-                  ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
-                  : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
-              }`}
-            >
-              <User className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-              <span>Profile</span>
-            </button>
           </nav>
 
-          {/* Quick Actions (User Dropdown or Sign In) */}
+          {/* Quick Actions (Mobile Search, User Dropdown or Sign In) */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Mobile Search Button */}
+            <button
+              id="btn-mobile-search"
+              type="button"
+              onClick={onOpenSearch}
+              className="sm:hidden w-9 h-9 rounded-xl flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition-colors cursor-pointer"
+              title="Search astrology topics"
+            >
+              <Search className="w-4 h-4 text-amber-800" />
+            </button>
+
             {user ? (
               <div className="relative" ref={userDropdownRef}>
                 <button
@@ -309,7 +358,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {userDropdownOpen && (
                   <div 
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-stone-200 shadow-xl p-3 z-50 animate-fadeIn space-y-2"
+                    className="absolute right-0 top-[calc(100%+8px)] w-56 bg-white rounded-2xl border border-stone-200 shadow-xl p-3 z-50 animate-fadeIn space-y-2"
                     onClick={() => setUserDropdownOpen(false)}
                   >
                     <div className="px-2 py-1.5 border-b border-stone-100">
@@ -366,19 +415,33 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             ) : (
               <button
-                id="btn-open-login"
-                onClick={() => openAuthModal('Sign in as an Astronava Member to access personalized astrology services.')}
-                className="h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
+                id="btn-user-profile"
+                onClick={() => openAuthModal('Sign in to access your Astronava Member Profile & Birth Details')}
+                className={`h-9 px-3.5 sm:px-4 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-300 shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0 border ${
+                  activeTab === 'profile'
+                    ? 'bg-amber-900 text-amber-50 border-amber-800 shadow-sm'
+                    : 'bg-gradient-to-r from-[#1D140E] via-[#2A1D15] to-[#1D140E] hover:from-[#261B12] hover:to-[#261B12] text-amber-100 border-amber-500/40'
+                }`}
+                title="Astronava Member Profile"
               >
-                <User className="w-3.5 h-3.5 text-amber-300" />
-                <span className="hidden xs:inline">Sign In</span>
+                <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Profile</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Mobile Navigation Row (TASK 9) */}
-        <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-stone-200/80 no-scrollbar -mx-4 px-4">
+        <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-stone-200/80 no-scrollbar -mx-3.5 px-3.5 sm:-mx-6 sm:px-6">
+          {/* Quick Search Tab for Mobile */}
+          <button
+            id="mobile-nav-search"
+            onClick={onOpenSearch}
+            className="whitespace-nowrap px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all active:scale-95 bg-amber-100/70 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs cursor-pointer"
+          >
+            <Search className="w-3.5 h-3.5 text-amber-800" />
+            <span>Search</span>
+          </button>
           {[
             { id: 'home', label: 'Home', icon: Home },
             { id: 'generator', label: 'Kundli', icon: Sparkles },
@@ -386,6 +449,7 @@ export const Header: React.FC<HeaderProps> = ({
             { id: 'match', label: 'Match', icon: Heart },
             { id: 'gemstones', label: 'Gemstones', icon: Gem },
             { id: 'numerology', label: 'Numerology', icon: Hash },
+            { id: 'name-correction', label: 'Name Correction', icon: SpellCheck },
             { id: 'store', label: 'Store', icon: ShoppingBag },
             { id: 'profile', label: 'Profile', icon: User },
           ].map((item) => {

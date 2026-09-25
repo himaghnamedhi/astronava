@@ -4,7 +4,7 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'legal' | 'store' | 'profile';
+export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
 
 export interface AppViewRoute {
@@ -197,6 +197,29 @@ export const APP_ROUTES: AppViewRoute[] = [
     changefreq: 'weekly',
     category: 'Astrological Tools',
     lastmod: '2026-09-14',
+  },
+  {
+    id: 'name-correction',
+    tab: 'name-correction',
+    path: '/name-correction',
+    aliases: ['/name-tuning', '/namecorrection', '/namank'],
+    title: 'Vedic Name Correction & Spelling Tuning | Chaldean & Pythagorean | astronava.com',
+    shortTitle: 'Name Correction',
+    description: 'Harmonize your name vibrations with your Mulank and Bhagyank. Tune your name spelling with classical Chaldean and Pythagorean compound analysis to attract luck, prosperity, and cosmic harmony.',
+    keywords: [
+      'name correction',
+      'vedic name correction',
+      'chaldean name numerology',
+      'spelling tuning',
+      'namank vibration',
+      'lucky name spelling',
+      'pythagorean name calculator'
+    ],
+    ogType: 'website',
+    priority: 0.85,
+    changefreq: 'weekly',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-21',
   },
   {
     id: 'sacred-store',
@@ -472,6 +495,8 @@ export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): strin
       return 'Kundli Milan | astronava.com';
     case 'numerology':
       return 'Numerology Calculator | astronava.com';
+    case 'name-correction':
+      return 'Name Correction & Spelling Tuning | astronava.com';
     case 'store':
       return 'Sacred Store | astronava.com';
     case 'legal':

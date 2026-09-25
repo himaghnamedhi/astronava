@@ -61,7 +61,7 @@ export const SitemapModal: React.FC<SitemapModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-950/80 backdrop-blur-xs overflow-y-auto animate-fadeIn">
-      <div className="bg-stone-900 text-stone-100 rounded-3xl shadow-2xl border border-amber-800/40 w-full max-w-4xl my-auto overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="bg-stone-900 text-stone-100 rounded-2xl sm:rounded-3xl shadow-2xl border border-amber-800/40 w-full max-w-4xl my-auto overflow-hidden flex flex-col max-h-[92vh] min-w-0 box-border">
         {/* HEADER */}
         <div className="px-5 sm:px-6 py-4 bg-gradient-to-r from-stone-950 via-amber-950 to-stone-950 border-b border-amber-800/40 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">

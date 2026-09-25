@@ -313,41 +313,41 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn">
+    <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fadeIn w-full max-w-full min-w-0 box-border">
       {/* Top Welcome Banner */}
-      <div className="bg-gradient-to-r from-amber-950 via-stone-900 to-amber-950 rounded-3xl p-6 sm:p-8 text-white shadow-md border border-amber-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold text-xl flex items-center justify-center shrink-0">
+      <div className="bg-gradient-to-r from-amber-950 via-stone-900 to-amber-950 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 text-white shadow-md border border-amber-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 w-full min-w-0">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold text-lg sm:text-xl flex items-center justify-center shrink-0">
             {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold font-vedic text-white">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-lg sm:text-2xl font-bold font-vedic text-white truncate">
                 Namaste, {user.displayName || 'Vedic Seeker'}
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-semibold">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-semibold shrink-0">
                 Astronava Member
               </span>
             </div>
-            <p className="text-xs text-amber-200/80 mt-1">
+            <p className="text-xs text-amber-200/80 mt-1 truncate">
               {user.email} {user.phoneNumber ? `• ${user.phoneNumber}` : ''}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           <button
             onClick={() => onNavigateTab('horoscope')}
-            className="px-4 py-2 rounded-xl bg-amber-600/30 hover:bg-amber-600/40 border border-amber-400/30 text-amber-100 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl bg-amber-600/30 hover:bg-amber-600/40 border border-amber-400/30 text-amber-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
           >
-            <Sun className="w-3.5 h-3.5 text-amber-400" />
+            <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span>View Horoscope</span>
           </button>
           <button
             onClick={() => onNavigateTab('generator')}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
             <span>Kundli Maker</span>
           </button>
         </div>
@@ -355,25 +355,25 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
+        <div className="p-3.5 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
           <Check className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2.5 text-xs text-rose-800 animate-fadeIn">
+        <div className="p-3.5 sm:p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-2.5 text-xs text-rose-800 animate-fadeIn">
           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Main Grid: Sidebar Navigation + Active Content View */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 w-full min-w-0">
         
-        {/* Left Sidebar Menu */}
-        <div className="lg:col-span-1 bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-3 space-y-1">
-          <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+        {/* Left Sidebar Menu (Horizontally scrollable on mobile, vertical sidebar on lg) */}
+        <div className="lg:col-span-1 bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-2 sm:p-3 flex lg:flex-col overflow-x-auto lg:overflow-visible gap-1.5 lg:gap-1 no-scrollbar w-full min-w-0">
+          <div className="hidden lg:block px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Account Management
           </div>
           {sections.map((sec) => {
@@ -387,13 +387,13 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                   setSuccessMessage(null);
                   setErrorMessage(null);
                 }}
-                className={`w-full px-3 py-2.5 rounded-xl text-left text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
+                className={`px-3 py-2 sm:py-2.5 rounded-xl text-left text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shrink-0 lg:shrink whitespace-nowrap lg:whitespace-normal ${
                   isActive
                     ? 'bg-amber-900 text-white shadow-xs'
                     : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-amber-200' : 'text-stone-400'}`} />
+                <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-amber-200' : 'text-stone-400'}`} />
                 <span className="truncate">{sec.label}</span>
               </button>
             );
@@ -401,14 +401,14 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
         </div>
 
         {/* Right Active Section Content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-4 sm:space-y-6 w-full min-w-0">
 
           {/* 1. Birth Details Section */}
           {activeSection === 'birth_details' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
-                <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-amber-800" />
+                <h2 className="text-base sm:text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-amber-800 shrink-0" />
                   <span>Permanent Birth Details</span>
                 </h2>
                 <p className="text-xs text-stone-500 mt-1">
@@ -565,7 +565,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 2. Personal Profile */}
           {activeSection === 'profile' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <User className="w-5 h-5 text-amber-800" />
@@ -646,7 +646,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 3. Today's Horoscope Quick Preview */}
           {activeSection === 'today_horoscope' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
@@ -686,7 +686,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 4. Horoscope History */}
           {activeSection === 'horoscope_history' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-4 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <History className="w-5 h-5 text-amber-800" />
@@ -720,7 +720,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 5. Orders & Tracking */}
           {activeSection === 'orders' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
@@ -773,7 +773,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 6. Wishlist */}
           {activeSection === 'wishlist' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <Heart className="w-5 h-5 text-rose-600 fill-rose-600/20" />
@@ -837,7 +837,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 7. Saved Addresses */}
           {activeSection === 'addresses' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
@@ -911,7 +911,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 8. Saved Payment Methods */}
           {activeSection === 'payment_methods' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-amber-800" />
@@ -939,7 +939,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 9. Notification Preferences */}
           {activeSection === 'notifications' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <Bell className="w-5 h-5 text-amber-800" />
@@ -1008,7 +1008,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 10. Saved Downloads */}
           {activeSection === 'downloads' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-4 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <Download className="w-5 h-5 text-amber-800" />
@@ -1048,7 +1048,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 11. Account Settings */}
           {activeSection === 'account_settings' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <Settings className="w-5 h-5 text-amber-800" />
@@ -1086,7 +1086,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
           {/* 12. Privacy & Zero-Trust */}
           {activeSection === 'privacy' && (
-            <div className="bg-white rounded-3xl border border-stone-200/90 shadow-2xs p-6 sm:p-8 space-y-6 animate-fadeIn">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-2xs p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn w-full min-w-0 box-border">
               <div>
                 <h2 className="text-lg font-bold text-stone-900 font-vedic flex items-center gap-2">
                   <Shield className="w-5 h-5 text-emerald-700" />

@@ -32,6 +32,7 @@ import {
   Star,
   Moon,
   History,
+  Eye,
   X
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -73,6 +74,7 @@ import { AllDivisionalChartsGrid } from './astrology/AllDivisionalChartsGrid';
 import { PlanetHouseMeaningsView } from './astrology/PlanetHouseMeaningsView';
 import { VedicRemediesDossier } from './astrology/VedicRemediesDossier';
 import { AiKundliSummaryView } from './astrology/AiKundliSummaryView';
+import { PrintableKundliDossier } from './reports/PrintableKundliDossier';
 
 export interface RecentKundliItem {
   id: string;
@@ -635,74 +637,93 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
     }
   };
 
+  const handlePrintKundli = () => {
+    if (!kundliData) return;
+    window.print();
+  };
+
   const currentChart = kundliData ? kundliData.divisionalCharts[selectedDivisionalChart] : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0 box-border">
       {/* ------------------------------------------------------------- */}
-      {/* TOP HEADER & SACRED INVOCATION BANNER */}
+      {/* SCREEN VIEW (HIDDEN ON PRINT MEDIA) */}
       {/* ------------------------------------------------------------- */}
-      <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 rounded-2xl p-5 sm:p-6 text-amber-50 shadow-md border border-amber-800/30 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 text-amber-300/90 text-xs font-serif tracking-widest uppercase mb-1">
-              <span>॥ श्री गणेशाय नमः ॥</span>
+      <div className="kundli-screen-view no-print space-y-4 sm:space-y-6 w-full max-w-full min-w-0 box-border">
+        {/* ------------------------------------------------------------- */}
+        {/* TOP HEADER & SACRED INVOCATION BANNER */}
+        {/* ------------------------------------------------------------- */}
+        <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-amber-50 shadow-md border border-amber-800/30 relative overflow-hidden w-full min-w-0 box-border">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 text-amber-300/90 text-xs font-serif tracking-widest uppercase mb-1">
+                <span>॥ श्री गणेशाय नमः ॥</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-vedic text-amber-100 tracking-tight">
+                {hasGenerated ? 'Janam Kundli & Natal Dossier' : 'Kundli Maker'}
+              </h1>
+              <p className="text-xs sm:text-sm text-stone-300/90 w-full mt-1 leading-relaxed">
+                {hasGenerated
+                  ? 'Sidereal Vedic horoscope with Lahiri Ayanamsha, divisional charts, Vimshottari Dasha, and Ashtakavarga.'
+                  : 'Calculate your Vedic Janam Kundli with planetary positions, divisional charts, and Vimshottari Dasha.'}
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-vedic text-amber-100 tracking-tight">
-              {hasGenerated ? 'Janam Kundli & Natal Dossier' : 'Kundli Maker'}
-            </h1>
-            <p className="text-xs sm:text-sm text-stone-300/90 w-full mt-1 leading-relaxed">
-              {hasGenerated
-                ? 'Sidereal Vedic horoscope with Lahiri Ayanamsha, divisional charts, Vimshottari Dasha, and Ashtakavarga.'
-                : 'Calculate your Vedic Janam Kundli with planetary positions, divisional charts, and Vimshottari Dasha.'}
-            </p>
+
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+              {hasGenerated && (
+                <>
+                  <button
+                    id="btn-edit-kundli-inputs"
+                    onClick={() => setShowEditForm(!showEditForm)}
+                    className="px-3 py-1.5 sm:py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-100 border border-amber-800/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{showEditForm ? 'Hide Form' : 'Edit Details'}</span>
+                  </button>
+
+                  <button
+                    id="btn-new-kundli-entry"
+                    onClick={handleResetToNewDetails}
+                    className="px-3 py-1.5 sm:py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-100 border border-amber-800/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>New Chart</span>
+                  </button>
+
+                  <button
+                    id="btn-print-kundli-report"
+                    onClick={handlePrintKundli}
+                    className="px-3.5 py-1.5 sm:py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-100 border border-amber-800/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+                    title="Print Kundli Report (A4 Layout)"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Print Kundli (A4)</span>
+                  </button>
+
+                  <button
+                    id="btn-download-kundli-pdf"
+                    onClick={() => {
+                      if (!user || user.isAnonymous) {
+                        openAuthModal('Sign up as an Astronava Member to download high-resolution Janam Patrika PDF reports.');
+                        return;
+                      }
+                      setShowPatrikaPdfModal(true);
+                    }}
+                    className="px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+                    title="Vedic Kundli PDF"
+                  >
+                    <Download className="w-3.5 h-3.5 text-amber-200" />
+                    <span>Vedic Kundli PDF</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-
-          <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
-            {hasGenerated && (
-              <>
-                <button
-                  id="btn-edit-kundli-inputs"
-                  onClick={() => setShowEditForm(!showEditForm)}
-                  className="px-3 py-1.5 sm:py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-100 border border-amber-800/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{showEditForm ? 'Hide Form' : 'Edit Details'}</span>
-                </button>
-
-                <button
-                  id="btn-new-kundli-entry"
-                  onClick={handleResetToNewDetails}
-                  className="px-3 py-1.5 sm:py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-100 border border-amber-800/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
-                >
-                  <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
-                  <span>New Chart</span>
-                </button>
-
-                <button
-                  id="btn-download-kundli-pdf"
-                  onClick={() => {
-                    if (!user || user.isAnonymous) {
-                      openAuthModal('Sign up as an Astronava Member to download high-resolution Janam Patrika PDF reports.');
-                      return;
-                    }
-                    setShowPatrikaPdfModal(true);
-                  }}
-                  className="px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
-                  title="Vedic Kundli PDF"
-                >
-                  <Download className="w-3.5 h-3.5 text-amber-200" />
-                  <span>Vedic Kundli PDF</span>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
 
         {/* Quick Sample Native Pills / Check Kundli of Famous People */}
-        <div className="relative z-10 mt-3 pt-3 border-t border-amber-900/40 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+        <div className="relative z-10 mt-4 pt-1 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0">
             <span className="text-amber-300 font-bold whitespace-nowrap text-xs flex items-center gap-1.5 shrink-0 bg-amber-950/70 px-2 py-1 rounded-lg border border-amber-700/50 shadow-2xs">
               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -851,11 +872,101 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
       )}
 
       {/* ------------------------------------------------------------- */}
+      {/* GUEST SEEKER PREVIEW & WHAT YOU WILL GET PANEL */}
+      {/* ------------------------------------------------------------- */}
+      {(!user || user.isAnonymous) && (!hasGenerated || showEditForm) && (
+        <div className="bg-gradient-to-br from-amber-50/90 via-[#FAF7F2] to-amber-50/40 rounded-3xl p-6 sm:p-7 border border-amber-200/80 shadow-xs space-y-5 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/60 text-amber-950 text-[11px] font-bold tracking-wider uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                <span>Guest Seeker Preview</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold font-vedic text-stone-900">
+                What You Will Get with an Astronava Janam Patrika
+              </h3>
+              <p className="text-xs text-stone-600 max-w-2xl leading-relaxed">
+                As a guest seeker, you can explore historically verified horoscopes and sample calculations. Members receive unmetered generation of comprehensive birth dossiers stored securely in their account.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                type="button"
+                onClick={() => handleApplySampleProfile(SAMPLE_PROFILES[0])}
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-xs font-semibold border border-stone-300 shadow-2xs hover:shadow-xs transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Eye className="w-3.5 h-3.5 text-stone-600" />
+                <span>Preview Sample Dossier</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => openAuthModal('Create your free Astronava Member account to compute, save, and export your personal Janam Kundli.')}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 text-xs font-bold shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-1.5 border border-amber-600/40"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                <span>Sign Up to Unlock</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 5 Core Dossier Deliverables Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+            {[
+              {
+                title: 'Lagna & Vargas',
+                desc: 'D1 Lagna, D9 Navamsha, D7 Saptamsha, and 7 Divisional charts with degrees',
+                icon: Compass,
+              },
+              {
+                title: 'Vimshottari Dasha',
+                desc: '120-year Mahadasha, Antardasha & Pratyantardasha balance with exact dates',
+                icon: Clock,
+              },
+              {
+                title: 'Planetary Matrix',
+                desc: 'Sarvashtakavarga 337-point bindu matrix, Shadbala & classical Yogas',
+                icon: Award,
+              },
+              {
+                title: 'Vedic Remedies',
+                desc: 'Tailored auspicious gemstones, authentic Rudraksha beads & mantras',
+                icon: Gem,
+              },
+              {
+                title: 'High-Res PDF Patrika',
+                desc: 'Print-ready multi-page Vedic Patrika document download for life records',
+                icon: Download,
+              },
+            ].map((feature) => {
+              const FIcon = feature.icon;
+              return (
+                <div
+                  key={feature.title}
+                  className="p-3.5 rounded-2xl bg-white/90 border border-stone-200/80 shadow-2xs space-y-1.5 transition-all duration-300 hover:scale-[1.02] hover:border-amber-300"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-amber-100/70 text-amber-900 flex items-center justify-center">
+                    <FIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className="text-xs font-bold text-stone-900 font-vedic leading-tight">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[11px] text-stone-500 leading-normal">
+                    {feature.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
       {/* STEP 1: INPUT FORM (Enter Birth Details) */}
       {/* ------------------------------------------------------------- */}
       {(!hasGenerated || showEditForm) && (
         <div
-          className={`bg-white rounded-2xl border transition-all duration-200 shadow-xs p-5 sm:p-7 space-y-6 ${
+          className={`bg-white rounded-3xl border transition-all duration-300 hover:shadow-md p-5 sm:p-7 space-y-6 ${
             birthDetails.gender === 'male'
               ? 'border-blue-200/90 ring-1 ring-blue-500/10'
               : birthDetails.gender === 'female'
@@ -863,15 +974,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               : 'border-stone-200'
           }`}
         >
-          <div
-            className={`flex items-center justify-between border-b pb-3 transition-colors ${
-              birthDetails.gender === 'male'
-                ? 'border-blue-100'
-                : birthDetails.gender === 'female'
-                ? 'border-pink-100'
-                : 'border-stone-100'
-            }`}
-          >
+          <div className="flex items-center justify-between pb-1 transition-colors">
             <div>
               <h2 className="text-lg font-bold font-vedic text-stone-900 flex items-center gap-2">
                 <img
@@ -1180,12 +1283,12 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               </div>
             </div>
 
-            {/* Submit Action Button */}
-            <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Submit Action Button - Clean whitespace without harsh divider line */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               {(!user || user.isAnonymous) ? (
-                <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/80 px-3 py-2 rounded-xl border border-amber-200/80 w-full sm:w-auto">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                  <span>Guest Seeker: Explore famous horoscopes below. Sign up to compute your personal chart.</span>
+                <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/90 px-3.5 py-2.5 rounded-xl border border-amber-200/80 w-full sm:w-auto shadow-2xs">
+                  <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Guest Seeker: Explore famous horoscopes freely. Free account required to generate personal charts.</span>
                 </div>
               ) : (
                 <div />
@@ -1193,10 +1296,19 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               <button
                 type="submit"
                 id="btn-submit-kundli-calc"
-                className="w-full sm:w-auto px-7 py-3 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-7 py-3 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-50 font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer border border-amber-600/30"
               >
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>{(!user || user.isAnonymous) ? 'Sign Up to Calculate Kundli' : 'Generate Janam Kundli'}</span>
+                {(!user || user.isAnonymous) ? (
+                  <>
+                    <ShieldCheck className="w-4 h-4 text-amber-300" />
+                    <span>Sign Up to Calculate Kundli</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>Generate Janam Kundli</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -2117,6 +2229,17 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
               <button
                 type="button"
+                id="btn-bottom-print-kundli"
+                onClick={handlePrintKundli}
+                className="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                title="Print dedicated A4 Kundli dossier"
+              >
+                <Printer className="w-4 h-4 text-amber-400" />
+                <span>Print Dossier (A4)</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleDirectDownloadPdf}
                 disabled={isGeneratingPdf}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95 disabled:opacity-60"
@@ -2249,6 +2372,17 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
           </div>
         </div>
+      )}
+
+      </div>
+
+      {/* DEDICATED A4 PRINTABLE KUNDLI DOSSIER (VISIBLE ONLY ON PRINT MEDIA) */}
+      {kundliData && (
+        <PrintableKundliDossier
+          kundliData={kundliData}
+          brandName="Astronava"
+          websiteAddress="www.astronava.com"
+        />
       )}
 
       {/* TRADITIONAL VEDIC PATRIKA PDF STUDIO MODAL */}

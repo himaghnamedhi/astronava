@@ -27,6 +27,7 @@ import {
   AlertTriangle,
   Lightbulb,
   ArrowRight,
+  SpellCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -49,11 +50,13 @@ import { NumerologySystem } from '../types/numerology';
 interface NumerologyCalculatorProps {
   initialName?: string;
   initialDob?: { day: number; month: number; year: number };
+  initialSection?: 'overview' | 'name' | 'loshu' | 'year' | 'tools';
 }
 
 export const NumerologyCalculator: React.FC<NumerologyCalculatorProps> = ({
   initialName = '',
   initialDob = { day: 17, month: 9, year: 1950 },
+  initialSection = 'overview',
 }) => {
   const { user, openAuthModal } = useAuth();
   // User Input States
@@ -101,7 +104,14 @@ export const NumerologyCalculator: React.FC<NumerologyCalculatorProps> = ({
   // Sub-Navigation Tabs
   const [activeSection, setActiveSection] = useState<
     'overview' | 'name' | 'loshu' | 'year' | 'tools'
-  >('overview');
+  >(initialSection);
+
+  // Sync activeSection when parent initialSection prop changes (e.g. navigation from Services or Home)
+  useEffect(() => {
+    if (initialSection) {
+      setActiveSection(initialSection);
+    }
+  }, [initialSection]);
 
   // Name Spelling Sandbox State
   const [sandboxSpelling, setSandboxSpelling] = useState(name);
@@ -206,19 +216,24 @@ Calculated via Astronava (www.astronava.com)`;
   };
 
   return (
-    <div className="space-y-6 print:space-y-4">
+    <div className="space-y-4 sm:space-y-6 print:space-y-4 w-full max-w-full min-w-0 box-border">
       {/* 1. Unified Numerology Command & Input Card */}
-      <div className="bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-xs space-y-4 sm:space-y-5 print:p-4 print:border-amber-900/40">
+      <div className="bg-white p-4 sm:p-7 rounded-2xl sm:rounded-3xl border border-stone-200/90 shadow-xs space-y-4 sm:space-y-5 print:p-4 print:border-amber-900/40 w-full min-w-0 box-border">
         {/* Header Row: Title, Subtitle, Quick Actions & Presets */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-stone-100">
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase tracking-wider">
-                Ank Jyotish
+                {activeSection === 'name' ? 'Naam Shastra' : 'Ank Jyotish'}
               </span>
+              {activeSection === 'name' && (
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-900 text-[11px] font-semibold border border-indigo-200">
+                  Chaldean &amp; Pythagorean Name Tuning
+                </span>
+              )}
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold font-vedic text-stone-900 tracking-tight mt-1">
-              Numerology Calculator
+              {activeSection === 'name' ? 'Vedic Name Numerology & Correction' : 'Numerology Calculator'}
             </h1>
           </div>
 
@@ -371,7 +386,7 @@ Calculated via Astronava (www.astronava.com)`;
       <div className="flex overflow-x-auto gap-2 p-1.5 bg-stone-100/80 rounded-2xl border border-stone-200 no-scrollbar print:hidden">
         {[
           { id: 'overview', label: 'Core Mulank & Bhagyank', icon: Sun },
-          { id: 'name', label: 'Name Numerology & Correction', icon: User },
+          { id: 'name', label: 'Name Numerology & Correction', icon: SpellCheck },
           { id: 'loshu', label: 'Lo Shu Grid & Remedies', icon: Hash },
           { id: 'year', label: 'Personal Year Predictions', icon: Calendar },
           { id: 'tools', label: 'Mobile & Vehicle Harmonizer', icon: Smartphone },
@@ -659,6 +674,33 @@ Calculated via Astronava (www.astronava.com)`;
       {/* ========================================================================= */}
       {activeSection === 'name' && (
         <div className="space-y-8">
+          {!name.trim() && (
+            <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-stone-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-100 text-amber-900 shrink-0">
+                  <SpellCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold font-vedic text-stone-900">
+                    Enter Name to Begin Vedic Name Correction
+                  </h4>
+                  <p className="text-xs text-stone-600">
+                    Type your full legal or daily name in the command card above to evaluate your vibration numbers, enemy compounds, and test auspicious spellings.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleNameChange('Arjuna Varma')}
+                  className="px-3.5 py-1.5 rounded-lg bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Load Sample Name
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Main Name Result Overview */}
           <div className="bg-white p-6 sm:p-7 rounded-3xl border border-stone-200 shadow-xs space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">

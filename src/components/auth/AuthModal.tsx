@@ -9,7 +9,12 @@ import {
   AlertCircle, 
   ArrowRight, 
   CheckCircle2, 
-  Compass
+  Compass,
+  ShieldCheck,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
@@ -28,6 +33,7 @@ export const AuthModal: React.FC = () => {
   } = useAuth();
 
   const [viewMode, setViewMode] = useState<AuthViewMode>('signin');
+  const [showGuestComparisonPopup, setShowGuestComparisonPopup] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -112,17 +118,17 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        initial={{ opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 8 }}
+        exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-        className="relative w-full max-w-sm sm:max-w-md my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden transition-all"
+        className="relative w-full max-w-md sm:max-w-lg my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Decorative Banner */}
-        <div className="bg-gradient-to-r from-amber-950 via-stone-900 to-amber-950 px-6 py-5 text-amber-50 relative shrink-0 text-center">
+        {/* Luxury Top Header */}
+        <div className="bg-gradient-to-r from-[#170F0A] via-[#241710] to-[#170F0A] px-6 py-6 text-amber-50 relative shrink-0 text-center">
           <button
             onClick={closeAuthModal}
             aria-label="Close modal"
@@ -131,26 +137,26 @@ export const AuthModal: React.FC = () => {
             <X className="w-4 h-4" />
           </button>
 
-          <div className="flex justify-center mb-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold tracking-wide">
+          <div className="flex justify-center mb-2.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[11px] font-bold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Astronava Member</span>
+              <span>Astronava Vedic Portal</span>
             </div>
           </div>
 
-          <h2 className="text-lg sm:text-xl font-bold font-vedic text-white leading-tight">
-            {viewMode === 'signup' && 'Join as an Astronava Member'}
+          <h2 className="text-xl sm:text-2xl font-bold font-vedic text-white leading-tight">
+            {viewMode === 'signup' && 'Create Member Account'}
             {viewMode === 'signin' && 'Astronava Member Sign In'}
-            {viewMode === 'forgot_password' && 'Reset Your Password'}
+            {viewMode === 'forgot_password' && 'Password Recovery'}
           </h2>
-          <p className="text-xs text-amber-200/80 mt-1 max-w-xs mx-auto leading-relaxed">
-            {authModalReason || 'Access your personalized Kundli, daily transits, matching reports, and sacred remedies.'}
+          <p className="text-xs text-amber-200/90 mt-2 max-w-sm mx-auto leading-relaxed">
+            {authModalReason || 'Access your personalized Janam Kundli, 36-Guna matching, and certified astrological remedies.'}
           </p>
         </div>
 
-        {/* View Mode Switch Tabs (Animated pill without harsh divider lines) */}
+        {/* View Mode Switch Tabs */}
         {viewMode !== 'forgot_password' && (
-          <div className="p-1.5 mx-5 mt-4 bg-stone-200/60 rounded-2xl flex items-center relative">
+          <div className="p-1.5 mx-6 mt-5 bg-stone-200/70 rounded-2xl flex items-center relative">
             <button
               type="button"
               onClick={() => {
@@ -158,14 +164,14 @@ export const AuthModal: React.FC = () => {
                 setError(null);
                 setSuccessMessage(null);
               }}
-              className={`relative flex-1 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer text-center z-10 ${
+              className={`relative flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer text-center z-10 ${
                 viewMode === 'signin' ? 'text-amber-950' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               {viewMode === 'signin' && (
                 <motion.div
                   layoutId="authTabIndicator"
-                  className="absolute inset-0 bg-white rounded-xl shadow-xs border border-stone-200/60 -z-10"
+                  className="absolute inset-0 bg-white rounded-xl shadow-xs border border-stone-300/60 -z-10"
                   transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 />
               )}
@@ -179,36 +185,37 @@ export const AuthModal: React.FC = () => {
                 setError(null);
                 setSuccessMessage(null);
               }}
-              className={`relative flex-1 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer text-center z-10 ${
+              className={`relative flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer text-center z-10 ${
                 viewMode === 'signup' ? 'text-amber-950' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               {viewMode === 'signup' && (
                 <motion.div
                   layoutId="authTabIndicator"
-                  className="absolute inset-0 bg-white rounded-xl shadow-xs border border-stone-200/60 -z-10"
+                  className="absolute inset-0 bg-white rounded-xl shadow-xs border border-stone-300/60 -z-10"
                   transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 />
               )}
-              <span>Sign Up</span>
+              <span>Create Free Account</span>
             </button>
           </div>
         )}
 
-        {/* Form Container */}
-        <div className="p-5 space-y-4">
-          {/* Google 1-Click Sign-In */}
+        {/* Form & Main Body */}
+        <div className="p-6 space-y-4">
+
+          {/* Official Google Sign-In with Verified Identity Branding */}
           {viewMode !== 'forgot_password' && (
-            <>
+            <div className="space-y-3">
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.01, translateY: -1 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: 1.015, translateY: -1 }}
+                whileTap={{ scale: 0.985 }}
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white hover:bg-stone-50 text-stone-800 font-semibold text-xs sm:text-sm rounded-xl border border-stone-300/90 shadow-2xs hover:border-amber-700/40 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white hover:bg-stone-50 text-stone-800 font-semibold text-xs sm:text-sm rounded-xl border border-stone-300 hover:border-stone-400 shadow-xs hover:shadow-md transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -229,20 +236,17 @@ export const AuthModal: React.FC = () => {
                 <span>Continue with Google</span>
               </motion.button>
 
-              {/* Seamless gradient divider without harsh lines */}
-              <div className="relative flex items-center justify-center my-2">
-                <div className="h-px w-full bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
-                <span className="px-3 text-[10px] font-bold text-stone-400 uppercase tracking-widest whitespace-nowrap">
-                  or with email
+              <div className="flex items-center justify-center gap-3 py-1">
+                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                  or continue with email
                 </span>
-                <div className="h-px w-full bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
               </div>
-            </>
+            </div>
           )}
 
           {/* Success Message */}
           {successMessage && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2 text-xs text-emerald-800">
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2.5 text-xs text-emerald-800">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">{successMessage}</p>
@@ -259,7 +263,7 @@ export const AuthModal: React.FC = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2 text-xs text-rose-800">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-800">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -267,19 +271,19 @@ export const AuthModal: React.FC = () => {
 
           {/* Domain Warning for Google Auth in Preview */}
           {unauthorizedDomainInfo && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1.5">
+            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1.5">
               <div className="flex items-center gap-1.5 font-bold">
                 <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
                 <span>Google Sign-In Domain Notice</span>
               </div>
               <p className="text-[11px] text-amber-800 leading-normal">
-                Google OAuth requires authorizing <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">{unauthorizedDomainInfo.domain}</code> in Firebase. You can use <strong>Email & Password</strong> or <strong>Explore as Guest</strong> right now.
+                Google OAuth requires authorizing <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">{unauthorizedDomainInfo.domain}</code> in Firebase. You can use <strong>Email &amp; Password</strong> or <strong>Explore as Guest</strong> right now.
               </p>
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Email / Password Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {viewMode === 'signup' && (
               <>
                 <div>
@@ -287,14 +291,14 @@ export const AuthModal: React.FC = () => {
                     Full Name
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Arjuna Varma"
-                      className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs"
+                      className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
                     />
                   </div>
                 </div>
@@ -304,13 +308,13 @@ export const AuthModal: React.FC = () => {
                     Phone Number (Optional)
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="tel"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       placeholder="+91 98765 43210"
-                      className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs"
+                      className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
                     />
                   </div>
                 </div>
@@ -322,14 +326,14 @@ export const AuthModal: React.FC = () => {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs"
+                  className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
                 />
               </div>
             </div>
@@ -355,7 +359,7 @@ export const AuthModal: React.FC = () => {
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
@@ -363,53 +367,218 @@ export const AuthModal: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
                   />
                 </div>
               </div>
             )}
 
+            {/* Professionally Branded Primary Action Button */}
             <motion.button
               type="submit"
               disabled={loading}
               whileHover={{ scale: 1.015, translateY: -1 }}
               whileTap={{ scale: 0.985 }}
-              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-amber-900 via-stone-900 to-amber-950 hover:from-amber-800 hover:to-amber-900 text-amber-50 font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-2 py-3 px-5 bg-gradient-to-r from-[#1E140E] via-[#2D1D14] to-[#1E140E] hover:from-[#261A12] hover:to-[#261A12] text-amber-100 font-bold text-xs sm:text-sm rounded-xl border border-amber-600/40 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
+                  <span>Authenticating Securely...</span>
+                </div>
               ) : (
                 <>
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
                   <span>
-                    {viewMode === 'signup' && 'Create Member Account'}
-                    {viewMode === 'signin' && 'Sign In as Member'}
-                    {viewMode === 'forgot_password' && 'Send Password Reset Link'}
+                    {viewMode === 'signup' && 'Create Free Member Account'}
+                    {viewMode === 'signin' && 'Sign In as Verified Member'}
+                    {viewMode === 'forgot_password' && 'Send Recovery Email'}
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4 text-amber-400" />
                 </>
               )}
             </motion.button>
           </form>
 
-          {/* Guest Seeker Exploration Access (Without harsh dividing lines) */}
+
+
+          {/* Distinct Guest Seeker Exploration Button */}
           <div className="pt-2">
             <motion.button
               type="button"
-              onClick={closeAuthModal}
+              onClick={() => setShowGuestComparisonPopup(true)}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="w-full py-2.5 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-600/25 text-amber-950 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-300/80 text-stone-800 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
             >
-              <Compass className="w-3.5 h-3.5 text-amber-700" />
-              <span>Explore as Guest Seeker (Free Preview)</span>
+              <Compass className="w-3.5 h-3.5 text-stone-600" />
+              <span>Continue as Guest Seeker (Preview Only)</span>
             </motion.button>
-            <p className="text-[10px] text-stone-500 text-center mt-1.5 leading-relaxed">
-              Guest seekers can freely browse sample charts, guides &amp; store items. To compute calculations for your personal birth coordinates, sign up anytime.
+            <p className="text-[10px] text-stone-500 text-center mt-2 leading-relaxed">
+              Explore sample charts, compatibility rules, and educational guides without signing in. You can upgrade to a free member account anytime to calculate your own birth chart.
             </p>
           </div>
+
         </div>
       </motion.div>
+
+      {/* Guest Seeker vs Member Comparison Popup Dialog */}
+      <AnimatePresence>
+        {showGuestComparisonPopup && (
+          <div 
+            className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-stone-950/80 backdrop-blur-xs animate-fadeIn"
+            onClick={() => setShowGuestComparisonPopup(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+              className="relative w-full max-w-lg bg-[#FAF8F5] rounded-3xl shadow-2xl border border-amber-900/30 overflow-hidden my-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Luxury Header */}
+              <div className="bg-gradient-to-r from-[#170F0A] via-[#241710] to-[#170F0A] px-6 py-5 text-amber-50 relative text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowGuestComparisonPopup(false)}
+                  aria-label="Close popup"
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10.5px] font-bold tracking-wider uppercase mb-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Access Comparison</span>
+                </div>
+
+                <h3 className="text-xl font-bold font-vedic text-white leading-tight">
+                  Guest Seeker vs. Astronava Member
+                </h3>
+                <p className="text-xs text-amber-200/90 mt-1 max-w-sm mx-auto leading-relaxed">
+                  Understand what is included with Guest exploration versus a permanent free Member account.
+                </p>
+              </div>
+
+              {/* Comparison Grid */}
+              <div className="p-5 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Guest Seeker Card */}
+                  <div className="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-2.5 flex flex-col justify-between shadow-2xs">
+                    <div>
+                      <div className="flex items-center justify-between pb-1.5 border-b border-stone-100">
+                        <div className="flex items-center gap-1.5 font-bold text-stone-700 text-xs uppercase tracking-wider">
+                          <Eye className="w-3.5 h-3.5 text-stone-500" />
+                          <span>Guest Seeker</span>
+                        </div>
+                        <span className="text-[10px] font-medium text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
+                          Preview
+                        </span>
+                      </div>
+                      <ul className="mt-2.5 space-y-2 text-xs text-stone-600 leading-tight">
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>Preview verified historical charts</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>Sample 36-Guna Kundli Milan</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>Browse 9 Navaratna stones</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>Daily transit &amp; panchang</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-2 border-t border-stone-100 text-[10px] text-stone-400 italic">
+                      Personal chart generation &amp; PDF downloads require free sign up.
+                    </div>
+                  </div>
+
+                  {/* Member Card */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-b from-amber-50 to-amber-100/60 border border-amber-300 space-y-2.5 flex flex-col justify-between shadow-xs ring-1 ring-amber-400/40">
+                    <div>
+                      <div className="flex items-center justify-between pb-1.5 border-b border-amber-200">
+                        <div className="flex items-center gap-1.5 font-bold text-amber-950 text-xs uppercase tracking-wider">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                          <span>Member</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-md">
+                          100% Free
+                        </span>
+                      </div>
+                      <ul className="mt-2.5 space-y-2 text-xs text-amber-950 leading-tight font-medium">
+                        <li className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                          <span>Personal Vedic Janam Kundli</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                          <span>Custom 36-Guna Kundli Milan</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                          <span>Body-weight calibrated gems</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                          <span>Download 3-Page A4 PDF Patrika</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                          <span>Save &amp; access charts anywhere</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-2 border-t border-amber-200/80 text-[10px] text-amber-800 font-semibold">
+                      Full access to all calculation engines &amp; downloads.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Popup Action Buttons */}
+                <div className="pt-2 space-y-2">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => {
+                      setShowGuestComparisonPopup(false);
+                      setViewMode('signup');
+                    }}
+                    className="w-full py-2.5 px-4 bg-gradient-to-r from-[#1E140E] via-[#2D1D14] to-[#1E140E] hover:from-[#261A12] hover:to-[#261A12] text-amber-100 font-bold text-xs rounded-xl border border-amber-600/40 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Create Free Member Account</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                  </motion.button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowGuestComparisonPopup(false);
+                      closeAuthModal();
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-stone-200"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-stone-500" />
+                    <span>Proceed as Guest Seeker</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
 

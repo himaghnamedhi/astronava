@@ -36,6 +36,7 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
   gemstones: 'Gemstone Recommender | astronava.com',
   match: 'Kundli Milan | astronava.com',
   numerology: 'Numerology Calculator | astronava.com',
+  'name-correction': 'Vedic Name Correction & Spelling Tuning | astronava.com',
   store: 'Store | astronava.com',
   profile: 'My Profile & Account Dashboard | astronava.com',
   legal: (doc?: LegalDocType) => {
@@ -65,6 +66,7 @@ export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) =>
   gemstones: 'Vedic Ratna Calculator & Remedies',
   match: '36 Guna Horoscope Matching & Compatibility',
   numerology: 'Mulank, Bhagyank & Destiny Number Analysis',
+  'name-correction': 'Vedic Name Correction & Chaldean Spelling Harmonizer',
   store: 'Certified Gemstones, Nepali Rudraksha & Crystals',
   profile: 'Astronava Member Dashboard & Astrological Records',
   legal: (doc?: LegalDocType) => {
@@ -215,6 +217,10 @@ export default function App() {
       setActiveTab('numerology');
       return true;
     }
+    if (cleanPath === '/name-correction' || cleanPath === '/name-tuning' || cleanPath === '/namecorrection' || cleanPath === '/namank') {
+      setActiveTab('name-correction');
+      return true;
+    }
     if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/admin' || cleanPath === '/store/admin') {
       setActiveTab('store');
       return true;
@@ -244,6 +250,19 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Global Cmd+K / Ctrl+K shortcut for Search Modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing inside an input or textarea (unless Cmd/Ctrl key is pressed)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Dynamically inject descriptive meta tags and Open Graph data whenever activeTab, legalDoc, or report context changes
@@ -320,7 +339,7 @@ export default function App() {
   return (
     <AuthProvider>
       <StoreProvider>
-        <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950">
+        <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-950 w-full max-w-full overflow-x-hidden">
       
       {/* Top Header */}
       <Header
@@ -332,7 +351,7 @@ export default function App() {
       />
 
       {/* Main App Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6 sm:space-y-8 min-w-0 box-border overflow-x-hidden">
         
         {/* Dynamic Content Views based on activeTab */}
         {activeTab === 'home' && (
@@ -394,6 +413,19 @@ export default function App() {
 
         {activeTab === 'numerology' && (
           <NumerologyCalculator
+            initialSection="overview"
+            initialName={reportKundliData?.nativeName || ''}
+            initialDob={{
+              day: reportKundliData?.birthData.day || 17,
+              month: reportKundliData?.birthData.month || 9,
+              year: reportKundliData?.birthData.year || 1950,
+            }}
+          />
+        )}
+
+        {activeTab === 'name-correction' && (
+          <NumerologyCalculator
+            initialSection="name"
             initialName={reportKundliData?.nativeName || ''}
             initialDob={{
               day: reportKundliData?.birthData.day || 17,
@@ -420,10 +452,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-stone-900 text-stone-300 border-t border-stone-800 mt-16 pt-12 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <footer className="bg-stone-900 text-stone-300 border-t border-stone-800 mt-12 sm:mt-16 pt-8 sm:pt-12 pb-6 sm:pb-8 w-full max-w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 box-border">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             
             {/* Col 1: About */}
             <div className="space-y-3">
@@ -520,12 +552,24 @@ export default function App() {
                 <li>
                   <button
                     onClick={() => {
-                      handleTabChange('store');
+                      handleTabChange('name-correction');
                       scrollToTop();
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">7.</span>
+                    <span>Vedic Name Correction</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      handleTabChange('store');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">8.</span>
                     <span>Store</span>
                   </button>
                 </li>
@@ -537,7 +581,7 @@ export default function App() {
                     }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">8.</span>
+                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">9.</span>
                     <span>My Profile &amp; Dashboard</span>
                   </button>
                 </li>
@@ -619,8 +663,8 @@ export default function App() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 border-t border-stone-800 flex flex-col items-center justify-center text-xs text-stone-400 gap-6 relative">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-stone-400">
+          <div className="pt-6 sm:pt-8 border-t border-stone-800 flex flex-col items-center justify-center text-xs text-stone-400 gap-4 sm:gap-6 relative">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs text-stone-400">
               <a
                 href="/privacy-policy"
                 onClick={(e) => {
@@ -717,9 +761,7 @@ export default function App() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onNavigateToTab={(tab) => {
-          if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
-            handleTabChange(tab as AppTabType);
-          }
+          handleTabChange(tab as AppTabType);
         }}
         onSelectHouse={(h) => {
           setSelectedHouse(h);

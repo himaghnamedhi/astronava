@@ -452,7 +452,7 @@ export const CustomReportModal: React.FC<CustomReportModalProps> = ({
       `}</style>
 
       {/* Modal Container */}
-      <div className="bg-stone-100 rounded-3xl max-w-5xl w-full max-h-[96vh] shadow-2xl border border-stone-300 flex flex-col overflow-hidden">
+      <div className="bg-stone-100 rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[96vh] shadow-2xl border border-stone-300 flex flex-col overflow-hidden min-w-0 box-border">
         
         {/* Top Interactive Toolbar (Hidden in Print) */}
         <div className="p-3.5 sm:p-4 bg-[#FAF8F5] border-b border-stone-200 flex flex-wrap items-center justify-between gap-3 no-print">
