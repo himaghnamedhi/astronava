@@ -1,7 +1,6 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { StoreNavbar } from './StoreNavbar.tsx';
 import { StoreHome } from './StoreHome.tsx';
 import { StoreShop } from './StoreShop.tsx';
 import { StoreProductDetail } from './StoreProductDetail.tsx';
@@ -21,12 +20,9 @@ export const StoreModule: React.FC = () => {
   const isAdmin = Boolean(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase().trim()));
 
   return (
-    <div className="flex-1 flex flex-col bg-[#FAF8F5]">
-      {/* Top Store Sub-navigation (hidden on admin screen) */}
-      {activeStoreView !== 'admin' && <StoreNavbar />}
-
+    <div className="flex-1 flex flex-col bg-[#FAF8F5] w-full">
       {/* Main View Switcher */}
-      <main className="flex-1">
+      <div className="flex-1 w-full">
         {activeStoreView === 'home' && <StoreHome />}
         {activeStoreView === 'shop' && <StoreShop />}
         {activeStoreView === 'product' && <StoreProductDetail />}
@@ -36,7 +32,7 @@ export const StoreModule: React.FC = () => {
         {activeStoreView === 'wishlist' && <StoreWishlist />}
         {activeStoreView === 'profile' && <StoreUserProfile />}
         {activeStoreView === 'admin' && (isAdmin ? <AdminPanel /> : <StoreHome />)}
-      </main>
+      </div>
 
       {/* Slide-over Quick Cart Drawer */}
       <CartDrawer />

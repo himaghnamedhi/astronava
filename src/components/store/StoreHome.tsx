@@ -69,15 +69,16 @@ export const StoreHome: React.FC = () => {
   };
 
   return (
-    <div className="space-y-12 sm:space-y-16 pb-16">
+    <div className="space-y-8 sm:space-y-12 pb-16">
       {/* 1. Hero Banner - Compact & Elegant */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#2a0e05] via-[#43180a] to-[#1c0803] text-amber-50 rounded-2xl border border-amber-500/20 shadow-md mx-4 sm:mx-6 lg:mx-8 mt-3">
-        {/* Sacred geometric subtle backdrop */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-72 h-72 rounded-full bg-rose-600/10 blur-2xl pointer-events-none" />
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#2a0e05] via-[#43180a] to-[#1c0803] text-amber-50 rounded-2xl border border-amber-500/20 shadow-md">
+          {/* Sacred geometric subtle backdrop */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+          <div className="absolute -left-20 -bottom-20 w-72 h-72 rounded-full bg-rose-600/10 blur-2xl pointer-events-none" />
 
-        <div className="relative max-w-4xl mx-auto px-5 py-6 sm:py-8 text-center space-y-3.5">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-5 py-5 sm:py-6 text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>100% Certified Vedic Authentic Store Collection</span>
@@ -156,7 +157,8 @@ export const StoreHome: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* 2. Shop by Category (MVP Categories: Gemstones, Rudraksha, Crystals) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

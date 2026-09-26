@@ -351,7 +351,13 @@ export default function App() {
       />
 
       {/* Main App Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6 sm:space-y-8 min-w-0 box-border overflow-x-hidden">
+      <main
+        className={`flex-1 w-full mx-auto min-w-0 box-border overflow-x-hidden ${
+          activeTab === 'store'
+            ? 'max-w-full p-0 space-y-0'
+            : 'max-w-7xl px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6 sm:space-y-8'
+        }`}
+      >
         
         {/* Dynamic Content Views based on activeTab */}
         {activeTab === 'home' && (

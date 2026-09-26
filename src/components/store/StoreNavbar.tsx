@@ -27,9 +27,9 @@ export const StoreNavbar: React.FC = () => {
   }, [categories]);
 
   return (
-    <div className="border-b border-amber-900/10 bg-[#FAF8F5]/90 backdrop-blur-md sticky top-18 z-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-13 gap-2 sm:gap-4">
+    <div className="border-b border-amber-900/10 bg-[#FAF8F5]/95 backdrop-blur-md sticky top-16 sm:top-18 z-30 w-full shadow-xs">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-12 gap-2 sm:gap-4">
           {/* Dynamic Category Tabs from Database */}
           <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1 text-xs font-semibold">
             <button

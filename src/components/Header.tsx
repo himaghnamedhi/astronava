@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const { user, openAuthModal, signOut } = useAuth();
-  const { navigateToAdmin, cartCount } = useStore();
+  const { navigateToAdmin, cartCount, openCart } = useStore();
 
   const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
   const isAdminUser = Boolean(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase().trim()));
@@ -168,9 +168,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="truncate text-stone-500 group-hover:text-stone-800 font-medium">
               Search astrology, houses &amp; planets...
             </span>
-            <kbd className="hidden lg:inline-flex items-center ml-auto px-1.5 py-0.5 text-[10px] font-mono text-stone-400 bg-white rounded border border-stone-200 shrink-0 shadow-2xs">
-              ⌘K
-            </kbd>
           </button>
 
           {/* Desktop Navigation: Home | Services ▼ | Store */}
@@ -340,6 +337,23 @@ export const Header: React.FC<HeaderProps> = ({
               <Search className="w-4 h-4 text-amber-800" />
             </button>
 
+            {/* Quick Cart Button */}
+            <button
+              id="btn-header-cart"
+              type="button"
+              onClick={openCart}
+              className="relative h-9 px-2.5 sm:px-3 rounded-xl bg-stone-100 hover:bg-amber-100/70 text-stone-700 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Shopping Cart"
+            >
+              <ShoppingBag className="w-4 h-4 text-amber-800" />
+              <span className="hidden sm:inline text-xs font-semibold">Cart</span>
+              {cartCount > 0 && (
+                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold rounded-full bg-amber-900 text-white shadow-2xs">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             {user ? (
               <div className="relative" ref={userDropdownRef}>
                 <button
@@ -433,50 +447,50 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Navigation Row (TASK 9) */}
         <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-stone-200/80 no-scrollbar -mx-3.5 px-3.5 sm:-mx-6 sm:px-6">
-          {/* Quick Search Tab for Mobile */}
-          <button
-            id="mobile-nav-search"
-            onClick={onOpenSearch}
-            className="whitespace-nowrap px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all active:scale-95 bg-amber-100/70 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs cursor-pointer"
-          >
-            <Search className="w-3.5 h-3.5 text-amber-800" />
-            <span>Search</span>
-          </button>
-          {[
-            { id: 'home', label: 'Home', icon: Home },
-            { id: 'generator', label: 'Kundli', icon: Sparkles },
-            { id: 'horoscope', label: 'Horoscope', icon: Sun },
-            { id: 'match', label: 'Match', icon: Heart },
-            { id: 'gemstones', label: 'Gemstones', icon: Gem },
-            { id: 'numerology', label: 'Numerology', icon: Hash },
-            { id: 'name-correction', label: 'Name Correction', icon: SpellCheck },
-            { id: 'store', label: 'Store', icon: ShoppingBag },
-            { id: 'profile', label: 'Profile', icon: User },
-          ].map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.id === 'profile' && !user) {
-                    openAuthModal('Sign in to access your Profile');
-                  } else {
-                    setActiveTab(item.id as any);
-                  }
-                }}
-                className={`whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all active:scale-95 shadow-2xs ${
-                  isActive
-                    ? 'bg-amber-900 text-amber-50 font-bold shadow-xs'
-                    : 'bg-stone-100/90 text-stone-700 hover:bg-stone-200 border border-stone-200/60'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
+            {/* Quick Search Tab for Mobile */}
+            <button
+              id="mobile-nav-search"
+              onClick={onOpenSearch}
+              className="whitespace-nowrap px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all active:scale-95 bg-amber-100/70 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs cursor-pointer"
+            >
+              <Search className="w-3.5 h-3.5 text-amber-800" />
+              <span>Search</span>
+            </button>
+            {[
+              { id: 'home', label: 'Home', icon: Home },
+              { id: 'generator', label: 'Kundli', icon: Sparkles },
+              { id: 'horoscope', label: 'Horoscope', icon: Sun },
+              { id: 'match', label: 'Match', icon: Heart },
+              { id: 'gemstones', label: 'Gemstones', icon: Gem },
+              { id: 'numerology', label: 'Numerology', icon: Hash },
+              { id: 'name-correction', label: 'Name Correction', icon: SpellCheck },
+              { id: 'store', label: 'Store', icon: ShoppingBag },
+              { id: 'profile', label: 'Profile', icon: User },
+            ].map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    if (item.id === 'profile' && !user) {
+                      openAuthModal('Sign in to access your Profile');
+                    } else {
+                      setActiveTab(item.id as any);
+                    }
+                  }}
+                  className={`whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all active:scale-95 shadow-2xs ${
+                    isActive
+                      ? 'bg-amber-900 text-amber-50 font-bold shadow-xs'
+                      : 'bg-stone-100/90 text-stone-700 hover:bg-stone-200 border border-stone-200/60'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
       </div>
     </header>
   );
