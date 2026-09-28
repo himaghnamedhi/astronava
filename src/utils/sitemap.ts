@@ -26,6 +26,19 @@ export interface AppViewRoute {
 
 export const CANONICAL_BASE_URL = 'https://www.astronava.com';
 
+export function getCanonicalBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.startsWith('app.') || hostname.includes('app.astronava.com')) {
+      return `https://${hostname}`;
+    }
+    if (hostname && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
+      return `https://${hostname}`;
+    }
+  }
+  return CANONICAL_BASE_URL;
+}
+
 /**
  * Standard registry of all indexable app views & astrological tools
  */
@@ -524,7 +537,7 @@ export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): strin
 export function injectDynamicMetaTags(
   tab: AppTabType,
   legalDoc?: LegalDocType,
-  baseUrl: string = CANONICAL_BASE_URL,
+  baseUrl: string = getCanonicalBaseUrl(),
   options?: DynamicMetaOptions
 ): AppViewRoute {
   const route = findRouteByTab(tab, legalDoc);

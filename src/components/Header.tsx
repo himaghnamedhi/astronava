@@ -14,7 +14,8 @@ import {
   Search,
   ArrowRight,
   X,
-  SpellCheck
+  SpellCheck,
+  FileText
 } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +28,7 @@ interface HeaderProps {
   chartStyle: ChartStyle;
   setChartStyle: (style: ChartStyle) => void;
   onOpenSearch: () => void;
+  onOpenFullReport?: () => void;
 }
 
 interface ServiceItem {
@@ -42,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   onOpenSearch,
+  onOpenFullReport,
 }) => {
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [serviceSearch, setServiceSearch] = useState('');
@@ -109,6 +112,14 @@ export const Header: React.FC<HeaderProps> = ({
       tagline: 'Mulank, Bhagyank, and Namank destiny vibration numbers',
       icon: Hash,
       tab: 'numerology',
+    },
+    {
+      id: 'full-astrology-report',
+      name: 'Full Astrology Report',
+      category: 'core',
+      tagline: '20-section comprehensive report with 3-year predictive forecast',
+      icon: FileText,
+      tab: 'generator',
     },
     {
       id: 'name-correction',
@@ -213,16 +224,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Subtle top indicator arrow */}
                   <div className="hidden sm:block absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-stone-200 rotate-45" />
 
-                  {/* Dropdown Header & Service Count */}
-                  <div className="flex items-center justify-between pb-1.5 border-b border-stone-100 px-1 relative z-10">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950 font-vedic">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Vedic Astrology Services</span>
-                    </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">
-                      {filteredServices.length} {filteredServices.length === 1 ? 'service' : 'services'}
-                    </span>
-                  </div>
+
 
                   {/* Search bar inside Services Dropdown */}
                   <div className="relative z-10">
@@ -260,7 +262,11 @@ export const Header: React.FC<HeaderProps> = ({
                           <div
                             key={service.id}
                             onClick={() => {
-                              setActiveTab(service.tab);
+                              if (service.id === 'full-astrology-report' && onOpenFullReport) {
+                                onOpenFullReport();
+                              } else {
+                                setActiveTab(service.tab);
+                              }
                               setServicesDropdownOpen(false);
                               setServiceSearch('');
                             }}

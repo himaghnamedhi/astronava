@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { generateKundliAiSummary } from './src/server/geminiAstrology';
+import { generateKundliAiSummary, generateFullAstrologyReportWithAi } from './src/server/geminiAstrology';
 import { generateClientSitemapXml } from './src/utils/sitemap';
 import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
 import { seedStoreIfEmpty } from './src/server/storeDb.ts';
@@ -62,6 +62,22 @@ async function startServer() {
     } catch (error: any) {
       console.error('AI Summary generation failed:', error);
       res.status(500).json({ error: error.message || 'Failed to generate AI summary' });
+    }
+  });
+
+  // Comprehensive Full Astrology Report Endpoint
+  app.post('/api/ai/full-astrology-report', async (req, res) => {
+    try {
+      const { kundliData, forecastYears } = req.body;
+      if (!kundliData) {
+        return res.status(400).json({ error: 'Kundli data is required' });
+      }
+
+      const report = await generateFullAstrologyReportWithAi(kundliData, forecastYears || 3);
+      res.json(report);
+    } catch (error: any) {
+      console.error('Full Astrology Report generation failed:', error);
+      res.status(500).json({ error: error.message || 'Failed to generate full astrology report' });
     }
   });
 

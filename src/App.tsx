@@ -8,11 +8,12 @@ import { MatchFinder } from './components/MatchFinder';
 import { NumerologyCalculator } from './components/NumerologyCalculator';
 import { SearchModal } from './components/SearchModal';
 import { CustomReportModal } from './components/CustomReportModal';
+import { FullAstrologyReportModal } from './components/reports/FullAstrologyReportModal';
 import { LegalModal } from './components/LegalModal';
 import { LegalPage } from './components/LegalPage';
 import { SitemapModal } from './components/SitemapModal';
 import { LegalDocType } from './data/legalPolicies';
-import { CompleteKundliData } from './data/vedicEphemeris';
+import { CompleteKundliData, generateCompleteKundli } from './data/vedicEphemeris';
 import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
@@ -174,9 +175,19 @@ export default function App() {
   const [reportGemstoneData, setReportGemstoneData] = useState<{ lagna?: number; profile?: any; name?: string }>({});
   const [reportKundliData, setReportKundliData] = useState<CompleteKundliData | null>(null);
 
+  // Full Astrology Report Modal state
+  const [isFullReportOpen, setIsFullReportOpen] = useState(false);
+  const [fullReportKundliData, setFullReportKundliData] = useState<CompleteKundliData | null>(null);
+  const [fullReportInitialYears, setFullReportInitialYears] = useState<1 | 2 | 3 | 5>(3);
+  const [fullReportInitialSection, setFullReportInitialSection] = useState<string>('sec-1-summary');
+
   // Helper to map pathname to view state
   const parsePathname = (path: string) => {
     const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+    if (cleanPath === '/full-astrology-report' || cleanPath === '/full-report') {
+      setTimeout(() => handleOpenFullReport(), 50);
+      return true;
+    }
     if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html') {
       setIsSitemapOpen(true);
       return true;
@@ -313,6 +324,33 @@ export default function App() {
     setIsReportOpen(true);
   };
 
+  const handleOpenFullReport = (
+    data?: CompleteKundliData,
+    years: 1 | 2 | 3 | 5 = 3,
+    section: string = 'sec-1-summary'
+  ) => {
+    let targetData = data || reportKundliData;
+    if (!targetData) {
+      targetData = generateCompleteKundli({
+        name: 'Seeker',
+        gender: 'male',
+        dob: '1950-09-17',
+        tob: '11:00',
+        city: 'Vadnagar, Gujarat, India',
+        latitude: 23.7842,
+        longitude: 72.6369,
+        timezoneOffset: 5.5,
+        weightKg: 78,
+        weightUnit: 'kg',
+      });
+      setReportKundliData(targetData);
+    }
+    setFullReportKundliData(targetData);
+    setFullReportInitialYears(years);
+    setFullReportInitialSection(section);
+    setIsFullReportOpen(true);
+  };
+
   // Group placements by house number for the chart renderer
   const houseOccupants: Record<HouseNumber, PlanetId[]> = React.useMemo(() => {
     const map: Record<HouseNumber, PlanetId[]> = {
@@ -348,6 +386,7 @@ export default function App() {
         chartStyle={chartStyle}
         setChartStyle={setChartStyle}
         onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenFullReport={() => handleOpenFullReport()}
       />
 
       {/* Main App Container */}
@@ -374,6 +413,7 @@ export default function App() {
         {activeTab === 'generator' && (
           <KundliGenerator
             onOpenReportModal={(kData) => handleOpenReport('kundli', kData)}
+            onOpenFullReportModal={(kData, yrs, sec) => handleOpenFullReport(kData, yrs, sec)}
             onKundliGenerated={(kData) => setReportKundliData(kData)}
             onApplyPlacementsToBuilder={(placements) => {
               setCustomPlacements(placements);
@@ -778,6 +818,17 @@ export default function App() {
           handleTabChange('builder');
         }}
       />
+
+      {/* Comprehensive 20-Section Full Astrology Report & Multi-Year Forecast Modal */}
+      {fullReportKundliData && (
+        <FullAstrologyReportModal
+          isOpen={isFullReportOpen}
+          onClose={() => setIsFullReportOpen(false)}
+          kundliData={fullReportKundliData}
+          initialYears={fullReportInitialYears}
+          initialFocusedSection={fullReportInitialSection}
+        />
+      )}
 
       {/* Printable Custom Vedic Report Modal */}
       <CustomReportModal

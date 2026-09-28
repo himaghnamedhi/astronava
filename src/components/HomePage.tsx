@@ -66,20 +66,20 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTab }) => {
       title: 'Kundli Maker & Janam Patrika',
       tagline: 'Authentic Vedic Horoscopes & Divisional Charts',
       description:
-        'Generate high-precision Vedic Janam Kundli charts based on classical Parashari Jyotish and Chitrapaksha Lahiri Ayanamsha. Includes Lagna, Navamsha, 7 Divisional Vargas (D1–D12), Vimshottari Mahadasha timeline, and 337-point Sarvashtakavarga tables.',
+        'Generate high-precision Vedic Janam Kundli charts based on classical Parashari Jyotish and Chitrapaksha Lahiri Ayanamsha. Features our comprehensive 20-Section Full Astrology Report, 3-year predictive forecast, 12-house deep dive, and Vimshottari Mahadasha timeline.',
       icon: Sparkles,
-      badge: 'Most Popular',
+      badge: 'Full Report & Forecast',
       badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
       accentGradient: 'from-amber-700 to-amber-900',
       borderAccent: 'border-amber-200/80 hover:border-amber-400',
       highlights: [
-        'Lahiri Ayanamsha (Chitrapaksha)',
-        '7 Divisional Charts (D1 to D12)',
-        'Vimshottari Dasha with Dates',
-        'Sarvashtakavarga 337 Bindus',
+        '20-Section Full Astrology Report',
+        '1/2/3/5-Year Predictive Forecast',
+        'Every 12 Houses Real-Life Scenarios',
+        'Lahiri Ayanamsha & Divisional Vargas',
       ],
-      ctaLabel: 'Generate Janam Kundli',
-      popularQuery: 'kundli birth chart lagna dasha patrika',
+      ctaLabel: 'Generate Janam Kundli & Report',
+      popularQuery: 'kundli birth chart lagna dasha patrika full astrology report',
     },
     {
       id: 'gemstones',
@@ -191,12 +191,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTab }) => {
   return (
     <div className="space-y-6 sm:space-y-10 lg:space-y-12 animate-fadeIn w-full max-w-full min-w-0 box-border">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-b from-stone-900 via-[#1c120c] to-stone-950 text-stone-100 p-4 sm:p-8 lg:p-12 border border-amber-500/20 shadow-xl w-full max-w-full box-border">
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-b from-stone-900 via-[#1c120c] to-stone-950 text-stone-100 p-2.5 sm:p-3.5 lg:p-4 border border-amber-500/20 shadow-xl w-full max-w-full box-border">
         {/* Subtle Background Vedic Mandala Glow */}
         <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-56 sm:w-80 h-56 sm:h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-2 sm:space-y-3">
           {/* Sacred Brand Badge */}
           <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] sm:text-xs font-semibold tracking-wider uppercase max-w-full">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />

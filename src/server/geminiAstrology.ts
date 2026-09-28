@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
+import { generateFullAstrologyReport, FullAstrologyReportData } from '../data/fullAstrologyReportEngine';
 
 export interface AiSummarySectionPayload {
   overview: string;
@@ -448,4 +449,71 @@ export function generateAlgorithmicVedicSummary(k: any): AiSummarySectionPayload
     dashaActivation,
     vedicRemedies,
   };
+}
+
+export async function generateFullAstrologyReportWithAi(
+  kundliData: any,
+  forecastYears: 1 | 2 | 3 | 5 = 3
+): Promise<FullAstrologyReportData> {
+  // 1. Calculate deterministic ground truth report
+  const baseReport = generateFullAstrologyReport(kundliData, forecastYears);
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey.trim() === '') {
+    return baseReport;
+  }
+
+  try {
+    const ai = new GoogleGenAI({
+      apiKey: apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+
+    const prompt = `You are a world-class classical Vedic Astrologer synthesizing an empowering, highly articulate, and deeply respectful Full Astrology Report for ${baseReport.nativeName}.
+The calculations and planetary positions are strictly pre-calculated and fixed:
+- Ascendant: ${baseReport.ascendantAnalysis.sign} (${baseReport.ascendantAnalysis.exactDegree}) ruled by ${baseReport.ascendantAnalysis.lord} in House ${baseReport.ascendantAnalysis.lordPlacedInHouse}
+- Moon: ${baseReport.chartOverview.moonSign} under Nakshatra ${baseReport.chartOverview.moonNakshatra}
+- Sun: ${baseReport.chartOverview.sunSign}
+- Current Mahadasha: ${baseReport.dashaAnalysis.currentMahadasha} with Antardasha of ${baseReport.dashaAnalysis.currentAntardasha}
+- Selected Multi-Year Forecast: ${forecastYears} Years
+
+Please synthesize an elevated Executive Summary and refined life core theme for this native.
+Return JSON with this exact structure:
+{
+  "headline": string,
+  "lifeCoreTheme": string,
+  "majorOpportunities": string[],
+  "mindsetGuidance": string[]
+}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
+    });
+
+    if (response.text) {
+      const parsed = JSON.parse(response.text.trim());
+      if (parsed.headline && parsed.lifeCoreTheme) {
+        baseReport.executiveSummary.headline = parsed.headline;
+        baseReport.executiveSummary.lifeCoreTheme = parsed.lifeCoreTheme;
+        if (Array.isArray(parsed.majorOpportunities) && parsed.majorOpportunities.length > 0) {
+          baseReport.executiveSummary.majorOpportunities = parsed.majorOpportunities;
+        }
+        if (Array.isArray(parsed.mindsetGuidance) && parsed.mindsetGuidance.length > 0) {
+          baseReport.executiveSummary.mindsetGuidance = parsed.mindsetGuidance;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('AI enhancement for full report failed, using deterministic Vedic engine:', err);
+  }
+
+  return baseReport;
 }

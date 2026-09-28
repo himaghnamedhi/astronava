@@ -124,7 +124,7 @@ export const AuthModal: React.FC = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-        className="relative w-full max-w-md sm:max-w-lg my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md sm:max-w-lg my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden h-[620px] sm:h-[640px] flex flex-col justify-between"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Luxury Top Header */}
@@ -284,42 +284,40 @@ export const AuthModal: React.FC = () => {
 
           {/* Email / Password Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {viewMode === 'signup' && (
-              <>
-                <div>
-                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Arjuna Varma"
-                      className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
-                    />
-                  </div>
+            <div className={`space-y-3.5 transition-all duration-200 overflow-hidden ${viewMode === 'signup' ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pointer-events-none'}`}>
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required={viewMode === 'signup'}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Arjuna Varma"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">
-                    Phone Number (Optional)
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="+91 98765 43210"
-                      className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
-                    />
-                  </div>
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  Phone Number (Optional)
+                </label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-800 shadow-2xs font-medium text-stone-900"
+                  />
                 </div>
-              </>
-            )}
+              </div>
+            </div>
 
             <div>
               <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">

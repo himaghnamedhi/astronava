@@ -33,6 +33,7 @@ import {
   Moon,
   History,
   Eye,
+  ArrowUpRight,
   X
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -91,6 +92,7 @@ export interface RecentKundliItem {
 
 interface KundliGeneratorProps {
   onOpenReportModal?: (kundliData: CompleteKundliData) => void;
+  onOpenFullReportModal?: (kundliData: CompleteKundliData, initialYears?: 1 | 2 | 3 | 5, initialSection?: string) => void;
   onApplyPlacementsToBuilder?: (placements: Record<PlanetId, HouseNumber>, lagnaSign: string, nativeName: string) => void;
   onKundliGenerated?: (kundliData: CompleteKundliData) => void;
 }
@@ -311,6 +313,7 @@ const SAMPLE_PROFILES: FamousPersonProfile[] = [
 
 export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   onOpenReportModal,
+  onOpenFullReportModal,
   onApplyPlacementsToBuilder,
   onKundliGenerated,
 }) => {
@@ -1719,6 +1722,27 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
 
               <button
                 type="button"
+                id="btn-open-full-astrology-report"
+                onClick={() => {
+                  if (onOpenFullReportModal) {
+                    onOpenFullReportModal(kundliData, 3, 'sec-1-summary');
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 hover:from-amber-700 hover:to-amber-900 text-amber-100 border border-amber-500/40 text-left transition-all cursor-pointer group shadow-xs hover:scale-[1.02] active:scale-98"
+                title="Open comprehensive 20-section Full Astrology Report & Multi-Year Forecast"
+              >
+                <span className="text-amber-300 text-[10px] uppercase font-bold flex items-center gap-1">
+                  <FileText className="w-3 h-3 text-amber-400" />
+                  <span>Full Report</span>
+                </span>
+                <strong className="text-white font-bold group-hover:underline flex items-center gap-1">
+                  <span>Full Astrology Report</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </strong>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleResetToNewDetails}
                 className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold border border-stone-300 text-xs flex items-center gap-1 transition-colors"
                 title="Enter details for another person"
@@ -1838,7 +1862,8 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                 {/* Horizontal Tab Navigation */}
                 <div className="flex items-center gap-1.5 border-b border-stone-200 overflow-x-auto no-scrollbar pb-2 text-xs font-semibold">
                   {[
-                    { id: 'ai-summary', label: '✦ AI Summary', icon: Sparkles },
+                    { id: 'full-report', label: '✦ Full Report (20 Sections)', icon: FileText },
+                    { id: 'ai-summary', label: 'AI Summary', icon: Sparkles },
                     { id: 'grahas', label: 'Graha Spashta', icon: Sparkles },
                     { id: 'vargas', label: 'All Charts (षोडशवर्ग)', icon: Layers },
                     { id: 'meanings', label: 'Planets in Houses', icon: BookOpen },
@@ -1850,17 +1875,28 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                   ].map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeAnalysisTab === tab.id;
+                    const isReportTab = tab.id === 'full-report';
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveAnalysisTab(tab.id as any)}
-                        className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition-all ${
-                          isActive
+                        onClick={() => {
+                          if (isReportTab) {
+                            if (onOpenFullReportModal) {
+                              onOpenFullReportModal(kundliData, 3, 'sec-1-summary');
+                            }
+                          } else {
+                            setActiveAnalysisTab(tab.id as any);
+                          }
+                        }}
+                        className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
+                          isReportTab
+                            ? 'bg-gradient-to-r from-amber-800 to-amber-950 text-amber-100 font-bold border border-amber-600/40 shadow-xs hover:from-amber-700 hover:to-amber-900'
+                            : isActive
                             ? 'bg-amber-900 text-amber-50 shadow-2xs font-bold'
                             : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                         }`}
                       >
-                        <Icon className="w-3.5 h-3.5" />
+                        <Icon className={`w-3.5 h-3.5 ${isReportTab ? 'text-amber-400' : ''}`} />
                         <span>{tab.label}</span>
                       </button>
                     );
@@ -1891,7 +1927,14 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                 {/* TAB: PLANETS IN HOUSES (MEANINGS & EFFECTS) */}
                 {activeAnalysisTab === 'meanings' && (
                   <div className="mt-4">
-                    <PlanetHouseMeaningsView kundliData={kundliData} />
+                    <PlanetHouseMeaningsView 
+                      kundliData={kundliData} 
+                      onOpenFullReport={(section) => {
+                        if (onOpenFullReportModal) {
+                          onOpenFullReportModal(kundliData, 3, section || 'sec-4-houses');
+                        }
+                      }}
+                    />
                   </div>
                 )}
 
