@@ -184,74 +184,74 @@ export default function App() {
   // Helper to map pathname to view state
   const parsePathname = (path: string) => {
     const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
-    if (cleanPath === '/full-astrology-report' || cleanPath === '/full-report') {
+    if (cleanPath === '/full-astrology-report' || cleanPath === '/full-report' || cleanPath === 'full-astrology-report' || cleanPath === 'full-report') {
       setTimeout(() => handleOpenFullReport(), 50);
       return true;
     }
-    if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html') {
+    if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html' || cleanPath === 'sitemap' || cleanPath === 'sitemap.html') {
       setIsSitemapOpen(true);
       return true;
     }
-    if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy') {
+    if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy' || cleanPath === 'privacy-policy' || cleanPath === 'privacy' || cleanPath === 'legal/privacy') {
       setSelectedLegalDoc('privacy');
       setActiveTab('legal');
       return true;
     }
-    if (cleanPath === '/terms-and-conditions' || cleanPath === '/terms' || cleanPath === '/terms-of-service' || cleanPath === '/legal/terms') {
+    if (cleanPath === '/terms-and-conditions' || cleanPath === '/terms' || cleanPath === '/terms-of-service' || cleanPath === '/legal/terms' || cleanPath === 'terms-and-conditions' || cleanPath === 'terms' || cleanPath === 'terms-of-service' || cleanPath === 'legal/terms') {
       setSelectedLegalDoc('terms');
       setActiveTab('legal');
       return true;
     }
-    if (cleanPath === '/disclaimer' || cleanPath === '/legal/disclaimer') {
+    if (cleanPath === '/disclaimer' || cleanPath === '/legal/disclaimer' || cleanPath === 'disclaimer' || cleanPath === 'legal/disclaimer') {
       setSelectedLegalDoc('disclaimer');
       setActiveTab('legal');
       return true;
     }
-    if (cleanPath === '/contact' || cleanPath === '/contact-us' || cleanPath === '/legal/contact') {
+    if (cleanPath === '/contact' || cleanPath === '/contact-us' || cleanPath === '/legal/contact' || cleanPath === 'contact' || cleanPath === 'contact-us' || cleanPath === 'legal/contact') {
       setSelectedLegalDoc('contact');
       setActiveTab('legal');
       return true;
     }
-    if (cleanPath === '/builder') {
+    if (cleanPath === '/builder' || cleanPath === 'builder') {
       setActiveTab('builder');
       return true;
     }
-    if (cleanPath === '/gemstones') {
+    if (cleanPath === '/gemstones' || cleanPath === 'gemstones') {
       setActiveTab('gemstones');
       return true;
     }
-    if (cleanPath === '/match') {
+    if (cleanPath === '/match' || cleanPath === 'match') {
       setActiveTab('match');
       return true;
     }
-    if (cleanPath === '/numerology') {
+    if (cleanPath === '/numerology' || cleanPath === 'numerology') {
       setActiveTab('numerology');
       return true;
     }
-    if (cleanPath === '/name-correction' || cleanPath === '/name-tuning' || cleanPath === '/namecorrection' || cleanPath === '/namank') {
+    if (cleanPath === '/name-correction' || cleanPath === '/name-tuning' || cleanPath === '/namecorrection' || cleanPath === '/namank' || cleanPath === 'name-correction' || cleanPath === 'name-tuning' || cleanPath === 'namecorrection' || cleanPath === 'namank') {
       setActiveTab('name-correction');
       return true;
     }
-    if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/admin' || cleanPath === '/store/admin') {
+    if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/admin' || cleanPath === '/store/admin' || cleanPath === 'store' || cleanPath === 'shop' || cleanPath === 'products' || cleanPath === 'admin' || cleanPath === 'store/admin') {
       setActiveTab('store');
       return true;
     }
-    if (cleanPath === '/profile' || cleanPath === '/account' || cleanPath === '/dashboard') {
+    if (cleanPath === '/profile' || cleanPath === '/account' || cleanPath === '/dashboard' || cleanPath === 'profile' || cleanPath === 'account' || cleanPath === 'dashboard') {
       setActiveTab('profile');
       return true;
     }
-    if (cleanPath === '' || cleanPath === '/' || cleanPath === '/home') {
+    if (cleanPath === '' || cleanPath === '/' || cleanPath === '/home' || cleanPath === 'home') {
       setActiveTab('home');
       return true;
     }
-    if (cleanPath === '/generator' || cleanPath === '/kundli') {
+    if (cleanPath === '/generator' || cleanPath === '/kundli' || cleanPath === 'generator' || cleanPath === 'kundli') {
       setActiveTab('generator');
       return true;
     }
     return false;
   };
 
-  // Sync route on mount and browser back/forward (popstate)
+  // Sync route on mount, hash change, and browser back/forward (popstate)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
@@ -273,20 +273,46 @@ export default function App() {
           cleanPath === '/sitemap.html';
         
         if (!isMarketingOrLegal) {
-          window.location.href = `https://app.astronava.com${pathname}${window.location.search}${window.location.hash}`;
+          window.location.href = `https://app.astronava.com/#${pathname}${window.location.search}${window.location.hash}`;
           return;
         }
       }
     }
 
-    parsePathname(window.location.pathname);
+    const parseCurrentUrl = () => {
+      // 1. Check hash first (e.g. #generator or #/generator)
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash) {
+        if (parsePathname(hash)) return;
+      }
 
-    const handlePopState = () => {
+      // 2. Check query search params (e.g. ?tab=generator)
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') || params.get('view');
+      if (tabParam) {
+        if (parsePathname('/' + tabParam)) return;
+      }
+
+      // 3. Fallback to pathname
       parsePathname(window.location.pathname);
     };
 
+    parseCurrentUrl();
+
+    const handlePopState = () => {
+      parseCurrentUrl();
+    };
+
+    const handleHashChange = () => {
+      parseCurrentUrl();
+    };
+
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   // Global Cmd+K / Ctrl+K shortcut for Search Modal
@@ -329,7 +355,7 @@ export default function App() {
       const hostname = window.location.hostname;
       if ((hostname === 'astronava.com' || hostname === 'www.astronava.com') && tab !== 'home' && tab !== 'legal') {
         const route = findRouteByTab(tab, selectedLegalDoc);
-        window.location.href = `https://app.astronava.com${route.path}`;
+        window.location.href = `https://app.astronava.com/#${route.path}`;
         return;
       }
     }
