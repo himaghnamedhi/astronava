@@ -29,7 +29,8 @@ import {
   Trash2,
   RefreshCw,
   Eye,
-  Cloud
+  Cloud,
+  Loader2
 } from 'lucide-react';
 import { 
   saveMatchSubmission, 
@@ -110,6 +111,7 @@ export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpe
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
   const [hasCalculated, setHasCalculated] = useState<boolean>(false);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // Firebase 24-Hour Cloud Storage State
   const [isSavingToFirebase, setIsSavingToFirebase] = useState<boolean>(false);
@@ -241,57 +243,61 @@ export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpe
     const updatedP1: BirthDetails = { ...p1Details, tob: p1Tob };
     const updatedP2: BirthDetails = { ...p2Details, tob: p2Tob };
 
-    const report = calculateVedAstroMatch(updatedP1, updatedP2);
-    setMatchReport(report);
-    setHasCalculated(true);
+    setIsCalculating(true);
+    setTimeout(async () => {
+      const report = calculateVedAstroMatch(updatedP1, updatedP2);
+      setMatchReport(report);
+      setHasCalculated(true);
+      setIsCalculating(false);
 
-    // Persist to Firebase Firestore with 24-hour TTL
-    setIsSavingToFirebase(true);
-    setFirebaseError(null);
-    const submissionId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    try {
-      const res = await saveMatchSubmission({
-        id: submissionId,
-        partner1: {
-          name: updatedP1.name.trim() || 'Partner 1',
-          gender: updatedP1.gender,
-          dob: updatedP1.dob,
-          tob: p1Tob,
-          hour: p1Hour,
-          minute: p1Minute,
-          period: p1Period,
-          city: updatedP1.city,
-          latitude: Number(updatedP1.latitude) || 0,
-          longitude: Number(updatedP1.longitude) || 0,
-          timezoneOffset: Number(updatedP1.timezoneOffset) || 5.5,
-        },
-        partner2: {
-          name: updatedP2.name.trim() || 'Partner 2',
-          gender: updatedP2.gender,
-          dob: updatedP2.dob,
-          tob: p2Tob,
-          hour: p2Hour,
-          minute: p2Minute,
-          period: p2Period,
-          city: updatedP2.city,
-          latitude: Number(updatedP2.latitude) || 0,
-          longitude: Number(updatedP2.longitude) || 0,
-          timezoneOffset: Number(updatedP2.timezoneOffset) || 5.5,
-        },
-        ashtakootaScore: report.totalObtainedGunas,
-        maximumScore: 36,
-        compatibilityVerdict: report.summaryDescription || report.verdict,
-      });
-      setFirebaseStatus({
-        id: res.id,
-        expiresAtDate: res.expiresAtDate,
-      });
-    } catch (err) {
-      console.error('Failed to save match submission to Firebase', err);
-      setFirebaseError('Could not sync to cloud database. Local calculation is complete.');
-    } finally {
-      setIsSavingToFirebase(false);
-    }
+      // Persist to Firebase Firestore with 24-hour TTL
+      setIsSavingToFirebase(true);
+      setFirebaseError(null);
+      const submissionId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      try {
+        const res = await saveMatchSubmission({
+          id: submissionId,
+          partner1: {
+            name: updatedP1.name.trim() || 'Partner 1',
+            gender: updatedP1.gender,
+            dob: updatedP1.dob,
+            tob: p1Tob,
+            hour: p1Hour,
+            minute: p1Minute,
+            period: p1Period,
+            city: updatedP1.city,
+            latitude: Number(updatedP1.latitude) || 0,
+            longitude: Number(updatedP1.longitude) || 0,
+            timezoneOffset: Number(updatedP1.timezoneOffset) || 5.5,
+          },
+          partner2: {
+            name: updatedP2.name.trim() || 'Partner 2',
+            gender: updatedP2.gender,
+            dob: updatedP2.dob,
+            tob: p2Tob,
+            hour: p2Hour,
+            minute: p2Minute,
+            period: p2Period,
+            city: updatedP2.city,
+            latitude: Number(updatedP2.latitude) || 0,
+            longitude: Number(updatedP2.longitude) || 0,
+            timezoneOffset: Number(updatedP2.timezoneOffset) || 5.5,
+          },
+          ashtakootaScore: report.totalObtainedGunas,
+          maximumScore: 36,
+          compatibilityVerdict: report.summaryDescription || report.verdict,
+        });
+        setFirebaseStatus({
+          id: res.id,
+          expiresAtDate: res.expiresAtDate,
+        });
+      } catch (err) {
+        console.error('Failed to save match submission to Firebase', err);
+        setFirebaseError('Could not sync to cloud database. Local calculation is complete.');
+      } finally {
+        setIsSavingToFirebase(false);
+      }
+    }, 1000);
   };
 
   // Preset loader
@@ -324,9 +330,13 @@ export const MatchFinder: React.FC<MatchFinderProps> = ({ onNavigateToTab, onOpe
     setP2Period(p2P);
     setP2TimeUnknown(false);
 
-    const report = calculateVedAstroMatch(newP1, newP2);
-    setMatchReport(report);
-    setHasCalculated(true);
+    setIsCalculating(true);
+    setTimeout(() => {
+      const report = calculateVedAstroMatch(newP1, newP2);
+      setMatchReport(report);
+      setHasCalculated(true);
+      setIsCalculating(false);
+    }, 1000);
   };
 
   // Filtered cities for P1
@@ -1136,7 +1146,23 @@ Calculated via Astronava Match Finder`;
         </div>
       </div>
 
-      {hasCalculated ? (
+      {isCalculating ? (
+        <div className="bg-white rounded-3xl border border-amber-900/15 p-10 sm:p-14 space-y-8 animate-pulse shadow-sm my-8 text-center">
+          <div className="w-20 h-20 mx-auto rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
+            <Loader2 className="w-10 h-10 text-amber-800 animate-spin" />
+          </div>
+          <div className="space-y-3 max-w-md mx-auto">
+            <h3 className="text-xl font-extrabold text-stone-900 font-vedic">Evaluating 36-Guna Ashtakoota Milan</h3>
+            <p className="text-sm text-stone-600">Analyzing Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi, and Manglik Dosha compatibility...</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 max-w-3xl mx-auto">
+            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
+            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
+            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
+            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
+          </div>
+        </div>
+      ) : hasCalculated ? (
         /* 3. MATCH RESULTS DASHBOARD - UNIFIED SINGLE CARD */
         <div className="bg-white rounded-3xl border border-amber-900/15 shadow-sm overflow-hidden divide-y divide-stone-200 animate-fadeIn">
           {/* Active Status Banner */}
@@ -1742,8 +1768,9 @@ Calculated via Astronava Match Finder`;
         </div>
 
       </div>
-    ) : (
-      /* BASIC DETAILS FOR THE SPACE (Shown when match is not calculated yet) */
+
+      ) : (
+        /* BASIC DETAILS FOR THE SPACE (Shown when match is not calculated yet) */
       <div className="space-y-8 animate-fadeIn">
         {/* Header Card */}
         <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-8 shadow-xs space-y-4">

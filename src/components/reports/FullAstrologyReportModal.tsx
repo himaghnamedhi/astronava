@@ -48,6 +48,87 @@ import {
 } from '../../data/fullAstrologyReportEngine';
 import { VedicOrnamentalBorder } from './VedicOrnamentalBorder';
 
+const PLANET_DEFINITIONS: Record<string, { title: string; sanskrit: string; desc: string }> = {
+  'Sun': { title: 'Sun', sanskrit: 'Surya', desc: 'Signifies soul, vitality, self-esteem, ego, father, authority, and career standing.' },
+  'Surya': { title: 'Sun', sanskrit: 'Surya', desc: 'Signifies soul, vitality, self-esteem, ego, father, authority, and career standing.' },
+  'Moon': { title: 'Moon', sanskrit: 'Chandra', desc: 'Signifies mind, emotions, mother, public response, mental peace, and nurturing instincts.' },
+  'Chandra': { title: 'Moon', sanskrit: 'Chandra', desc: 'Signifies mind, emotions, mother, public response, mental peace, and nurturing instincts.' },
+  'Mars': { title: 'Mars', sanskrit: 'Mangal', desc: 'Signifies physical energy, drive, courage, ambition, brothers, real estate, and technical capability.' },
+  'Mangal': { title: 'Mars', sanskrit: 'Mangal', desc: 'Signifies physical energy, drive, courage, ambition, brothers, real estate, and technical capability.' },
+  'Mercury': { title: 'Mercury', sanskrit: 'Budha', desc: 'Signifies intellect, communication, commerce, analytical reasoning, humor, and education.' },
+  'Budha': { title: 'Mercury', sanskrit: 'Budha', desc: 'Signifies intellect, communication, commerce, analytical reasoning, humor, and education.' },
+  'Jupiter': { title: 'Jupiter', sanskrit: 'Guru / Brihaspati', desc: 'Signifies wisdom, higher learning, expansion, wealth, fortune, children, and spiritual grace.' },
+  'Guru': { title: 'Jupiter', sanskrit: 'Guru / Brihaspati', desc: 'Signifies wisdom, higher learning, expansion, wealth, fortune, children, and spiritual grace.' },
+  'Venus': { title: 'Venus', sanskrit: 'Shukra', desc: 'Signifies love, romance, luxury, arts, pleasures, beauty, vehicles, and marital harmony.' },
+  'Shukra': { title: 'Venus', sanskrit: 'Shukra', desc: 'Signifies love, romance, luxury, arts, pleasures, beauty, vehicles, and marital harmony.' },
+  'Saturn': { title: 'Saturn', sanskrit: 'Shani', desc: 'Signifies karma, discipline, longevity, hard work, delay, structure, duty, and spiritual service.' },
+  'Shani': { title: 'Saturn', sanskrit: 'Shani', desc: 'Signifies karma, discipline, longevity, hard work, delay, structure, duty, and spiritual service.' },
+  'Rahu': { title: 'Rahu', sanskrit: 'Rahu', desc: 'Signifies material ambition, worldly obsession, innovation, foreign connections, and sudden events.' },
+  'Ketu': { title: 'Ketu', sanskrit: 'Ketu', desc: 'Signifies spiritual liberation (Moksha), intuition, past-life karma, and detachment.' },
+};
+
+const HOUSE_DEFINITIONS: Record<number, { title: string; sanskrit: string; desc: string }> = {
+  1: { title: '1st House', sanskrit: 'Tanu Bhava', desc: 'Self, physical body, appearance, personality, vitality, and primary life approach.' },
+  2: { title: '2nd House', sanskrit: 'Dhana Bhava', desc: 'Accumulated wealth, family assets, speech quality, food habits, and financial resources.' },
+  3: { title: '3rd House', sanskrit: 'Sahaja Bhava', desc: 'Courage, younger siblings, short travels, communication, writing, and manual skills.' },
+  4: { title: '4th House', sanskrit: 'Sukha Bhava', desc: 'Mother, home, inner peace, real estate, land, vehicles, and domestic happiness.' },
+  5: { title: '5th House', sanskrit: 'Putra Bhava', desc: 'Progeny, creative intelligence, romance, speculation, and past-life merits (Purvapunya).' },
+  6: { title: '6th House', sanskrit: 'Ripu Bhava', desc: 'Enemies, debts, daily service, illnesses, obstacles, and competition.' },
+  7: { title: '7th House', sanskrit: 'Yuvati Bhava', desc: 'Spouse, marriage, business partnerships, public dealings, and contracts.' },
+  8: { title: '8th House', sanskrit: 'Randhra Bhava', desc: 'Transformation, longevity, occult sciences, inheritance, and hidden secrets.' },
+  9: { title: '9th House', sanskrit: 'Bhagya Bhava', desc: 'Dharma, higher learning, long journeys, father, luck, and spiritual fortune.' },
+  10: { title: '10th House', sanskrit: 'Karma Bhava', desc: 'Career, professional authority, social status, public standing, and karma.' },
+  11: { title: '11th House', sanskrit: 'Labha Bhava', desc: 'Financial gains, income streams, social network, and fulfillment of desires.' },
+  12: { title: '12th House', sanskrit: 'Vyaya Bhava', desc: 'Spirituality, liberation, foreign lands, expenditures, and subconscious realms.' },
+};
+
+const PlanetTooltip: React.FC<{ planetName: string; children: React.ReactNode }> = ({ planetName, children }) => {
+  const [show, setShow] = useState(false);
+  const cleanName = planetName.split(' ')[0].replace(/[^a-zA-Z]/g, '');
+  const def = PLANET_DEFINITIONS[cleanName] || PLANET_DEFINITIONS[planetName] || { title: planetName, sanskrit: planetName, desc: 'Vedic planetary influence and functional significance in horoscope analysis.' };
+
+  return (
+    <span className="relative inline-block" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      <span className="cursor-help border-b border-dotted border-amber-600/70 inline-flex items-center gap-1 font-semibold text-amber-950">
+        {children}
+        <Info className="w-2.5 h-2.5 text-amber-700/80 shrink-0" />
+      </span>
+      {show && (
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 p-3 rounded-2xl bg-stone-900 text-stone-100 shadow-2xl text-xs space-y-1 pointer-events-none animate-fadeIn border border-amber-500/30">
+          <div className="flex items-center justify-between border-b border-stone-800 pb-1">
+            <span className="font-bold text-amber-300">{def.title}</span>
+            <span className="text-[10px] text-amber-400 font-vedic">{def.sanskrit}</span>
+          </div>
+          <p className="text-stone-300 text-[11px] leading-relaxed">{def.desc}</p>
+        </div>
+      )}
+    </span>
+  );
+};
+
+const HouseTooltip: React.FC<{ houseNum: number; children: React.ReactNode }> = ({ houseNum, children }) => {
+  const [show, setShow] = useState(false);
+  const def = HOUSE_DEFINITIONS[houseNum] || { title: `${houseNum}th House`, sanskrit: 'Bhava', desc: 'Vedic astrological house representing specific life departments.' };
+
+  return (
+    <span className="relative inline-block" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      <span className="cursor-help border-b border-dotted border-amber-600/70 inline-flex items-center gap-1 font-semibold text-amber-950">
+        {children}
+        <Info className="w-2.5 h-2.5 text-amber-700/80 shrink-0" />
+      </span>
+      {show && (
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 p-3 rounded-2xl bg-stone-900 text-stone-100 shadow-2xl text-xs space-y-1 pointer-events-none animate-fadeIn border border-amber-500/30">
+          <div className="flex items-center justify-between border-b border-stone-800 pb-1">
+            <span className="font-bold text-amber-300">{def.title}</span>
+            <span className="text-[10px] text-amber-400 font-vedic">{def.sanskrit}</span>
+          </div>
+          <p className="text-stone-300 text-[11px] leading-relaxed">{def.desc}</p>
+        </div>
+      )}
+    </span>
+  );
+};
+
 interface FullAstrologyReportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -739,7 +820,7 @@ ${report.multiYearForecast.periods.map((p) => `${p.label}: ${p.overallPeriodThem
                       <span className="text-2xl">{planet.avatar}</span>
                       <div>
                         <h4 className="text-sm font-bold text-stone-900 font-vedic">
-                          {planet.name} ({planet.sanskritName})
+                          <PlanetTooltip planetName={planet.name}>{planet.name} ({planet.sanskritName})</PlanetTooltip>
                         </h4>
                         <span className="text-[10px] text-stone-500">
                           {planet.signName} {planet.degrees}
@@ -801,10 +882,10 @@ ${report.multiYearForecast.periods.map((p) => `${p.label}: ${p.overallPeriodThem
                   {report.houseLordsMatrix.map((item) => (
                     <tr key={item.houseNumber} className="hover:bg-amber-50/40 transition-colors">
                       <td className="py-2.5 px-3 font-bold text-stone-900">
-                        {item.houseNumber}th House
+                        <HouseTooltip houseNum={item.houseNumber}>{item.houseNumber}th House</HouseTooltip>
                       </td>
                       <td className="py-2.5 px-3 font-semibold text-amber-950">
-                        {item.lord}
+                        <PlanetTooltip planetName={item.lord}>{item.lord}</PlanetTooltip>
                       </td>
                       <td className="py-2.5 px-3 font-semibold text-stone-800">
                         {item.placedInHouse}th House ({item.placedInSign})

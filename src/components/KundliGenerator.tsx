@@ -336,6 +336,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   const [hasGenerated, setHasGenerated] = useState<boolean>(false); // Don't show any chart before entering data!
   const [kundliData, setKundliData] = useState<CompleteKundliData | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // View Preferences
   const [selectedDivisionalChart, setSelectedDivisionalChart] = useState<DivisionalChartType>('D1');
@@ -430,15 +431,19 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   };
 
   const handleLoadRecentKundli = (item: RecentKundliItem) => {
+    setIsCalculating(true);
     setBirthDetails(item.birthDetails);
     setCityInputValue(item.birthDetails.city);
     setCitySearchQuery('');
     setFormError(null);
-    const data = generateCompleteKundli(item.birthDetails);
-    setKundliData(data);
-    setHasGenerated(true);
-    setShowEditForm(false);
-    onKundliGenerated?.(data);
+    setTimeout(() => {
+      const data = generateCompleteKundli(item.birthDetails);
+      setKundliData(data);
+      setHasGenerated(true);
+      setShowEditForm(false);
+      setIsCalculating(false);
+      onKundliGenerated?.(data);
+    }, 1000);
   };
 
   const handleEditRecentKundli = (item: RecentKundliItem) => {
@@ -510,15 +515,19 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   };
 
   const handleApplySampleProfile = (profile: (typeof SAMPLE_PROFILES)[0]) => {
+    setIsCalculating(true);
     setBirthDetails(profile.details);
     setCityInputValue(profile.details.city);
     setCitySearchQuery('');
     setFormError(null);
-    const data = generateCompleteKundli(profile.details);
-    setKundliData(data);
-    setHasGenerated(true);
-    setShowEditForm(false);
-    onKundliGenerated?.(data);
+    setTimeout(() => {
+      const data = generateCompleteKundli(profile.details);
+      setKundliData(data);
+      setHasGenerated(true);
+      setShowEditForm(false);
+      setIsCalculating(false);
+      onKundliGenerated?.(data);
+    }, 1000);
   };
 
   const handleResetToNewDetails = () => {
@@ -567,12 +576,16 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
     }
 
     setFormError(null);
-    const data = generateCompleteKundli(birthDetails);
-    setKundliData(data);
-    setHasGenerated(true);
-    setShowEditForm(false);
-    onKundliGenerated?.(data);
-    saveToRecentKundlis(birthDetails, data);
+    setIsCalculating(true);
+    setTimeout(() => {
+      const data = generateCompleteKundli(birthDetails);
+      setKundliData(data);
+      setHasGenerated(true);
+      setShowEditForm(false);
+      setIsCalculating(false);
+      onKundliGenerated?.(data);
+      saveToRecentKundlis(birthDetails, data);
+    }, 1000);
   };
 
   // Direct High-Resolution Multi-Page PDF Exporter
@@ -1592,7 +1605,24 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
       {/* ------------------------------------------------------------- */}
       {/* STEP 2: SHOW ALL THE CHART AND THE DETAILS */}
       {/* ------------------------------------------------------------- */}
-      {hasGenerated && kundliData && (
+      {isCalculating && (
+        <div className="bg-white rounded-3xl border border-amber-900/15 p-10 sm:p-14 space-y-8 animate-pulse shadow-sm my-8 text-center">
+          <div className="w-20 h-20 mx-auto rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
+            <Loader2 className="w-10 h-10 text-amber-800 animate-spin" />
+          </div>
+          <div className="space-y-3 max-w-md mx-auto">
+            <h3 className="text-xl font-extrabold text-stone-900 font-vedic">Computing Vedic Ephemeris &amp; Janam Kundli</h3>
+            <p className="text-sm text-stone-600">Calculating planetary positions, house cusps, Vimshottari dasha periods, and divisional charts...</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-2xl mx-auto">
+            <div className="h-28 bg-stone-100 rounded-2xl border border-stone-200"></div>
+            <div className="h-28 bg-stone-100 rounded-2xl border border-stone-200"></div>
+            <div className="h-28 bg-stone-100 rounded-2xl border border-stone-200"></div>
+          </div>
+        </div>
+      )}
+
+      {!isCalculating && hasGenerated && kundliData && (
         <div className="space-y-6">
           {/* Native Astro Profile Header Summary Strip */}
           <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-2xs flex flex-wrap items-center justify-between gap-4">
