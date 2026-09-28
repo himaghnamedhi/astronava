@@ -253,6 +253,32 @@ export default function App() {
 
   // Sync route on mount and browser back/forward (popstate)
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const pathname = window.location.pathname;
+      if (hostname === 'astronava.com' || hostname === 'www.astronava.com') {
+        const cleanPath = pathname.toLowerCase().replace(/\/$/, '') || '/';
+        const isMarketingOrLegal = 
+          cleanPath === '' || 
+          cleanPath === '/' || 
+          cleanPath === '/home' || 
+          cleanPath === '/privacy-policy' || 
+          cleanPath === '/privacy' || 
+          cleanPath === '/terms-and-conditions' || 
+          cleanPath === '/terms' || 
+          cleanPath === '/disclaimer' || 
+          cleanPath === '/contact' || 
+          cleanPath === '/contact-us' || 
+          cleanPath === '/sitemap' || 
+          cleanPath === '/sitemap.html';
+        
+        if (!isMarketingOrLegal) {
+          window.location.href = `https://app.astronava.com${pathname}${window.location.search}${window.location.hash}`;
+          return;
+        }
+      }
+    }
+
     parsePathname(window.location.pathname);
 
     const handlePopState = () => {
@@ -299,6 +325,15 @@ export default function App() {
   };
 
   const handleTabChange = (tab: AppTabType) => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if ((hostname === 'astronava.com' || hostname === 'www.astronava.com') && tab !== 'home' && tab !== 'legal') {
+        const route = findRouteByTab(tab, selectedLegalDoc);
+        window.location.href = `https://app.astronava.com${route.path}`;
+        return;
+      }
+    }
+
     setActiveTab(tab);
     const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
     if (window.location.pathname !== route.path) {
