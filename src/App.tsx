@@ -256,6 +256,9 @@ export default function App() {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
+      const search = window.location.search;
+      const hash = window.location.hash;
+
       if (hostname === 'astronava.com' || hostname === 'www.astronava.com') {
         const cleanPath = pathname.toLowerCase().replace(/\/$/, '') || '/';
         const isMarketingOrLegal = 
@@ -273,7 +276,13 @@ export default function App() {
           cleanPath === '/sitemap.html';
         
         if (!isMarketingOrLegal) {
-          window.location.href = `https://app.astronava.com/#${pathname}${window.location.search}${window.location.hash}`;
+          window.location.href = `https://app.astronava.com/#${pathname}${search}${hash}`;
+          return;
+        }
+      } else if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-')) {
+        // If on app subdomain/preview and there's a pathname other than '/' but no hash, convert to hash to prevent 404 on refresh
+        if (pathname && pathname !== '/' && !hash) {
+          window.location.replace(`/#${pathname}${search}`);
           return;
         }
       }
@@ -343,8 +352,21 @@ export default function App() {
     setActiveTab('legal');
 
     const route = findRouteByTab('legal', doc);
-    if (window.location.pathname !== route.path) {
-      window.history.pushState(null, '', route.path);
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-') || hostname === 'localhost') {
+        const newHash = `#${route.path}`;
+        if (window.location.hash !== newHash) {
+          window.location.hash = newHash;
+        }
+      } else if (hostname === 'astronava.com' || hostname === 'www.astronava.com') {
+        window.location.href = `https://app.astronava.com/#${route.path}`;
+        return;
+      } else {
+        if (window.location.pathname !== route.path) {
+          window.history.pushState(null, '', route.path);
+        }
+      }
     }
     updateTabMetaTags('legal', doc);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -356,6 +378,17 @@ export default function App() {
       if ((hostname === 'astronava.com' || hostname === 'www.astronava.com') && tab !== 'home' && tab !== 'legal') {
         const route = findRouteByTab(tab, selectedLegalDoc);
         window.location.href = `https://app.astronava.com/#${route.path}`;
+        return;
+      }
+
+      if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-') || hostname === 'localhost') {
+        setActiveTab(tab);
+        const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
+        const newHash = `#${route.path}`;
+        if (window.location.hash !== newHash) {
+          window.location.hash = newHash;
+        }
+        updateTabMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
         return;
       }
     }
