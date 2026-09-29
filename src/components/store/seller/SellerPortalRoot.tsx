@@ -83,13 +83,20 @@ export const SellerPortalRoot: React.FC = () => {
           <header className="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-xs">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('dashboard')}>
-                <div className="w-9 h-9 rounded-xl bg-amber-900 text-amber-50 flex items-center justify-center font-bold shadow-sm">
-                  <Store className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl shadow-md ring-2 ring-amber-500/40 overflow-hidden shrink-0 bg-[#2a0e05]">
+                  <img
+                    src="/icons/app_logo.svg"
+                    alt="Astronava Logo"
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
                 <div>
-                  <span className="text-base font-extrabold font-vedic text-stone-950 tracking-wider">
-                    ASTRONAVA <span className="text-amber-700 font-normal text-xs">Seller Portal</span>
-                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-extrabold tracking-wider text-amber-950 font-vedic leading-tight">
+                      ASTR<span className="relative inline-flex items-center justify-center">O<span className="absolute inset-0 flex items-center justify-center text-[9px] text-amber-500 select-none pointer-events-none">✦</span></span>NAVA <span className="text-amber-700 font-normal text-xs font-sans">Seller Portal</span>
+                    </span>
+                  </div>
                 </div>
               </div>
 

@@ -16,13 +16,20 @@ export const SellerWelcomePage: React.FC<SellerWelcomePageProps> = ({ onSignIn, 
       {/* Top Header */}
       <header className="w-full border-b border-stone-200/80 bg-white/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl shadow-md ring-2 ring-amber-500/40 overflow-hidden bg-[#2a0e05] flex items-center justify-center text-amber-400 font-bold">
-            <Store className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl shadow-md ring-2 ring-amber-500/40 overflow-hidden shrink-0 bg-[#2a0e05]">
+            <img
+              src="/icons/app_logo.svg"
+              alt="Astronava Logo"
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div>
-            <span className="text-xl font-extrabold tracking-wider text-amber-950 font-vedic">
-              ASTRONAVA <span className="text-amber-700 font-normal text-sm">Seller Portal</span>
-            </span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl font-extrabold tracking-wider text-amber-950 font-vedic leading-tight">
+                ASTR<span className="relative inline-flex items-center justify-center">O<span className="absolute inset-0 flex items-center justify-center text-[10px] text-amber-500 select-none pointer-events-none">✦</span></span>NAVA <span className="text-amber-700 font-normal text-xs font-sans">Seller Portal</span>
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
