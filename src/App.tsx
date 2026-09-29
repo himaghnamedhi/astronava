@@ -22,6 +22,7 @@ import { StoreModule } from './components/store/StoreModule';
 import { HomePage } from './components/HomePage';
 import { HoroscopeDashboard } from './components/horoscope/HoroscopeDashboard';
 import { UserDashboard } from './components/user/UserDashboard';
+import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 /**
@@ -146,6 +147,27 @@ export function updateTabMetaTags(
 }
 
 export default function App() {
+  const [isSellerPortal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const h = window.location.hostname;
+      const p = window.location.pathname;
+      const q = window.location.search;
+      const hash = window.location.hash;
+      return h.startsWith('seller.') || h.includes('seller.astronava.com') || p.includes('/seller') || q.includes('view=seller') || hash.includes('seller');
+    }
+    return false;
+  });
+
+  if (isSellerPortal) {
+    return (
+      <AuthProvider>
+        <StoreProvider>
+          <SellerPortalRoot />
+        </StoreProvider>
+      </AuthProvider>
+    );
+  }
+
   const [activeTab, setActiveTab] = useState<AppTabType>('home');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>('sun');
