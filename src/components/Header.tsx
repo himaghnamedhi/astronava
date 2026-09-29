@@ -15,7 +15,8 @@ import {
   ArrowRight,
   X,
   SpellCheck,
-  FileText
+  FileText,
+  Store
 } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
@@ -391,6 +392,14 @@ export const Header: React.FC<HeaderProps> = ({
                       </p>
                     </div>
 
+                    <button
+                      onClick={() => window.location.href = 'https://ais-dev-zxttfjvhxjhlskfajqp3e3-747336900579.asia-southeast1.run.app'}
+                      className="w-full px-2.5 py-1.5 text-left text-xs font-semibold text-stone-800 hover:bg-stone-100 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <Store className="w-3.5 h-3.5 text-amber-800" />
+                      <span>Seller Portal</span>
+                    </button>
+                    
                     <button
                       onClick={() => setActiveTab('profile')}
                       className="w-full px-2.5 py-1.5 text-left text-xs font-semibold text-stone-800 hover:bg-stone-100 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
