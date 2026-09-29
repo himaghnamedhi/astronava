@@ -11,7 +11,7 @@ import {
   LogOut,
   Store
 } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@/src/context/AuthContext';
 import { SellerSalesOverview } from './SellerSalesOverview';
 import { SellerInventoryTab } from './SellerInventoryTab';
 import { SellerBulkImportTab } from './SellerBulkImportTab';

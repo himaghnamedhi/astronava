@@ -267,15 +267,6 @@ export async function getProducts(options: ProductFilterOptions = {}) {
 
   const conditions = [];
 
-  // Public visibility: System products (null sellerId) or approved products from approved sellers
-  conditions.push(or(
-    isNull(products.sellerId),
-    and(
-        eq(products.status, 'approved'),
-        eq(sellers.status, 'approved')
-    )
-  ));
-
   if (!options.includeDrafts) {
     conditions.push(eq(products.isPublished, true));
   }
@@ -393,7 +384,6 @@ export async function getProducts(options: ProductFilterOptions = {}) {
     })
     .from(products)
     .leftJoin(categories, eq(products.categoryId, categories.id))
-    .leftJoin(sellers, eq(products.sellerId, sellers.id))
     .where(whereClause)
     .orderBy(orderByClause)
     .limit(limit)

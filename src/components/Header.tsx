@@ -168,19 +168,6 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Global Search Bar (Prominent in header on desktop/tablet) */}
-          <button
-            id="btn-header-search"
-            type="button"
-            onClick={onOpenSearch}
-            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 lg:py-2 rounded-xl bg-stone-100/90 hover:bg-amber-50/80 text-stone-500 hover:text-amber-950 border border-stone-200/90 hover:border-amber-300 text-xs transition-all cursor-pointer shadow-2xs group flex-1 max-w-xs md:max-w-sm lg:max-w-md mx-1 sm:mx-2 lg:mx-4"
-            title="Search astrology topics, houses, planets & services (Ctrl+K)"
-          >
-            <Search className="w-3.5 h-3.5 text-amber-800/80 group-hover:text-amber-900 shrink-0 transition-colors" />
-            <span className="truncate text-stone-500 group-hover:text-stone-800 font-medium">
-              Search astrology, houses &amp; planets...
-            </span>
-          </button>
 
           {/* Desktop Navigation: Home | Services ▼ | Store */}
           <nav className="hidden md:flex items-center gap-1 bg-stone-200/50 p-1 rounded-xl border border-stone-300/60 text-xs lg:text-sm font-medium shrink-0">

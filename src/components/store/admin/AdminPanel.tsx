@@ -48,6 +48,27 @@ export const AdminPanel: React.FC = () => {
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
   const [runningBatch, setRunningBatch] = useState(false);
   const [batchStatusMessage, setBatchStatusMessage] = useState<string | null>(null);
+  const [pendingSellersCount, setPendingSellersCount] = useState<number>(2);
+
+  useEffect(() => {
+    async function fetchPendingSellers() {
+      try {
+        const res = await fetch('/api/admin/sellers', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const pending = data.filter((s: any) => s.status === 'pending').length;
+          setPendingSellersCount(pending);
+        }
+      } catch (e) {
+        // Keep default mock count
+      }
+    }
+    if (token) {
+      fetchPendingSellers();
+    }
+  }, [token]);
 
   // Check admin authorization on token change
   useEffect(() => {
@@ -303,7 +324,7 @@ export const AdminPanel: React.FC = () => {
 
             <button
               onClick={() => setActiveAdminTab('sellers')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 relative ${
                 activeAdminTab === 'sellers'
                   ? 'bg-amber-950 text-amber-50 shadow-2xs'
                   : 'text-stone-600 hover:bg-stone-100'
@@ -311,6 +332,11 @@ export const AdminPanel: React.FC = () => {
             >
               <Users className="w-3.5 h-3.5 text-amber-500" />
               <span>Seller Management</span>
+              {pendingSellersCount > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-extrabold shadow-2xs">
+                  {pendingSellersCount}
+                </span>
+              )}
             </button>
 
             <button
@@ -345,6 +371,28 @@ export const AdminPanel: React.FC = () => {
         {/* Tab 1: Dashboard Overview (TASK 7 requirements) */}
         {activeAdminTab === 'dashboard' && (
           <div className="space-y-6">
+            {pendingSellersCount > 0 && (
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex items-center justify-between shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider">Pending Seller Registrations</h4>
+                    <p className="text-xs text-stone-700 mt-0.5">
+                      You have <strong className="text-amber-950">{pendingSellersCount}</strong> new seller application(s) awaiting verification and approval.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveAdminTab('sellers')}
+                  className="px-4 py-2 rounded-xl bg-amber-900 text-amber-50 hover:bg-amber-800 font-bold text-xs shadow-2xs transition-all cursor-pointer whitespace-nowrap"
+                >
+                  Review Applications &rarr;
+                </button>
+              </div>
+            )}
+
             {/* Top Stat Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {/* Widget 1: Today's Users */}

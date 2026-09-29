@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Store, Building, User, Mail, Phone, MapPin, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { WorldCoordinateMap } from '../../WorldCoordinateMap';
+import { WorldCoordinateMap } from '@/src/components/WorldCoordinateMap';
 
 interface SellerRegistrationPageProps {
   onBack: () => void;
