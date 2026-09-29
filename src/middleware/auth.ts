@@ -1,10 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import { adminAuth } from '../lib/firebase-admin.ts';
 import { DecodedIdToken } from 'firebase-admin/auth';
+import { db } from '../db/index.ts';
+import { sellers } from '../db/schema.ts';
+import { eq } from 'drizzle-orm';
 
 export interface AuthRequest extends Request {
   user?: DecodedIdToken;
 }
+
+export const requireSeller = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  // First, authenticate the user
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.split('Bearer ')[1]?.trim();
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    req.user = decodedToken;
+
+    // Check if seller
+    const s = await db.select().from(sellers).where(eq(sellers.userId, decodedToken.uid)).limit(1);
+    if (s.length === 0 || s[0].status !== 'approved') {
+        return res.status(403).json({ error: 'Forbidden: Seller not approved' });
+    }
+    
+    // Attach seller info to request
+    (req as any).seller = s[0];
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+};
 
 // Configured admin email allowlist
 export const ADMIN_EMAILS: string[] = [

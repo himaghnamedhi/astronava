@@ -60,6 +60,8 @@ export const products = pgTable('products', {
   isBestSeller: boolean('is_best_seller').default(false).notNull(),
   isNewArrival: boolean('is_new_arrival').default(false).notNull(),
   isPublished: boolean('is_published').default(true).notNull(),
+  sellerId: integer('seller_id').references(() => sellers.id),
+  status: text('status').default('draft').notNull(), // 'draft', 'pending', 'approved', 'rejected'
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -68,6 +70,10 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
     fields: [products.categoryId],
     references: [categories.id],
+  }),
+  seller: one(sellers, {
+    fields: [products.sellerId],
+    references: [sellers.id],
   }),
   images: many(productImages),
   variations: many(productVariations),
@@ -235,6 +241,7 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   }),
 }));
 
+
 // Coupons table (future-ready promotions)
 export const coupons = pgTable('coupons', {
   id: serial('id').primaryKey(),
@@ -249,3 +256,27 @@ export const coupons = pgTable('coupons', {
   timesUsed: integer('times_used').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// Sellers table
+export const sellers = pgTable('sellers', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull().unique(), // Linked to existing Auth system (assuming Auth UID)
+  legalBusinessName: text('legal_business_name').notNull(),
+  contactPerson: text('contact_person').notNull(),
+  gstin: text('gstin').notNull(),
+  phone: text('phone').notNull(),
+  email: text('email').notNull(),
+  addressLine1: text('address_line_1').notNull(),
+  addressLine2: text('address_line_2'),
+  pinCode: text('pin_code').notNull(),
+  state: text('state').notNull(),
+  status: text('status').default('pending').notNull(), // 'pending', 'approved', 'rejected'
+  rejectionReason: text('rejection_reason'),
+  adminNotes: text('admin_notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const sellersRelations = relations(sellers, ({ many }) => ({
+  products: many(products),
+}));

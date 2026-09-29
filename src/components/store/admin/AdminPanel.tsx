@@ -26,6 +26,8 @@ import { AdminProductsTab } from './AdminProductsTab.tsx';
 import { AdminOrdersTab } from './AdminOrdersTab.tsx';
 import { AdminInventoryTab } from './AdminInventoryTab.tsx';
 import { AdminCategoriesTab } from './AdminCategoriesTab.tsx';
+import { AdminSellersTab } from './AdminSellersTab.tsx';
+import { AdminPendingProductsTab } from './AdminPendingProductsTab.tsx';
 
 const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
 
@@ -41,7 +43,7 @@ export const AdminPanel: React.FC = () => {
   });
   const [isAdmin, setIsAdmin] = useState<boolean>(isAllowlistedAdmin);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope'>('dashboard');
+  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products'>('dashboard');
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
   const [runningBatch, setRunningBatch] = useState(false);
@@ -300,6 +302,30 @@ export const AdminPanel: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setActiveAdminTab('sellers')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeAdminTab === 'sellers'
+                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                  : 'text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 text-amber-500" />
+              <span>Seller Management</span>
+            </button>
+
+            <button
+              onClick={() => setActiveAdminTab('pending-products')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeAdminTab === 'pending-products'
+                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                  : 'text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
+              <span>Product Approval</span>
+            </button>
+
+            <button
               onClick={() => setActiveAdminTab('horoscope')}
               className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
                 activeAdminTab === 'horoscope'
@@ -548,7 +574,13 @@ export const AdminPanel: React.FC = () => {
         {/* Tab 5: Inventory Tracking */}
         {activeAdminTab === 'inventory' && token && <AdminInventoryTab token={token} />}
 
-        {/* Tab 6: Horoscope & Batch Operations */}
+        {/* Tab 6: Seller Management */}
+        {activeAdminTab === 'sellers' && token && <AdminSellersTab token={token} />}
+
+        {/* Tab 7: Product Approval */}
+        {activeAdminTab === 'pending-products' && token && <AdminPendingProductsTab token={token} />}
+
+        {/* Tab 8: Horoscope & Batch Operations */}
         {activeAdminTab === 'horoscope' && (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-2xs space-y-4">

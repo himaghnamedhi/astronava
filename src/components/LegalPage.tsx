@@ -422,7 +422,17 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
         {/* Footer actions */}
         <div className="p-4 border-t border-stone-200 bg-stone-50 flex items-center justify-between text-xs text-stone-500">
-          <span>Astronava &bull; Vedic Astrology Platform</span>
+          <button 
+            className="cursor-pointer select-none px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-600 hover:text-stone-900 border border-transparent hover:border-stone-300 transition-all font-medium text-xs"
+            onClick={() => {
+                const count = (parseInt(sessionStorage.getItem('click_count') || '0') + 1);
+                sessionStorage.setItem('click_count', count.toString());
+                if (count >= 7) {
+                    sessionStorage.setItem('click_count', '0');
+                    window.location.href = 'https://ais-dev-zxttfjvhxjhlskfajqp3e3-747336900579.asia-southeast1.run.app';
+                }
+            }}
+          >Astronava &bull; Vedic Astrology Platform</button>
           <button
             onClick={onBack}
             className="px-4 py-1.5 rounded-lg bg-stone-900 text-white hover:bg-stone-800 font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"

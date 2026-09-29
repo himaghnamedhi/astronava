@@ -1,4 +1,4 @@
-import { desc, asc, eq, and, or, sql, like, inArray, gte, lte } from 'drizzle-orm';
+import { desc, asc, eq, and, or, sql, like, inArray, gte, lte, isNull } from 'drizzle-orm';
 import { db } from '../db/index.ts';
 import {
   categories,
@@ -10,8 +10,11 @@ import {
   orders,
   orderItems,
   coupons,
+  sellers,
 } from '../db/schema.ts';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData.ts';
+
+// ... (skipping ahead)
 
 /**
  * Automatically seeds the database if categories table is currently empty
@@ -264,6 +267,15 @@ export async function getProducts(options: ProductFilterOptions = {}) {
 
   const conditions = [];
 
+  // Public visibility: System products (null sellerId) or approved products from approved sellers
+  conditions.push(or(
+    isNull(products.sellerId),
+    and(
+        eq(products.status, 'approved'),
+        eq(sellers.status, 'approved')
+    )
+  ));
+
   if (!options.includeDrafts) {
     conditions.push(eq(products.isPublished, true));
   }
@@ -381,6 +393,7 @@ export async function getProducts(options: ProductFilterOptions = {}) {
     })
     .from(products)
     .leftJoin(categories, eq(products.categoryId, categories.id))
+    .leftJoin(sellers, eq(products.sellerId, sellers.id))
     .where(whereClause)
     .orderBy(orderByClause)
     .limit(limit)
@@ -810,9 +823,82 @@ export async function toggleProductPublish(id: number) {
   return updated;
 }
 
-// -------------------------------------------------------------
-// Inventory & Overview
-// -------------------------------------------------------------
+
+
+export async function getPendingProducts() {
+  return await db
+    .select({
+      product: products,
+      seller: sellers
+    })
+    .from(products)
+    .leftJoin(sellers, eq(products.sellerId, sellers.id))
+    .where(eq(products.status, 'pending'))
+    .orderBy(desc(products.createdAt));
+}
+
+export async function updateProductStatus(id: number, status: 'approved' | 'rejected') {
+  return await db
+    .update(products)
+    .set({ status, isPublished: status === 'approved' })
+    .where(eq(products.id, id))
+    .returning();
+}
+export async function getProductSellerId(productId: number) {
+  const prod = await db
+    .select({ sellerId: products.sellerId })
+    .from(products)
+    .where(eq(products.id, productId))
+    .limit(1);
+  return prod.length > 0 ? prod[0].sellerId : null;
+}
+
+export async function listSellerProducts(sellerId: number) {
+  return await db
+    .select()
+    .from(products)
+    .where(eq(products.sellerId, sellerId))
+    .orderBy(desc(products.createdAt));
+}
+
+export async function createSellerProduct(
+  sellerId: number,
+  productData: any,
+  imagesData: any[] = [],
+  variationsData: any[] = []
+) {
+  // Enforce 'pending' status for new seller products
+  const productDataWithStatus = {
+    ...productData,
+    sellerId,
+    status: 'pending',
+    isPublished: false,
+  };
+  return await createProduct(productDataWithStatus, imagesData, variationsData);
+}
+export async function getSellerInventoryItems(sellerId: number) {
+  return await db
+    .select({
+      id: inventory.id,
+      productId: inventory.productId,
+      productName: products.name,
+      productSku: products.sku,
+      variationId: inventory.variationId,
+      variationValue: productVariations.variationValue,
+      sku: inventory.sku,
+      stockQuantity: inventory.stockQuantity,
+      lowStockThreshold: inventory.lowStockThreshold,
+      updatedAt: inventory.updatedAt,
+      status: products.status,
+      price: products.price,
+    })
+    .from(inventory)
+    .leftJoin(products, eq(inventory.productId, products.id))
+    .leftJoin(productVariations, eq(inventory.variationId, productVariations.id))
+    .where(eq(products.sellerId, sellerId))
+    .orderBy(asc(inventory.stockQuantity), asc(products.name));
+}
+
 export async function getInventoryItems() {
   const items = await db
     .select({
@@ -1200,6 +1286,32 @@ export async function getAdminMetrics() {
     recentOrders,
   };
 }
+
+
+// -------------------------------------------------------------
+// Seller Management
+// -------------------------------------------------------------
+export async function listSellers() {
+  return await db.select().from(sellers).orderBy(desc(sellers.createdAt));
+}
+
+export async function getSellerByUserId(userId: string) {
+  const s = await db.select().from(sellers).where(eq(sellers.userId, userId)).limit(1);
+  return s.length > 0 ? s[0] : null;
+}
+
+export async function updateSellerStatus(id: number, status: 'approved' | 'rejected', adminNotes?: string) {
+  return await db
+    .update(sellers)
+    .set({
+      status,
+      adminNotes,
+      updatedAt: new Date(),
+    })
+    .where(eq(sellers.id, id))
+    .returning();
+}
+
 
 // -------------------------------------------------------------
 // Coupon Validation
