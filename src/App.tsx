@@ -772,18 +772,6 @@ export default function App() {
                     <span>Store</span>
                   </button>
                 </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      handleTabChange('profile');
-                      scrollToTop();
-                    }}
-                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer"
-                  >
-                    <span className="text-amber-400 group-hover:translate-x-0.5 transition-transform">9.</span>
-                    <span>My Profile &amp; Dashboard</span>
-                  </button>
-                </li>
               </ul>
             </div>
 
@@ -941,13 +929,13 @@ export default function App() {
               </a>
             </p>
 
-            <div className="mt-2 sm:mt-0 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 flex justify-center">
+            <div className="mt-2 sm:mt-0 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 flex justify-center group">
               <button
                 onClick={scrollToTop}
-                className="flex items-center gap-1 text-amber-400 hover:text-amber-300 font-medium cursor-pointer"
+                className="w-10 h-10 rounded-full bg-stone-800 hover:bg-amber-900/80 text-amber-400 hover:text-amber-300 flex items-center justify-center border border-stone-700 hover:border-amber-500/50 shadow-md hover:shadow-xl hover:shadow-amber-500/20 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                title="Back to Top"
               >
-                <span>Back to Top</span>
-                <ArrowUp className="w-3.5 h-3.5" />
+                <ArrowUp className="w-4 h-4 transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
               </button>
             </div>
           </div>

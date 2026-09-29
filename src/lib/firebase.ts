@@ -533,3 +533,63 @@ export async function getUserOrdersFromFirestore(userId: string): Promise<Fireba
 }
 
 
+
+// =============================================================
+// SELLER REGISTRATION & APPROVAL IN FIRESTORE
+// =============================================================
+
+export interface FirebaseSellerApplication {
+  id: string;
+  legalBusinessName: string;
+  contactPerson: string;
+  gstin: string;
+  phone: string;
+  email: string;
+  addressLine1: string;
+  state: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+}
+
+export async function saveSellerApplicationToFirestore(data: Omit<FirebaseSellerApplication, 'id' | 'status' | 'createdAt'>): Promise<string> {
+  const sellerId = `seller_${Date.now()}`;
+  const path = `sellers/${sellerId}`;
+  const payload = {
+    id: sellerId,
+    ...data,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+  };
+  try {
+    await setDoc(doc(db, 'sellers', sellerId), payload);
+    return sellerId;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+export async function getSellersFromFirestore(): Promise<FirebaseSellerApplication[]> {
+  const path = `sellers`;
+  try {
+    const q = query(collection(db, 'sellers'));
+    const snap = await getDocs(q);
+    const list: FirebaseSellerApplication[] = [];
+    snap.forEach((d) => {
+      list.push(d.data() as FirebaseSellerApplication);
+    });
+    return list;
+  } catch (error) {
+    console.warn('Could not fetch sellers from Firestore:', error);
+    return [];
+  }
+}
+
+export async function updateSellerStatusInFirestore(sellerId: string, status: 'approved' | 'rejected'): Promise<void> {
+  const path = `sellers/${sellerId}`;
+  try {
+    const sellerRef = doc(db, 'sellers', sellerId);
+    await setDoc(sellerRef, { status, updatedAt: serverTimestamp() }, { merge: true });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, path);
+  }
+}

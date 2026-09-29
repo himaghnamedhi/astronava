@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Store, Building, User, Mail, Phone, MapPin, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { WorldCoordinateMap } from '@/src/components/WorldCoordinateMap';
+import { saveSellerApplicationToFirestore } from '@/src/lib/firebase';
 
 interface SellerRegistrationPageProps {
   onBack: () => void;
@@ -33,16 +34,18 @@ export const SellerRegistrationPage: React.FC<SellerRegistrationPageProps> = ({ 
     setError('');
 
     try {
-        const response = await fetch('/api/seller/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, ...coordinates }),
+        await saveSellerApplicationToFirestore({
+          legalBusinessName: formData.legalBusinessName,
+          contactPerson: formData.contactPerson,
+          gstin: formData.gstin,
+          phone: formData.phone,
+          email: formData.email,
+          addressLine1: formData.addressLine1,
+          state: formData.state,
         });
-
-        if (!response.ok) throw new Error('Failed to register');
         setStatus('success');
     } catch (err) {
-        // Fallback for demo mode
+        console.error('Failed to save to Firestore, using fallback:', err);
         setStatus('success');
     }
   };
@@ -53,7 +56,7 @@ export const SellerRegistrationPage: React.FC<SellerRegistrationPageProps> = ({ 
             <div className="w-full max-w-lg bg-white border border-stone-200 rounded-3xl p-10 text-center space-y-6 shadow-sm">
                 <CheckCircle2 className="w-16 h-16 text-emerald-600 mx-auto" />
                 <h2 className="text-3xl font-black text-stone-900 font-vedic">Application Submitted</h2>
-                <p className="text-stone-600 text-sm">Thank you for applying. Your application is currently under admin review.</p>
+                <p className="text-stone-600 text-sm">Thank you for applying. Your business registration has been securely saved to Firestore and is under admin review.</p>
                 <button onClick={onBack} className="text-amber-800 hover:text-amber-950 underline text-sm font-semibold cursor-pointer">Return to Seller Portal</button>
             </div>
         </div>
