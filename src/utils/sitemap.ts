@@ -4,7 +4,7 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile';
+export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
 
 export interface AppViewRoute {
@@ -337,6 +337,21 @@ export const APP_ROUTES: AppViewRoute[] = [
     category: 'Policies & Legal',
     lastmod: '2026-09-14',
   },
+  {
+    id: 'sitemap-directory',
+    tab: 'sitemap',
+    path: '/sitemap',
+    aliases: ['/sitemap.html'],
+    title: 'Astronava Directory & Sitemap | All Astrological Tools & Pages',
+    shortTitle: 'Sitemap',
+    description: 'Complete HTML sitemap directory of all Vedic astrology tools, Kundli generators, gemstone calculators, and legal policies on astronava.com.',
+    keywords: ['astronava sitemap', 'site index', 'vedic tools directory', 'kundli tool list'],
+    ogType: 'website',
+    priority: 0.8,
+    changefreq: 'daily',
+    category: 'Policies & Legal',
+    lastmod: '2026-09-25',
+  },
 ];
 
 /**
@@ -512,6 +527,8 @@ export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): strin
       return 'Name Correction & Spelling Tuning | astronava.com';
     case 'store':
       return 'Sacred Store | astronava.com';
+    case 'sitemap':
+      return 'Sitemap Directory | astronava.com';
     case 'legal':
       switch (legalDoc) {
         case 'terms':
@@ -576,6 +593,9 @@ export function injectDynamicMetaTags(
   setMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: appliedTitle });
   setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: appliedDescription });
+  setMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${normalizedBase}/icons/app_logo.svg` });
+  setMetaTag('meta[name="twitter:site"]', { name: 'twitter:site', content: '@astronava' });
+  setMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${normalizedBase}/icons/app_logo.svg` });
 
   // 5. Canonical Link
   setMetaTag('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl }, 'link');

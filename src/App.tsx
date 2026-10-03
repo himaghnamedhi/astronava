@@ -12,6 +12,7 @@ import { FullAstrologyReportModal } from './components/reports/FullAstrologyRepo
 import { LegalModal } from './components/LegalModal';
 import { LegalPage } from './components/LegalPage';
 import { SitemapModal } from './components/SitemapModal';
+import { SitemapPage } from './components/SitemapPage';
 import { LegalDocType } from './data/legalPolicies';
 import { CompleteKundliData, generateCompleteKundli } from './data/vedicEphemeris';
 import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass } from 'lucide-react';
@@ -41,6 +42,7 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
   'name-correction': 'Vedic Name Correction & Spelling Tuning | astronava.com',
   store: 'Store | astronava.com',
   profile: 'My Profile & Account Dashboard | astronava.com',
+  sitemap: 'Sitemap Directory | astronava.com',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
@@ -211,7 +213,7 @@ export default function App() {
       return true;
     }
     if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html' || cleanPath === 'sitemap' || cleanPath === 'sitemap.html') {
-      setIsSitemapOpen(true);
+      setActiveTab('sitemap');
       return true;
     }
     if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy' || cleanPath === 'privacy-policy' || cleanPath === 'privacy' || cleanPath === 'legal/privacy') {
@@ -643,6 +645,16 @@ export default function App() {
         )}
 
         {activeTab === 'store' && <StoreModule />}
+
+        {activeTab === 'sitemap' && (
+          <SitemapPage
+            onNavigate={(tab, doc) => {
+              setSelectedLegalDoc(doc);
+              handleTabChange(tab);
+            }}
+            onBack={handleReturnHome}
+          />
+        )}
 
         {activeTab === 'profile' && (
           <UserDashboard onNavigateTab={handleTabChange} />
