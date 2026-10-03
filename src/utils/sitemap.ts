@@ -603,7 +603,25 @@ export function injectDynamicMetaTags(
     },
   });
 
-  // 7. JSON-LD SiteNavigationElement for Full Site Indexing
+  // 7. JSON-LD WebSite for Search Bar Sitelinks
+  setJsonLdScript('astronava-website-jsonld', {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Astronava',
+    url: normalizedBase,
+  });
+
+  // 8. JSON-LD Organization for Entity Visibility
+  setJsonLdScript('astronava-org-jsonld', {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Astronava',
+    url: normalizedBase,
+    logo: `${normalizedBase}/icons/app_logo.svg`,
+    sameAs: ['https://x.com/himaghnamedhi'],
+  });
+
+  // 9. JSON-LD SiteNavigationElement for Full Site Indexing
   const allRoutes = getAppSitemapRoutes(normalizedBase);
   setJsonLdScript('astronava-navigation-jsonld', {
     '@context': 'https://schema.org',

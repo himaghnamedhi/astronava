@@ -15,6 +15,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { SellerSalesOverview } from './SellerSalesOverview';
 import { SellerInventoryTab } from './SellerInventoryTab';
 import { SellerBulkImportTab } from './SellerBulkImportTab';
+import { SellerProductsTab } from './SellerProductsTab';
 
 export const SellerDashboard: React.FC = () => {
   const { signOut } = useAuth();
@@ -35,6 +36,8 @@ export const SellerDashboard: React.FC = () => {
     switch (activeTab) {
       case 'Sales':
         return <SellerSalesOverview />;
+      case 'Products':
+        return <SellerProductsTab token="demo" />;
       case 'Inventory':
         return <SellerInventoryTab token="demo" />;
       case 'Bulk Import':

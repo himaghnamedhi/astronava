@@ -16,7 +16,8 @@ import {
   Bell,
   CheckCircle2,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext.tsx';
 import { auth } from '../../../lib/firebase.ts';
@@ -28,6 +29,7 @@ import { AdminInventoryTab } from './AdminInventoryTab.tsx';
 import { AdminCategoriesTab } from './AdminCategoriesTab.tsx';
 import { AdminSellersTab } from './AdminSellersTab.tsx';
 import { AdminPendingProductsTab } from './AdminPendingProductsTab.tsx';
+import { AdminSeoTab } from './AdminSeoTab.tsx';
 
 const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
 
@@ -43,7 +45,7 @@ export const AdminPanel: React.FC = () => {
   });
   const [isAdmin, setIsAdmin] = useState<boolean>(isAllowlistedAdmin);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products'>('dashboard');
+  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo'>('dashboard');
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
   const [runningBatch, setRunningBatch] = useState(false);
@@ -362,6 +364,18 @@ export const AdminPanel: React.FC = () => {
               <Sun className="w-3.5 h-3.5 text-amber-500" />
               <span>Batch &amp; Astrology</span>
             </button>
+
+            <button
+              onClick={() => setActiveAdminTab('seo')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeAdminTab === 'seo'
+                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                  : 'text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5 text-amber-500" />
+              <span>SEO &amp; CTR Monitor</span>
+            </button>
           </div>
         </div>
       </div>
@@ -660,6 +674,9 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Tab 9: SEO & CTR Monitor */}
+        {activeAdminTab === 'seo' && token && <AdminSeoTab token={token} />}
       </div>
     </div>
   );
