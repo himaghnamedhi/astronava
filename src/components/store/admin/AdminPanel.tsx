@@ -30,6 +30,7 @@ import { AdminCategoriesTab } from './AdminCategoriesTab.tsx';
 import { AdminSellersTab } from './AdminSellersTab.tsx';
 import { AdminPendingProductsTab } from './AdminPendingProductsTab.tsx';
 import { AdminSeoTab } from './AdminSeoTab.tsx';
+import { AdminUsersTab } from './AdminUsersTab.tsx';
 
 const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
 
@@ -45,7 +46,7 @@ export const AdminPanel: React.FC = () => {
   });
   const [isAdmin, setIsAdmin] = useState<boolean>(isAllowlistedAdmin);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo'>('dashboard');
+  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo' | 'users'>('dashboard');
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
   const [runningBatch, setRunningBatch] = useState(false);
@@ -376,6 +377,18 @@ export const AdminPanel: React.FC = () => {
               <Globe className="w-3.5 h-3.5 text-amber-500" />
               <span>SEO &amp; CTR Monitor</span>
             </button>
+
+            <button
+              onClick={() => setActiveAdminTab('users')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeAdminTab === 'users'
+                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                  : 'text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 text-amber-500" />
+              <span>User Management</span>
+            </button>
           </div>
         </div>
       </div>
@@ -677,6 +690,9 @@ export const AdminPanel: React.FC = () => {
 
         {/* Tab 9: SEO & CTR Monitor */}
         {activeAdminTab === 'seo' && token && <AdminSeoTab token={token} />}
+
+        {/* Tab 10: User Management */}
+        {activeAdminTab === 'users' && token && <AdminUsersTab token={token} />}
       </div>
     </div>
   );

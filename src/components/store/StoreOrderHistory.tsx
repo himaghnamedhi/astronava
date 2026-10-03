@@ -71,7 +71,7 @@ export const StoreOrderHistory: React.FC<StoreOrderHistoryProps> = ({ onBrowseSt
       }
 
       const data = await res.json();
-      setOrders(data.items || []);
+      setOrders(Array.isArray(data) ? data : (data.items || data.orders || []));
     } catch (err: any) {
       console.error('Error fetching customer orders:', err);
       setError(err.message || 'Unable to load orders');
@@ -358,7 +358,7 @@ export const StoreOrderHistory: React.FC<StoreOrderHistoryProps> = ({ onBrowseSt
         </div>
       ) : (
         <div className="space-y-5">
-          {orders.map((order) => (
+          {(Array.isArray(orders) ? orders : []).map((order) => (
             <OrderCard
               key={order.id}
               order={order}

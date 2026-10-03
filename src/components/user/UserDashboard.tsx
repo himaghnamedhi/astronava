@@ -132,7 +132,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
       setLoadingOrders(true);
       fetch(`/api/store/orders?email=${encodeURIComponent(user.email)}`)
         .then((res) => (res.ok ? res.json() : []))
-        .then((data) => setOrders(Array.isArray(data) ? data : []))
+        .then((data) => setOrders(Array.isArray(data) ? data : (data.items || data.orders || [])))
         .catch(() => setOrders([]))
         .finally(() => setLoadingOrders(false));
     }
@@ -754,7 +754,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                 </div>
               ) : (
                 <div className="divide-y divide-stone-100 text-xs">
-                  {orders.map((o) => (
+                  {(Array.isArray(orders) ? orders : []).map((o) => (
                     <div key={o.id} className="py-4 space-y-2">
                       <div className="flex items-center justify-between font-mono font-bold">
                         <span className="text-stone-900">{o.orderNumber}</span>

@@ -38,7 +38,9 @@ export const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ token }) => {
       });
       if (res.ok) {
         const data = await res.json();
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : (data.items || data.orders || []));
+      } else {
+        setOrders([]);
       }
     } catch (err) {
       console.error('Failed to load orders:', err);
@@ -168,7 +170,7 @@ export const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ token }) => {
                   </td>
                 </tr>
               ) : (
-                orders.map((o) => (
+                (Array.isArray(orders) ? orders : []).map((o) => (
                   <tr key={o.id} className="hover:bg-stone-50/80 transition-colors">
                     <td className="px-5 py-3 font-mono font-bold text-stone-900">
                       {o.orderNumber}

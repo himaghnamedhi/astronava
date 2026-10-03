@@ -182,7 +182,7 @@ export const SellerPortalRoot: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {orders.map(order => (
+                      {(Array.isArray(orders) ? orders : []).map(order => (
                         <tr key={order.id} className="border-t border-stone-100 hover:bg-stone-50/50">
                           <td className="p-4 font-mono font-bold text-stone-900">{order.orderNumber}</td>
                           <td className="p-4 text-stone-800 font-medium">{order.customerName}</td>
