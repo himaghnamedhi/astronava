@@ -64,7 +64,7 @@ export const HousesExplorer: React.FC<HousesExplorerProps> = ({
                 key={hNum}
                 id={`btn-house-select-${hNum}`}
                 onClick={() => onSelectHouse(hNum)}
-                className={`p-2.5 rounded-xl border transition-all flex flex-col items-center justify-center text-center ${
+                className={`py-3 px-2.5 min-h-[44px] rounded-xl border transition-all flex flex-col items-center justify-center text-center ${
                   isSel
                     ? 'bg-amber-950 text-amber-50 border-amber-950 ring-2 ring-amber-400/40 shadow-sm font-semibold'
                     : 'bg-stone-50 hover:bg-amber-50 text-stone-800 border-stone-200'

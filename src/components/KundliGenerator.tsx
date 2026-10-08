@@ -1748,26 +1748,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                 </strong>
               </button>
 
-              <button
-                type="button"
-                id="btn-open-full-astrology-report"
-                onClick={() => {
-                  if (onOpenFullReportModal) {
-                    onOpenFullReportModal(kundliData, 3, 'sec-1-summary');
-                  }
-                }}
-                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 hover:from-amber-700 hover:to-amber-900 text-amber-100 border border-amber-500/40 text-left transition-all cursor-pointer group shadow-xs hover:scale-[1.02] active:scale-98"
-                title="Open comprehensive 20-section Full Astrology Report & Multi-Year Forecast"
-              >
-                <span className="text-amber-300 text-[10px] uppercase font-bold flex items-center gap-1">
-                  <FileText className="w-3 h-3 text-amber-400" />
-                  <span>Full Report</span>
-                </span>
-                <strong className="text-white font-bold group-hover:underline flex items-center gap-1">
-                  <span>Full Astrology Report</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </strong>
-              </button>
+
 
               <button
                 type="button"

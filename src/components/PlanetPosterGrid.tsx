@@ -119,7 +119,7 @@ export const PlanetPosterGrid: React.FC<PlanetPosterGridProps> = ({
                 key={pId}
                 id={`btn-planet-${pId}`}
                 onClick={() => onSelectPlanet(pId)}
-                className={`py-2 px-2 rounded-xl transition-all flex flex-col items-center justify-center gap-1 border ${
+                className={`py-3 px-2 min-h-[44px] rounded-xl transition-all flex flex-col items-center justify-center gap-1 border ${
                   isSelected
                     ? 'bg-amber-950 text-amber-50 border-amber-950 ring-2 ring-amber-400/40 shadow-sm font-semibold'
                     : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'

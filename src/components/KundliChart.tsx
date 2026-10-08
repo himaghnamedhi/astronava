@@ -37,6 +37,14 @@ export const KundliChart: React.FC<KundliChartProps> = ({
   const [highlightCategory, setHighlightCategory] = useState<'all' | 'kendra' | 'trikona' | 'upachaya' | 'dusthana' | 'maraka'>('all');
   const [displayMode, setDisplayMode] = useState<'houseNumber' | 'bhavaName' | 'karaka' | 'rashi'>('houseNumber');
   const [ornateStyle, setOrnateStyle] = useState(true);
+  const [hoveredPlanetInfo, setHoveredPlanetInfo] = useState<{
+    name: string;
+    sanskritName: string;
+    degree: string;
+    nakshatra: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Determine if a house matches active highlight category
   const isHighlighted = (hNum: HouseNumber): boolean => {
@@ -279,7 +287,23 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                             const p = PLANETS_DATA[pId];
                             const offsetX = (idx - (planetsInHouse.length - 1) / 2) * 22;
                             return (
-                              <g key={pId} transform={`translate(${offsetX}, 0)`}>
+                              <g 
+                                key={pId} 
+                                transform={`translate(${offsetX}, 0)`}
+                                className="cursor-pointer"
+                                onMouseEnter={(e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setHoveredPlanetInfo({
+                                    name: p.name,
+                                    sanskritName: p.sanskritName,
+                                    degree: '18° 42\'',
+                                    nakshatra: 'Purva Phalguni (Pada 2)',
+                                    x: rect.x + rect.width / 2,
+                                    y: rect.y - 10,
+                                  });
+                                }}
+                                onMouseLeave={() => setHoveredPlanetInfo(null)}
+                              >
                                 <circle
                                   r="9"
                                   fill="#451A03"
@@ -512,6 +536,23 @@ export const KundliChart: React.FC<KundliChartProps> = ({
         </div>
 
       </div>
+
+      {hoveredPlanetInfo && (
+        <div 
+          style={{ position: 'fixed', left: hoveredPlanetInfo.x, top: hoveredPlanetInfo.y, transform: 'translate(-50%, -100%)' }}
+          className="bg-white rounded-2xl shadow-xl border border-amber-900/20 p-3 text-xs z-50 pointer-events-none space-y-1 animate-fadeIn min-w-[180px]"
+        >
+          <div className="font-bold text-amber-950 font-vedic text-sm">
+            {hoveredPlanetInfo.name} ({hoveredPlanetInfo.sanskritName})
+          </div>
+          <div className="text-stone-600 text-[11px]">
+            <strong>Degree:</strong> {hoveredPlanetInfo.degree}
+          </div>
+          <div className="text-stone-600 text-[11px]">
+            <strong>Nakshatra:</strong> {hoveredPlanetInfo.nakshatra}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
