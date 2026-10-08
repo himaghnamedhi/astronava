@@ -39,6 +39,7 @@ export const AiKundliSummaryView: React.FC<AiKundliSummaryViewProps> = ({ kundli
 
   const [loading, setLoading] = useState<boolean>(false);
   const [summary, setSummary] = useState<AiSummarySectionPayload | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [focusArea, setFocusArea] = useState<string>('holistic');
   const [depth, setDepth] = useState<string>('detailed');
   const [activeSection, setActiveSection] = useState<'all' | 'grahas' | 'lords' | 'yogas' | 'dasha' | 'remedies'>('all');
@@ -85,13 +86,9 @@ export const AiKundliSummaryView: React.FC<AiKundliSummaryViewProps> = ({ kundli
 
       const data: AiSummarySectionPayload = await response.json();
       setSummary(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch AI summary:', err);
-      // Fallback locally if network route fails
-      import('../../server/geminiAstrology').then(({ generateAlgorithmicVedicSummary }) => {
-        const fallback = generateAlgorithmicVedicSummary(kundliData);
-        setSummary(fallback);
-      });
+      setErrorMsg(err.message || 'Failed to generate pure AI summary. Please ensure your Gemini API key is configured.');
     } finally {
       setLoading(false);
     }
@@ -300,6 +297,12 @@ export const AiKundliSummaryView: React.FC<AiKundliSummaryViewProps> = ({ kundli
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+          <span>{errorMsg}</span>
+        </div>
+      )}
 
       {/* Saved Summaries Drawer if toggled */}
       {showSavedList && savedSummaries.length > 0 && (

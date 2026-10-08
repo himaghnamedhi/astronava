@@ -16,7 +16,8 @@ import {
   X,
   SpellCheck,
   FileText,
-  Store
+  Store,
+  Compass
 } from 'lucide-react';
 import { ChartStyle } from '../types/astrology';
 import { useAuth } from '../context/AuthContext';
@@ -113,14 +114,6 @@ export const Header: React.FC<HeaderProps> = ({
       tagline: 'Mulank, Bhagyank, and Namank destiny vibration numbers',
       icon: Hash,
       tab: 'numerology',
-    },
-    {
-      id: 'full-astrology-report',
-      name: 'Full Astrology Report',
-      category: 'core',
-      tagline: '20-section comprehensive report with 3-year predictive forecast',
-      icon: FileText,
-      tab: 'generator',
     },
     {
       id: 'name-correction',

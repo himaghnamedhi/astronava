@@ -160,10 +160,11 @@ export const FullAstrologyReportModal: React.FC<FullAstrologyReportModalProps> =
 
   const reportContainerRef = useRef<HTMLDivElement>(null);
 
-  // Sync report when forecastYears or kundliData changes
+  // Sync report and automatically enhance with Gemini AI when kundliData or forecastYears changes
   useEffect(() => {
     const base = generateFullAstrologyReport(kundliData, forecastYears);
     setReport(base);
+    handleEnhanceWithAi();
   }, [kundliData, forecastYears]);
 
   // Handle optional AI enrichment
@@ -739,60 +740,16 @@ ${report.multiYearForecast.periods.map((p) => `${p.label}: ${p.overallPeriodThem
                           </p>
                         </div>
 
-                        {/* Real-Life Scenarios (3 to 7 Possibilities) */}
-                        <div className="space-y-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1 font-vedic">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>What Could This Look Like In Real Life? (Practical Scenarios)</span>
-                          </span>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {house.realLifeScenarios.map((scen, idx) => (
-                              <div key={idx} className="p-3 rounded-xl bg-emerald-50/50 border border-emerald-200/60 text-xs text-stone-800 flex items-start gap-2">
-                                <span className="font-bold text-emerald-700 shrink-0">{idx + 1}.</span>
-                                <span>{scen}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
 
-                        {/* Positive Manifestations & Challenges */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                          <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 block font-vedic">
-                              Positive Potential
-                            </span>
-                            <ul className="space-y-1 text-xs text-stone-700">
-                              {house.possiblePositiveManifestations.map((m, idx) => (
-                                <li key={idx} className="flex items-start gap-1.5">
-                                  <span className="text-amber-600 font-bold">•</span>
-                                  <span>{m}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
 
-                          <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 block font-vedic">
-                              Vulnerabilities &amp; Challenges
-                            </span>
-                            <ul className="space-y-1 text-xs text-stone-700">
-                              {house.possibleChallenges.map((c, idx) => (
-                                <li key={idx} className="flex items-start gap-1.5">
-                                  <span className="text-rose-600 font-bold">•</span>
-                                  <span>{c}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
 
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                       </div>
+                     )}
+                   </div>
+                 );
+               })}
+             </div>
+           </section>
 
           {/* ------------------------------------------------------------- */}
           {/* SECTION 5: ALL 9 PLANETS DETAILED */}

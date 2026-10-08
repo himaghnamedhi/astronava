@@ -55,6 +55,7 @@ import {
   MATCH_PRESETS,
   KutaResult
 } from '../data/vedicMatchCalculator';
+import { AiMatchAnalysisView } from './astrology/AiMatchAnalysisView';
 
 interface MatchFinderProps {
   onNavigateToTab?: (tab: 'chart' | 'builder' | 'gemstones' | 'match') => void;
@@ -1134,7 +1135,7 @@ Calculated via Astronava Match Finder`;
                 if (onOpenCustomReport) {
                   onOpenCustomReport({ report: matchReport, p1: p1Details, p2: p2Details });
                 } else {
-                  setShowPrintModal(true);
+                  window.print();
                 }
               }}
               className="px-6 py-4 rounded-2xl bg-stone-900 hover:bg-black text-amber-100 font-bold text-sm tracking-wide shadow-md hover:shadow-lg transition-all flex items-center gap-2.5 cursor-pointer border border-stone-700"
@@ -1299,7 +1300,7 @@ Calculated via Astronava Match Finder`;
                   if (onOpenCustomReport) {
                     onOpenCustomReport({ report: matchReport, p1: p1Details, p2: p2Details });
                   } else {
-                    setShowPrintModal(true);
+                    window.print();
                   }
                 }}
                 className="px-3.5 py-1.5 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
@@ -1309,6 +1310,11 @@ Calculated via Astronava Match Finder`;
               </button>
             </div>
           </div>
+        </div>
+
+        {/* AI-POWERED MATCH ANALYSIS SYNTHESIS */}
+        <div className="p-6 sm:p-8 pt-0">
+          <AiMatchAnalysisView matchReport={matchReport} p1={p1Details} p2={p2Details} />
         </div>
 
         {/* 4. SIDE-BY-SIDE ASTROLOGICAL PROFILE COMPARISON */}

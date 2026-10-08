@@ -116,7 +116,7 @@ export async function generateKundliAiSummary(
       const promptContext = buildAstrologicalPrompt(kundliData, focus, depth);
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-3.5-flash',
         contents: promptContext,
         config: {
           systemInstruction: `You are an erudite, classical Vedic Astrologer (Jyotish Acharya) with deep knowledge of the Brihat Parashara Hora Shastra, Jaimini Sutras, and Phaladeepika.
@@ -228,13 +228,13 @@ Ensure tone is dignified, constructive, culturally respectful, and clear.`,
         const parsed = JSON.parse(response.text.trim());
         return parsed as AiSummarySectionPayload;
       }
-    } catch (apiErr) {
-      console.warn('Gemini API call failed, using high-precision Vedic algorithmic engine:', apiErr);
+    } catch (apiErr: any) {
+      console.error('Gemini API call failed:', apiErr);
+      throw new Error(apiErr.message || 'AI summary generation failed.');
     }
   }
 
-  // Fallback to Classical Algorithmic Engine
-  return generateAlgorithmicVedicSummary(kundliData);
+  throw new Error('Gemini API key is not configured.');
 }
 
 function buildAstrologicalPrompt(k: any, focus: string, depth: string): string {

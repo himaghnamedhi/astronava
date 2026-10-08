@@ -344,7 +344,7 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [activeAnalysisTab, setActiveAnalysisTab] = useState<
     'ai-summary' | 'grahas' | 'vargas' | 'meanings' | 'remedies' | 'dasha' | 'ashtakavarga' | 'yogas' | 'bhavas' | 'effects'
-  >('grahas');
+  >('ai-summary');
 
   // Search & City Input State
   const [cityInputValue, setCityInputValue] = useState<string>(birthDetails.city || 'New Delhi, Delhi NCR, India');
@@ -999,7 +999,6 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
                   className="w-5 h-5 rounded-md shrink-0 shadow-2xs"
                   referrerPolicy="no-referrer"
                 />
-                <span>Enter Birth Details (जन्म विवरण प्रविष्ट करें)</span>
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
                 Accurate time and coordinates ensure exact Ascendant degree, D9 Navamsha, and Vimshottari Dasha balance.
@@ -1104,7 +1103,6 @@ export const KundliGenerator: React.FC<KundliGeneratorProps> = ({
               <div>
                 <label className="block text-xs font-semibold text-stone-700 mb-1.5 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-amber-800" />
-                  <span>Time of Birth (24h)</span>
                 </label>
                 <input
                   type="time"

@@ -58,7 +58,7 @@ CRITICAL RULES:
 `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: promptContext,
         config: {
           systemInstruction: `You are an erudite, ethical Vedic Astrologer (Jyotish Acharya).

@@ -698,13 +698,23 @@ export function calculateVimshottariDasha(
   const birthLord = DASHA_LORDS[lordIndex];
   const balanceYears = Number((birthLord.years * fractionRemaining).toFixed(2));
 
-  const [dobYear, dobMonth, dobDay] = dob.split('-').map(Number);
+  const safeDob = typeof dob === 'string' && dob.includes('-') ? dob : '2026-01-01';
+  const [dobYear, dobMonth, dobDay] = safeDob.split('-').map(Number);
   const birthDate = new Date(dobYear || 1995, (dobMonth || 1) - 1, dobDay || 1);
   const today = new Date();
 
   // Generate 9 Mahadasha sequence starting with birthLord
   const fullTimeline: DashaPeriod[] = [];
   let currentStart = new Date(birthDate);
+
+  const safeISO = (d: Date) => {
+    try {
+      if (isNaN(d.getTime())) return '2026-01-01';
+      return d.toISOString().split('T')[0];
+    } catch {
+      return '2026-01-01';
+    }
+  };
 
   for (let i = 0; i < 9; i++) {
     const dIdx = (lordIndex + i) % 9;
@@ -723,10 +733,10 @@ export function calculateVimshottariDasha(
       planet: dItem.planet,
       lordName: dItem.name,
       sanskritName: dItem.sanskrit,
-      startDate: currentStart.toISOString().split('T')[0],
-      endDate: currentEnd.toISOString().split('T')[0],
-      startYear: currentStart.getFullYear(),
-      endYear: currentEnd.getFullYear(),
+      startDate: safeISO(currentStart),
+      endDate: safeISO(currentEnd),
+      startYear: isNaN(currentStart.getFullYear()) ? 2026 : currentStart.getFullYear(),
+      endYear: isNaN(currentEnd.getFullYear()) ? 2026 : currentEnd.getFullYear(),
       durationYears: duration,
       isActive,
     });
@@ -1127,8 +1137,11 @@ export function assessDoshas(
 // -------------------------------------------------------------
 
 export function generateCompleteKundli(details: BirthDetails): CompleteKundliData {
-  const [yearStr, monthStr, dayStr] = details.dob.split('-');
-  const [hourStr, minStr] = details.tob.split(':');
+  const safeDob = typeof details?.dob === 'string' && details.dob.includes('-') ? details.dob : '1995-11-23';
+  const safeTob = typeof details?.tob === 'string' && details.tob.includes(':') ? details.tob : '06:45';
+
+  const [yearStr, monthStr, dayStr] = safeDob.split('-');
+  const [hourStr, minStr] = safeTob.split(':');
 
   const year = parseInt(yearStr || '1995', 10);
   const month = parseInt(monthStr || '1', 10);

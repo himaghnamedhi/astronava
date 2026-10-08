@@ -7,6 +7,7 @@ import { generateClientSitemapXml } from './src/utils/sitemap';
 import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
 import { seedStoreIfEmpty } from './src/server/storeDb.ts';
 import { horoscopeRouter } from './src/server/horoscopeRoutes';
+import { GoogleGenAI, Type } from '@google/genai';
 
 dotenv.config();
 
@@ -78,6 +79,110 @@ async function startServer() {
     } catch (error: any) {
       console.error('Full Astrology Report generation failed:', error);
       res.status(500).json({ error: error.message || 'Failed to generate full astrology report' });
+    }
+  });
+
+  // Real-time Planet or House Insight Endpoint using Gemini
+  app.post('/api/ai/planet-house-insight', async (req, res) => {
+    try {
+      const { targetType, targetId, placements } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+        return res.status(400).json({ error: 'Gemini API key not configured' });
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      const prompt = `Provide classical Vedic astrology insights for ${targetType} ID "${targetId}" given chart placements: ${JSON.stringify(placements)}. Return JSON with fields: title, subtitle, bulletPoints (array of 3 strings), remedy.`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING },
+              subtitle: { type: Type.STRING },
+              bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+              remedy: { type: Type.STRING },
+            },
+            required: ['title', 'subtitle', 'bulletPoints', 'remedy'],
+          },
+        },
+      });
+
+      if (response.text) {
+        res.json(JSON.parse(response.text.trim()));
+      } else {
+        res.status(500).json({ error: 'Empty AI response' });
+      }
+    } catch (error: any) {
+      console.error('Planet/House insight generation failed:', error);
+      res.status(500).json({ error: error.message || 'Failed to generate insight' });
+    }
+  });
+
+  // AI Match Analysis & Synastry Endpoint using Gemini
+  app.post('/api/ai/match-analysis', async (req, res) => {
+    try {
+      const { matchReport, p1, p2 } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+        return res.status(400).json({ error: 'Gemini API key not configured' });
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      const prompt = `Analyze the Vedic Guna Milan and synastry compatibility between ${p1?.name || 'Partner 1'} and ${p2?.name || 'Partner 2'}. 
+Match Report data: ${JSON.stringify(matchReport)}. 
+Return JSON with fields: 
+- executiveSummary (string)
+- synastryStrengths (array of objects with domain and description)
+- potentialChallenges (array of objects with domain and advice)
+- overallCompatibilityVerdict (string)`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              executiveSummary: { type: Type.STRING },
+              synastryStrengths: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: { domain: { type: Type.STRING }, description: { type: Type.STRING } },
+                  required: ['domain', 'description'],
+                },
+              },
+              potentialChallenges: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: { domain: { type: Type.STRING }, advice: { type: Type.STRING } },
+                  required: ['domain', 'advice'],
+                },
+              },
+              overallCompatibilityVerdict: { type: Type.STRING },
+            },
+            required: ['executiveSummary', 'synastryStrengths', 'potentialChallenges', 'overallCompatibilityVerdict'],
+          },
+        },
+      });
+
+      if (response.text) {
+        res.json(JSON.parse(response.text.trim()));
+      } else {
+        res.status(500).json({ error: 'Empty AI response' });
+      }
+    } catch (error: any) {
+      console.error('Match analysis generation failed:', error);
+      res.status(500).json({ error: error.message || 'Failed to generate match analysis' });
     }
   });
 

@@ -3,6 +3,9 @@ import { HouseNumber, PlanetId } from '../types/astrology';
 import { PLANETS_DATA } from '../data/planetsData';
 import { HOUSES_DATA } from '../data/housesData';
 import { RefreshCw, BookOpen, FileDown, CheckCircle2, Compass } from 'lucide-react';
+import { NavamshaModule } from './astrology/NavamshaModule';
+import { DashamshaModule } from './astrology/DashamshaModule';
+import { AstrologicalInsightsSection } from './astrology/AstrologicalInsightsSection';
 
 interface KundliBuilderProps {
   placements: Record<PlanetId, HouseNumber>;
@@ -209,6 +212,10 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
             })}
           </div>
       </div>
+
+      <NavamshaModule placements={placements} />
+      <DashamshaModule placements={placements} />
+      <AstrologicalInsightsSection placements={placements} />
 
       {/* Generated Kundli Synthesis & Reading */}
       <div className="bg-[#FAF8F5] p-5 sm:p-7 rounded-3xl border border-amber-900/15 shadow-sm space-y-4">

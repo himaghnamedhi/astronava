@@ -291,7 +291,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                   });
                 } else {
                   setNativeName(birthDetails.name || 'Native');
-                  setIsPrintModalOpen(true);
+                  window.print();
                 }
               }}
               className="flex-1 sm:flex-initial px-3 sm:px-4 py-2.5 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap"
@@ -1652,7 +1652,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
             </div>
 
             <button
-              onClick={() => setIsPrintModalOpen(true)}
+              onClick={() => window.print()}
               className="self-start md:self-center px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 text-xs font-semibold flex items-center gap-2 cursor-pointer shrink-0"
             >
               <Printer className="w-3.5 h-3.5" />
