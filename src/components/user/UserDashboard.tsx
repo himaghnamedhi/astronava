@@ -23,12 +23,14 @@ import {
   ExternalLink,
   Edit2,
   FileText,
-  RefreshCw
+  RefreshCw,
+  Globe
 } from 'lucide-react';
 import { useAuth, UserAddress, UserBirthDetails } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
 import { AppTabType } from '../../utils/sitemap';
 import { syncService } from '../../services/api/sync';
+import { WorldCoordinateMap } from '../WorldCoordinateMap';
 
 interface UserDashboardProps {
   onNavigateTab: (tab: AppTabType) => void;
@@ -103,6 +105,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
   const [longitude, setLongitude] = useState(user?.birthDetails?.longitude || 77.2090);
   const [timezoneOffset, setTimezoneOffset] = useState(user?.birthDetails?.timezoneOffset || 5.5);
   const [gender, setGender] = useState<'male' | 'female' | 'other'>(user?.birthDetails?.gender || 'male');
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   // Notification settings
   const [notificationTime, setNotificationTime] = useState(user?.notificationTime || '07:00');
@@ -377,43 +380,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
         </div>
       </div>
 
-      {/* Cloud Sync Status Dashboard Component */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-            syncStatus === 'synced' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-            syncStatus === 'syncing' ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-spin' :
-            'bg-rose-50 text-rose-700 border border-rose-200'
-          }`}>
-            <RefreshCw className={`w-5 h-5 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-stone-900">Firestore Cloud Sync Status</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                syncStatus === 'synced' ? 'bg-emerald-100 text-emerald-800' :
-                syncStatus === 'syncing' ? 'bg-amber-100 text-amber-800' :
-                'bg-rose-100 text-rose-800'
-              }`}>
-                {syncStatus === 'synced' ? 'Fully Synced' : syncStatus === 'syncing' ? 'Syncing...' : 'Sync Error'}
-              </span>
-            </div>
-            <p className="text-[11px] text-stone-500 mt-0.5">
-              Local cache last synced with Firestore database at <strong className="text-stone-700">{lastSyncedTime}</strong> (Cross-device sync active for Web & Android App).
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleManualSync}
-          disabled={syncStatus === 'syncing'}
-          className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 whitespace-nowrap"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
-          <span>{syncStatus === 'syncing' ? 'Syncing...' : 'Sync Now'}</span>
-        </button>
-      </div>
 
       {/* Notifications */}
       {successMessage && (
@@ -542,6 +508,14 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                       className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl border border-stone-300 bg-white focus:ring-1 focus:ring-amber-800 focus:border-amber-800"
                     />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="mt-2.5 w-full px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold flex items-center justify-center gap-2 border border-amber-200 transition-colors cursor-pointer shadow-xs"
+                    title="Choose Birth Location on Google Maps"
+                  >
+                    <Globe className="w-4 h-4 text-amber-800" />
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1331,6 +1305,59 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                 className="flex-1 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold cursor-pointer disabled:opacity-40"
               >
                 Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isMapModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div className="px-6 pt-5 pb-2 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-stone-900">
+                    Choose Birth Location on Google Maps
+                  </h3>
+                  <p className="text-[11px] text-stone-500">
+                    Click anywhere on Google Maps or drag the pin to set exact coordinates
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMapModalOpen(false)}
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="px-6 py-2 overflow-y-auto flex-1 bg-white">
+              <WorldCoordinateMap
+                latitude={latitude}
+                longitude={longitude}
+                timezoneOffset={timezoneOffset}
+                cityName={birthPlace}
+                onChange={(updates) => {
+                  setLatitude(updates.latitude);
+                  setLongitude(updates.longitude);
+                  setTimezoneOffset(updates.timezoneOffset);
+                  if (updates.cityName) {
+                    setBirthPlace(updates.cityName);
+                  }
+                }}
+              />
+            </div>
+            <div className="px-6 pt-2 pb-5 bg-white flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsMapModalOpen(false)}
+                className="px-6 py-2.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                Apply This Location
               </button>
             </div>
           </div>

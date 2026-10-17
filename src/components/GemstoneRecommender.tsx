@@ -33,6 +33,7 @@ import {
   ShieldCheck,
   Eye
 } from 'lucide-react';
+import { WorldCoordinateMap } from './WorldCoordinateMap';
 import { 
   NAVARATNA_DATA, 
   LAGNA_RECOMMENDATIONS, 
@@ -141,6 +142,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
   // City Search State
   const [citySearchQuery, setCitySearchQuery] = useState<string>('');
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState<boolean>(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
 
   // Filtered Cities for instant search
   const filteredCities = useMemo(() => {
@@ -260,7 +262,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
   const nameDestinyGemData = Object.values(NAVARATNA_DATA).find(g => g.planet === calculatedProfile.destinyPlanet) || NAVARATNA_DATA['ruby'];
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fadeIn w-full max-w-full min-w-0 box-border">
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn w-full max-w-full min-w-0 box-border pt-2 sm:pt-4">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-[#FAF5EE] via-[#F5EFE6] to-[#ECE3D5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-amber-900/15 shadow-sm relative overflow-hidden w-full min-w-0 box-border">
         <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -492,7 +494,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
           )}
 
           {/* Input Form Card */}
-          <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-8 shadow-sm space-y-6 transition-all duration-300 hover:shadow-md">
+          <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-10 shadow-sm space-y-8 transition-all duration-300 hover:shadow-md w-full">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-amber-950 font-vedic">
@@ -504,7 +506,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               
               {/* 1. Enter your name: */}
               <div className="space-y-1.5">
@@ -673,7 +675,6 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                         <option key={h} value={h}>{h}</option>
                       ))}
                     </select>
-                    <span className="text-[10px] font-medium text-stone-500 block mt-1.5 text-center">Hour (01-12)</span>
                   </div>
 
                   {/* Minute */}
@@ -691,7 +692,6 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                         <option key={m} value={m}>{m}</option>
                       ))}
                     </select>
-                    <span className="text-[10px] font-medium text-stone-500 block mt-1.5 text-center">Minute (00-59)</span>
                   </div>
 
                   {/* Period AM / PM */}
@@ -718,7 +718,6 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                         );
                       })}
                     </div>
-                    <span className="text-[10px] font-medium text-stone-500 block mt-1.5 text-center">Period</span>
                   </div>
                 </div>
               </div>
@@ -786,6 +785,21 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
                               <X className="w-3.5 h-3.5" />
                             </button>
                           )}
+                        </div>
+
+                        {/* Choose on Google Maps Button */}
+                        <div className="p-2.5 border-b border-stone-100 bg-amber-50/80">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCityDropdownOpen(false);
+                              setIsMapModalOpen(true);
+                            }}
+                            className="w-full py-2 px-3 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
+                          >
+                            <Globe className="w-4 h-4 text-amber-300" />
+                            <span>Choose Location on Google Maps</span>
+                          </button>
                         </div>
 
                         {/* City List */}
@@ -2497,6 +2511,60 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
         </div>
       )}
 
+      {isMapModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div className="px-6 pt-5 pb-2 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-stone-900">
+                    Choose Birth Location on Google Maps
+                  </h3>
+                  <p className="text-[11px] text-stone-500">
+                    Click anywhere on Google Maps or drag the pin to set exact coordinates
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMapModalOpen(false)}
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="px-6 py-2 overflow-y-auto flex-1 bg-white">
+              <WorldCoordinateMap
+                latitude={birthDetails.latitude}
+                longitude={birthDetails.longitude}
+                timezoneOffset={birthDetails.timezoneOffset}
+                cityName={birthDetails.city}
+                onChange={(updates) => {
+                  setBirthDetails((prev) => ({
+                    ...prev,
+                    latitude: updates.latitude,
+                    longitude: updates.longitude,
+                    timezoneOffset: updates.timezoneOffset,
+                    city: updates.cityName || prev.city,
+                  }));
+                }}
+              />
+            </div>
+            <div className="px-6 pt-2 pb-5 bg-white flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsMapModalOpen(false)}
+                className="px-6 py-2.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                Apply This Location
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
