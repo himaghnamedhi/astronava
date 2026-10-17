@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { generateFullAstrologyReport, FullAstrologyReportData } from '../data/fullAstrologyReportEngine';
+import { generateFullAstrologyReport, FullAstrologyReportData } from '../data/fullAstrologyReportEngine.ts';
 
 export interface AiSummarySectionPayload {
   overview: string;

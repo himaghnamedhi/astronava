@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { generateDailyHoroscope } from '../data/horoscopeEngine';
-import { interpretDailyHoroscopeWithAi } from './geminiHoroscope';
-import { HoroscopeUserProfile, AdminDailyJobLog } from '../types/horoscope';
+import { generateDailyHoroscope } from '../data/horoscopeEngine.ts';
+import { interpretDailyHoroscopeWithAi } from './geminiHoroscope.ts';
+import { HoroscopeUserProfile, AdminDailyJobLog } from '../types/horoscope.ts';
 
 export const horoscopeRouter = Router();
 

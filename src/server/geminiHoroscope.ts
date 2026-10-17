@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { DailyHoroscopeResult } from '../types/horoscope';
+import { DailyHoroscopeResult } from '../types/horoscope.ts';
 
 export interface AiHoroscopeInterpretation {
   aiSummary: string;
