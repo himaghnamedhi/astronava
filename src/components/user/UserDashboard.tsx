@@ -22,11 +22,13 @@ import {
   Sparkles,
   ExternalLink,
   Edit2,
-  FileText
+  FileText,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth, UserAddress, UserBirthDetails } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
 import { AppTabType } from '../../utils/sitemap';
+import { syncService } from '../../services/api/sync';
 
 interface UserDashboardProps {
   onNavigateTab: (tab: AppTabType) => void;
@@ -58,12 +60,34 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
     deleteUserAccount 
   } = useAuth();
   
-  const { wishlist, removeFromWishlist, moveToCartFromWishlist } = useStore();
+  const store = useStore() || {};
+  const wishlist = Array.isArray(store.wishlist) ? store.wishlist : [];
+  const removeFromWishlist = store.removeFromWishlist || (() => {});
+  const moveToCartFromWishlist = store.moveToCartFromWishlist || (() => {});
 
   const [activeSection, setActiveSection] = useState<DashboardSection>('birth_details');
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced');
+  const [lastSyncedTime, setLastSyncedTime] = useState<string>(new Date().toLocaleTimeString());
+
+  const handleManualSync = async () => {
+    if (!user?.uid) return;
+    setSyncStatus('syncing');
+    try {
+      await syncService.syncToCloud(user.uid, {
+        birthDetails: { dob, tob, birthPlace, latitude, longitude, timezoneOffset, gender },
+        lastUpdated: Date.now(),
+      });
+      setSyncStatus('synced');
+      setLastSyncedTime(new Date().toLocaleTimeString());
+      setSuccessMessage('Data successfully synced with Firestore cloud database.');
+    } catch (err) {
+      setSyncStatus('error');
+      setErrorMessage('Failed to sync data with cloud.');
+    }
+  };
 
   // Profile fields
   const [displayName, setDisplayName] = useState(user?.displayName || '');
@@ -351,6 +375,44 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
             <span>Kundli Maker</span>
           </button>
         </div>
+      </div>
+
+      {/* Cloud Sync Status Dashboard Component */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+            syncStatus === 'synced' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+            syncStatus === 'syncing' ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-spin' :
+            'bg-rose-50 text-rose-700 border border-rose-200'
+          }`}>
+            <RefreshCw className={`w-5 h-5 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-stone-900">Firestore Cloud Sync Status</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                syncStatus === 'synced' ? 'bg-emerald-100 text-emerald-800' :
+                syncStatus === 'syncing' ? 'bg-amber-100 text-amber-800' :
+                'bg-rose-100 text-rose-800'
+              }`}>
+                {syncStatus === 'synced' ? 'Fully Synced' : syncStatus === 'syncing' ? 'Syncing...' : 'Sync Error'}
+              </span>
+            </div>
+            <p className="text-[11px] text-stone-500 mt-0.5">
+              Local cache last synced with Firestore database at <strong className="text-stone-700">{lastSyncedTime}</strong> (Cross-device sync active for Web & Android App).
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleManualSync}
+          disabled={syncStatus === 'syncing'}
+          className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 whitespace-nowrap"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
+          <span>{syncStatus === 'syncing' ? 'Syncing...' : 'Sync Now'}</span>
+        </button>
       </div>
 
       {/* Notifications */}

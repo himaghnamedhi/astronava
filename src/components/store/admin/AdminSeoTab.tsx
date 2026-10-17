@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Search, Edit3, Check, AlertCircle, Sparkles, ShieldCheck } from 'lucide-react';
+import { Globe, Search, Edit3, Check, AlertCircle, Sparkles, ShieldCheck, X } from 'lucide-react';
 
 interface RouteSeoConfig {
   route: string;

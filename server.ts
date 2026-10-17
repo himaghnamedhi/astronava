@@ -2,12 +2,15 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { generateKundliAiSummary, generateFullAstrologyReportWithAi } from './src/server/geminiAstrology';
-import { generateClientSitemapXml } from './src/utils/sitemap';
+import { generateKundliAiSummary, generateFullAstrologyReportWithAi } from './src/server/geminiAstrology.ts';
+import { generateClientSitemapXml } from './src/utils/sitemap.ts';
 import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
 import { seedStoreIfEmpty } from './src/server/storeDb.ts';
-import { horoscopeRouter } from './src/server/horoscopeRoutes';
+import { horoscopeRouter } from './src/server/horoscopeRoutes.ts';
+import { userRouter } from './src/api/userRoutes.ts';
 import { GoogleGenAI, Type } from '@google/genai';
+import { generateCompleteKundli } from './src/data/vedicEphemeris.ts';
+import { calculateVedAstroMatch } from './src/data/vedicMatchCalculator.ts';
 
 dotenv.config();
 
@@ -31,6 +34,7 @@ async function startServer() {
   app.use('/api/store', storeRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/horoscope', horoscopeRouter);
+  app.use('/api/user', userRouter);
 
   // Dynamic XML Sitemap Endpoint for Web Crawlers and Search Engines
   app.get('/sitemap.xml', (req, res) => {
@@ -183,6 +187,35 @@ Return JSON with fields:
     } catch (error: any) {
       console.error('Match analysis generation failed:', error);
       res.status(500).json({ error: error.message || 'Failed to generate match analysis' });
+    }
+  });
+
+  // Mobile App API Endpoints for External App Sync
+  app.post('/api/mobile/kundli', (req, res) => {
+    try {
+      const birthDetails = req.body;
+      if (!birthDetails || !birthDetails.dob || !birthDetails.tob) {
+        return res.status(400).json({ error: 'Valid birth details (dob, tob, latitude, longitude) required' });
+      }
+      const kundliData = generateCompleteKundli(birthDetails);
+      res.json({ success: true, kundliData });
+    } catch (err: any) {
+      console.error('Mobile API Kundli generation failed:', err);
+      res.status(500).json({ error: err.message || 'Failed to generate Kundli' });
+    }
+  });
+
+  app.post('/api/mobile/match', (req, res) => {
+    try {
+      const { p1, p2 } = req.body;
+      if (!p1 || !p2) {
+        return res.status(400).json({ error: 'Both partner birth details (p1, p2) are required' });
+      }
+      const matchReport = calculateVedAstroMatch(p1, p2);
+      res.json({ success: true, matchReport });
+    } catch (err: any) {
+      console.error('Mobile API Match generation failed:', err);
+      res.status(500).json({ error: err.message || 'Failed to generate match report' });
     }
   });
 

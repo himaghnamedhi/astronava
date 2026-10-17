@@ -1,0 +1,14 @@
+{
+  "appId": "com.astronava.app",
+  "appName": "Astronava",
+  "webDir": "../dist",
+  "server": {
+    "url": "https://ais-dev-zxttfjvhxjhlskfajqp3e3-747336900579.asia-southeast1.run.app",
+    "cleartext": true
+  },
+  "android": {
+    "buildOptions": {
+      "releaseType": "APK"
+    }
+  }
+}

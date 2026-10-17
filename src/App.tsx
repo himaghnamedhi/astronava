@@ -23,6 +23,7 @@ import { StoreModule } from './components/store/StoreModule';
 import { HomePage } from './components/HomePage';
 import { HoroscopeDashboard } from './components/horoscope/HoroscopeDashboard';
 import { UserDashboard } from './components/user/UserDashboard';
+import { NotificationToast } from './components/common/NotificationToast';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
@@ -546,7 +547,8 @@ export default function App() {
 
       {/* Main App Container */}
       <main
-        className={`flex-1 w-full mx-auto min-w-0 box-border overflow-x-hidden ${
+        key={activeTab}
+        className={`flex-1 w-full mx-auto min-w-0 box-border overflow-x-hidden animate-slide-in-tab ${
           activeTab === 'store'
             ? 'max-w-full p-0 space-y-0'
             : 'max-w-7xl px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6 sm:space-y-8'
@@ -1022,6 +1024,9 @@ export default function App() {
 
       {/* User Authentication & Sign-Up Modal */}
       <AuthModal />
+
+      {/* Global Notification Toast */}
+      <NotificationToast />
 
         </div>
       </StoreProvider>

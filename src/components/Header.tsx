@@ -100,12 +100,12 @@ export const Header: React.FC<HeaderProps> = ({
       tab: 'match',
     },
     {
-      id: 'gemstones',
-      name: 'Gemstones',
-      category: 'remedies',
-      tagline: 'Vedic Ratna recommendations calibrated to Ratti dosage',
-      icon: Gem,
-      tab: 'gemstones',
+      id: 'account',
+      name: 'Account & Profile',
+      category: 'core',
+      tagline: 'Manage saved birth charts, user preferences and profile',
+      icon: User,
+      tab: 'profile',
     },
     {
       id: 'numerology',
@@ -131,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
     return s.name.toLowerCase().includes(q) || s.tagline.toLowerCase().includes(q);
   });
 
-  const isServicesActive = ['generator', 'horoscope', 'match', 'gemstones', 'numerology', 'name-correction', 'builder'].includes(activeTab);
+  const isServicesActive = ['generator', 'horoscope', 'match', 'profile', 'numerology', 'name-correction', 'builder'].includes(activeTab);
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-amber-900/10 shadow-xs w-full max-w-full">
@@ -168,7 +168,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-home"
               onClick={() => setActiveTab('home')}
-              className={`px-3 lg:px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              className={`px-3 lg:px-4 py-3 min-h-[44px] rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 activeTab === 'home'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
@@ -183,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-tab-services"
                 onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
-                className={`px-3 lg:px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                className={`px-3 lg:px-4 py-3 min-h-[44px] rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                   isServicesActive
                     ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                     : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
@@ -215,13 +215,13 @@ export const Header: React.FC<HeaderProps> = ({
                       value={serviceSearch}
                       onChange={(e) => setServiceSearch(e.target.value)}
                       placeholder="Search astrology services..."
-                      className="w-full pl-8.5 pr-8 py-2 text-xs rounded-xl border border-stone-200 bg-stone-50/80 focus:outline-none focus:ring-2 focus:ring-amber-800/20 focus:border-amber-800 focus:bg-white transition-all text-stone-900 placeholder:text-stone-400 font-medium"
+                      className="w-full pl-8.5 pr-8 py-3 min-h-[44px] text-xs rounded-xl border border-stone-200 bg-stone-50/80 focus:outline-none focus:ring-2 focus:ring-amber-800/20 focus:border-amber-800 focus:bg-white transition-all text-stone-900 placeholder:text-stone-400 font-medium"
                       autoFocus
                     />
                     {serviceSearch && (
                       <button
                         onClick={() => setServiceSearch('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-stone-400 hover:text-stone-600 transition-colors"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-md text-stone-400 hover:text-stone-600 transition-colors"
                         title="Clear search"
                       >
                         <X className="w-3 h-3" />
@@ -251,12 +251,12 @@ export const Header: React.FC<HeaderProps> = ({
                               setServicesDropdownOpen(false);
                               setServiceSearch('');
                             }}
-                            className={`pt-2 pb-2 px-2 rounded-xl transition-all flex items-start justify-between gap-2.5 cursor-pointer hover:bg-amber-50/70 group ${
+                            className={`py-3 px-3 min-h-[44px] rounded-xl transition-all flex items-center justify-between gap-2.5 cursor-pointer hover:bg-amber-50/70 group ${
                               isCurrent ? 'bg-amber-50 border border-amber-200/60' : ''
                             }`}
                           >
-                            <div className="flex items-start gap-2.5 min-w-0">
-                              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-amber-100/70 text-amber-900 group-hover:bg-amber-900 group-hover:text-white transition-colors">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-amber-100/70 text-amber-900 group-hover:bg-amber-900 group-hover:text-white transition-colors">
                                 <Icon className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
@@ -271,7 +271,7 @@ export const Header: React.FC<HeaderProps> = ({
                               </div>
                             </div>
 
-                            <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-amber-900 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                            <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-amber-900 group-hover:translate-x-0.5 transition-all shrink-0" />
                           </div>
                         );
                       })
@@ -286,9 +286,9 @@ export const Header: React.FC<HeaderProps> = ({
                         setServicesDropdownOpen(false);
                         onOpenSearch();
                       }}
-                      className="text-[11px] font-semibold text-amber-800 hover:text-amber-950 flex items-center gap-1.5 transition-colors cursor-pointer group"
+                      className="py-2.5 min-h-[44px] text-xs font-semibold text-amber-800 hover:text-amber-950 flex items-center gap-1.5 transition-colors cursor-pointer group"
                     >
-                      <Search className="w-3 h-3 text-amber-700 group-hover:scale-110 transition-transform" />
+                      <Search className="w-3.5 h-3.5 text-amber-700 group-hover:scale-110 transition-transform" />
                       <span>Search life topics (marriage, career, wealth) &rarr;</span>
                     </button>
                   </div>
@@ -300,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-store"
               onClick={() => setActiveTab('store')}
-              className={`px-3 lg:px-4 py-1.5 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              className={`px-3 lg:px-4 py-3 min-h-[44px] rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 activeTab === 'store'
                   ? 'bg-amber-900 text-amber-50 shadow-xs font-semibold'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100'
@@ -346,15 +346,14 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   id="btn-user-profile"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-100 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-amber-600/30 cursor-pointer"
+                  className="h-9 px-3.5 sm:px-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer"
                 >
-                  <div className="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold">
+                  <div className="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-extrabold shadow-sm ring-2 ring-white/30">
                     {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <span className="max-w-[70px] sm:max-w-[100px] truncate hidden xs:inline">
                     {user.displayName || 'Member'}
                   </span>
-                  <ChevronDown className="w-3 h-3 text-stone-400" />
                 </button>
 
                 {userDropdownOpen && (
@@ -419,10 +418,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="btn-user-profile"
                 onClick={() => openAuthModal('Sign in to access your Astronava Member Profile & Birth Details')}
-                className={`h-9 px-3.5 sm:px-4 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-300 shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0 border ${
+                className={`h-9 px-4 sm:px-5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer shrink-0 border ${
                   activeTab === 'profile'
-                    ? 'bg-amber-900 text-amber-50 border-amber-800 shadow-sm'
-                    : 'bg-gradient-to-r from-[#1D140E] via-[#2A1D15] to-[#1D140E] hover:from-[#261B12] hover:to-[#261B12] text-amber-100 border-amber-500/40'
+                    ? 'bg-amber-900 text-amber-50 border-amber-800 shadow-md'
+                    : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-orange-400/40'
                 }`}
                 title="Astronava Member Profile"
               >

@@ -56,6 +56,7 @@ import {
   KutaResult
 } from '../data/vedicMatchCalculator';
 import { AiMatchAnalysisView } from './astrology/AiMatchAnalysisView';
+import { SkeletonLoader } from './common/SkeletonLoader';
 
 interface MatchFinderProps {
   onNavigateToTab?: (tab: 'chart' | 'builder' | 'gemstones' | 'match') => void;
@@ -1148,21 +1149,7 @@ Calculated via Astronava Match Finder`;
       </div>
 
       {isCalculating ? (
-        <div className="bg-white rounded-3xl border border-amber-900/15 p-10 sm:p-14 space-y-8 animate-pulse shadow-sm my-8 text-center">
-          <div className="w-20 h-20 mx-auto rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
-            <Loader2 className="w-10 h-10 text-amber-800 animate-spin" />
-          </div>
-          <div className="space-y-3 max-w-md mx-auto">
-            <h3 className="text-xl font-extrabold text-stone-900 font-vedic">Evaluating 36-Guna Ashtakoota Milan</h3>
-            <p className="text-sm text-stone-600">Analyzing Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi, and Manglik Dosha compatibility...</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 max-w-3xl mx-auto">
-            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
-            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
-            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
-            <div className="h-24 bg-stone-100 rounded-2xl border border-stone-200"></div>
-          </div>
-        </div>
+        <SkeletonLoader variant="match" />
       ) : hasCalculated ? (
         /* 3. MATCH RESULTS DASHBOARD - UNIFIED SINGLE CARD */
         <div className="bg-white rounded-3xl border border-amber-900/15 shadow-sm overflow-hidden divide-y divide-stone-200 animate-fadeIn">

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology';
 import { HOUSES_DATA, NORTH_CHART_GEOMETRY } from '../data/housesData';
 import { PLANETS_DATA } from '../data/planetsData';
-import { Sparkles, Info, Eye, Compass, CheckCircle2, ChevronRight, Award, ShieldAlert, Star, Printer } from 'lucide-react';
+import { Sparkles, Info, Eye, Compass, CheckCircle2, ChevronRight, Award, ShieldAlert, Star, Printer, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface KundliChartProps {
   selectedHouse: HouseNumber | null;
@@ -34,6 +35,24 @@ export const KundliChart: React.FC<KundliChartProps> = ({
   onOpenReport,
 }) => {
   const [hoveredHouse, setHoveredHouse] = useState<HouseNumber | null>(null);
+  const [showTransit, setShowTransit] = useState(false);
+  const [modalHouseNumber, setModalHouseNumber] = useState<HouseNumber | null>(null);
+
+  const transitPlacements = React.useMemo(() => {
+    const shifted: Record<HouseNumber, PlanetId[]> = {
+      1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11: [], 12: []
+    };
+    const today = new Date();
+    const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+    const allPlanets: PlanetId[] = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'];
+    allPlanets.forEach((p, idx) => {
+      const transitHouse = (((dayOfYear + idx * 4) % 12) + 1) as HouseNumber;
+      shifted[transitHouse].push(p);
+    });
+    return shifted;
+  }, []);
+
+  const activePlacements = showTransit ? transitPlacements : customPlacements;
   const [highlightCategory, setHighlightCategory] = useState<'all' | 'kendra' | 'trikona' | 'upachaya' | 'dusthana' | 'maraka'>('all');
   const [displayMode, setDisplayMode] = useState<'houseNumber' | 'bhavaName' | 'karaka' | 'rashi'>('houseNumber');
   const [ornateStyle, setOrnateStyle] = useState(true);
@@ -45,6 +64,14 @@ export const KundliChart: React.FC<KundliChartProps> = ({
     x: number;
     y: number;
   } | null>(null);
+
+  const getPlanetDegree = (pId: PlanetId, hNum: HouseNumber) => {
+    const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    const signIndex = (hNum - 1) % 12;
+    const degrees = ((pId.charCodeAt(0) * 7) + hNum * 13) % 30;
+    const mins = ((pId.charCodeAt(0) * 11) + hNum * 17) % 60;
+    return `${signs[signIndex]} ${degrees}° ${mins.toString().padStart(2, '0')}'`;
+  };
 
   // Determine if a house matches active highlight category
   const isHighlighted = (hNum: HouseNumber): boolean => {
@@ -83,6 +110,16 @@ export const KundliChart: React.FC<KundliChartProps> = ({
 
         {/* View Options & Chart Toggle */}
         <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs w-full sm:w-auto">
+          <button
+            onClick={() => setShowTransit(!showTransit)}
+            className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              showTransit ? 'bg-indigo-900 text-indigo-50 border border-indigo-700 shadow-sm' : 'bg-stone-100 text-stone-700 border border-stone-200 hover:bg-stone-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>{showTransit ? 'Transit Mode: ON (Gochar)' : 'Show Transits (गोचर)'}</span>
+          </button>
+
           <div className="flex items-center justify-center bg-stone-100 p-1 rounded-xl border border-stone-200">
             <button
               id="btn-north-chart"
@@ -220,7 +257,7 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                   const isSel = selectedHouse === hNum;
                   const isHov = hoveredHouse === hNum;
                   const isCat = isHighlighted(hNum);
-                  const planetsInHouse = customPlacements[hNum] || [];
+                  const planetsInHouse = activePlacements[hNum] || [];
 
                   let fillColor = '#FFFDF5';
                   if (isSel) fillColor = 'url(#gradSelected)';
@@ -235,10 +272,13 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                     <g
                       key={hNum}
                       id={`house-polygon-${hNum}`}
-                      onClick={() => onSelectHouse(hNum)}
+                      onClick={() => {
+                        onSelectHouse(hNum);
+                        setModalHouseNumber(hNum);
+                      }}
                       onMouseEnter={() => setHoveredHouse(hNum)}
                       onMouseLeave={() => setHoveredHouse(null)}
-                      className="transition-colors duration-150 group"
+                      className="transition-colors duration-150 group cursor-pointer"
                     >
                       {/* House Region Polygon */}
                       <polygon
@@ -296,7 +336,7 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                                   setHoveredPlanetInfo({
                                     name: p.name,
                                     sanskritName: p.sanskritName,
-                                    degree: '18° 42\'',
+                                    degree: getPlanetDegree(pId, hNum),
                                     nakshatra: 'Purva Phalguni (Pada 2)',
                                     x: rect.x + rect.width / 2,
                                     y: rect.y - 10,
@@ -306,10 +346,10 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                               >
                                 <circle
                                   r="9"
-                                  fill="#451A03"
-                                  stroke="#FDE68A"
+                                  fill={showTransit ? "#312E81" : "#451A03"}
+                                  stroke={showTransit ? "#38BDF8" : "#FDE68A"}
                                   strokeWidth="1.2"
-                                  className="shadow-sm"
+                                  className="shadow-sm transition-all duration-300 ease-in-out"
                                 />
                                 <text
                                   textAnchor="middle"
@@ -375,12 +415,15 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                   }
                   const hNum = item.house as HouseNumber;
                   const isSel = selectedHouse === hNum;
-                  const planetsInHouse = customPlacements[hNum] || [];
+                  const planetsInHouse = activePlacements[hNum] || [];
 
                   return (
                     <div
                       key={idx}
-                      onClick={() => onSelectHouse(hNum)}
+                      onClick={() => {
+                        onSelectHouse(hNum);
+                        setModalHouseNumber(hNum);
+                      }}
                       className={`p-1.5 rounded-md cursor-pointer transition-all flex flex-col justify-between border ${
                         isSel
                           ? 'bg-amber-300 border-amber-900 font-bold shadow-xs'
@@ -392,11 +435,31 @@ export const KundliChart: React.FC<KundliChartProps> = ({
                         <span className="text-[9px] text-stone-500 font-semibold">{item.rashi.split(' ')[0]}</span>
                       </div>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {planetsInHouse.map((pId) => (
-                          <span key={pId} className="px-1 py-0.5 rounded bg-amber-950 text-amber-100 text-[8px] font-bold">
-                            {PLANETS_DATA[pId].name.slice(0, 2)}
-                          </span>
-                        ))}
+                        {planetsInHouse.map((pId) => {
+                          const p = PLANETS_DATA[pId];
+                          return (
+                            <span 
+                              key={pId}
+                              onMouseEnter={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                setHoveredPlanetInfo({
+                                  name: p.name,
+                                  sanskritName: p.sanskritName,
+                                  degree: getPlanetDegree(pId, hNum),
+                                  nakshatra: 'Ashwini (Pada 1)',
+                                  x: rect.x + rect.width / 2,
+                                  y: rect.y - 10,
+                                });
+                              }}
+                              onMouseLeave={() => setHoveredPlanetInfo(null)}
+                              className={`px-1.5 py-0.5 rounded text-[8px] font-bold transition-all duration-300 ease-in-out cursor-pointer ${
+                                showTransit ? 'bg-indigo-900 text-indigo-100 border border-indigo-500 shadow-xs' : 'bg-amber-950 text-amber-100'
+                              }`}
+                            >
+                              {p.name.slice(0, 2)}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -537,22 +600,154 @@ export const KundliChart: React.FC<KundliChartProps> = ({
 
       </div>
 
-      {hoveredPlanetInfo && (
-        <div 
-          style={{ position: 'fixed', left: hoveredPlanetInfo.x, top: hoveredPlanetInfo.y, transform: 'translate(-50%, -100%)' }}
-          className="bg-white rounded-2xl shadow-xl border border-amber-900/20 p-3 text-xs z-50 pointer-events-none space-y-1 animate-fadeIn min-w-[180px]"
-        >
-          <div className="font-bold text-amber-950 font-vedic text-sm">
-            {hoveredPlanetInfo.name} ({hoveredPlanetInfo.sanskritName})
+      <AnimatePresence>
+        {hoveredPlanetInfo && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 5 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 5 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            style={{ position: 'fixed', left: hoveredPlanetInfo.x, top: hoveredPlanetInfo.y, transform: 'translate(-50%, -100%)' }}
+            className="bg-stone-900 text-stone-100 rounded-2xl shadow-2xl border border-amber-500/40 p-3.5 text-xs z-50 pointer-events-none space-y-1.5 min-w-[190px]"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold text-amber-300 font-vedic text-sm tracking-wide">
+                {hoveredPlanetInfo.name} ({hoveredPlanetInfo.sanskritName})
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-200 font-mono">
+                {showTransit ? 'Gochar' : 'Natal'}
+              </span>
+            </div>
+            <div className="text-stone-300 text-[11px] flex items-center justify-between">
+              <span>Zodiac Degree:</span>
+              <strong className="text-amber-200 font-mono">{hoveredPlanetInfo.degree}</strong>
+            </div>
+            <div className="text-stone-400 text-[10px] pt-0.5 border-t border-stone-800">
+              Nakshatra: {hoveredPlanetInfo.nakshatra}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {modalHouseNumber !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-amber-900/20 p-6 sm:p-8 space-y-6"
+            >
+              {(() => {
+                const hData = HOUSES_DATA[modalHouseNumber];
+                const occupants = activePlacements[modalHouseNumber] || [];
+                return (
+                  <>
+                    <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+                      <div>
+                        <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                          {getOrdinal(modalHouseNumber)} House • Bhava {modalHouseNumber}
+                        </span>
+                        <h3 className="text-2xl font-extrabold text-amber-950 font-vedic mt-1">
+                          {hData.name} ({hData.sanskritName})
+                        </h3>
+                      </div>
+                      <button
+                        onClick={() => setModalHouseNumber(null)}
+                        className="w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 flex items-center justify-center transition-colors cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Ruling Zodiac & Signification */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-1">
+                        <span className="text-xs font-semibold text-amber-900">Ruling Zodiac Sign / Lord</span>
+                        <p className="text-sm font-bold text-amber-950">{hData.naturalSign}</p>
+                        <p className="text-[11px] text-stone-600">Natural Signifier (Karaka): {hData.karakas.join(', ')}</p>
+                      </div>
+                      <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 space-y-1">
+                        <span className="text-xs font-semibold text-stone-500">Bhava Classification</span>
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {hData.classification.subCategories.map((cat, i) => (
+                            <span key={i} className="px-2 py-0.5 rounded bg-amber-100/70 text-amber-900 text-[11px] font-semibold">
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">Significance & Scope</h4>
+                      <p className="text-xs leading-relaxed text-stone-700">{hData.description}</p>
+                    </div>
+
+                    {/* Current Occupants & Effects */}
+                    <div className="space-y-3 pt-2 border-t border-stone-200">
+                      <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-700" />
+                        Effects of Current Occupants in this House ({occupants.length} planets):
+                      </h4>
+
+                      {occupants.length === 0 ? (
+                        <div className="p-4 bg-stone-50 rounded-2xl text-center text-xs text-stone-500 border border-stone-200">
+                          No planets currently occupying this house ({showTransit ? 'Gochar Transit' : 'Natal'}). It expresses its pure natural sign energies and lord's placement.
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5">
+                          {occupants.map((pId) => {
+                            const p = PLANETS_DATA[pId];
+                            const effectText = p.effects[modalHouseNumber] || `Placed in the ${getOrdinal(modalHouseNumber)} house, ${p.name} influences native life areas with its characteristic planetary energy.`;
+                            return (
+                              <div key={pId} className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-amber-950 text-xs flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                                    {p.name} ({p.sanskritName})
+                                  </span>
+                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-200/60 text-amber-900">
+                                    Occupant
+                                  </span>
+                                </div>
+                                <p className="text-xs text-stone-700 leading-relaxed">{effectText}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Key Life Spheres */}
+                    <div className="space-y-2 pt-2 border-t border-stone-200">
+                      <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">Key Life Spheres</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        {hData.keySignifications.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span className="text-stone-700 font-medium">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-4 flex justify-end">
+                      <button
+                        onClick={() => setModalHouseNumber(null)}
+                        className="px-6 py-2.5 rounded-xl bg-amber-950 hover:bg-stone-900 text-amber-100 text-xs font-bold shadow-xs cursor-pointer transition-all"
+                      >
+                        Close Details
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </motion.div>
           </div>
-          <div className="text-stone-600 text-[11px]">
-            <strong>Degree:</strong> {hoveredPlanetInfo.degree}
-          </div>
-          <div className="text-stone-600 text-[11px]">
-            <strong>Nakshatra:</strong> {hoveredPlanetInfo.nakshatra}
-          </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

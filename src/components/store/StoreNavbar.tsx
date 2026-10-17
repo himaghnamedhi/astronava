@@ -3,21 +3,18 @@ import { ShoppingBag, Sparkles, Gem, Heart, Compass, Package, Layers } from 'luc
 import { useStore } from '../../context/StoreContext.tsx';
 
 export const StoreNavbar: React.FC = () => {
-  const {
-    activeStoreView,
-    cartCount,
-    openCart,
-    navigateToHome,
-    navigateToShop,
-    navigateToWishlist,
-    navigateToProfile,
-    wishlistCount,
-    shopFilters,
-    categories,
-    loadingCategories,
-  } = useStore();
-
+  const store = useStore() || {};
+  const shopFilters = store.shopFilters || {};
   const activeCategory = shopFilters.categorySlug || 'all';
+  const categories = Array.isArray(store.categories) ? store.categories : [];
+  const wishlistCount = typeof store.wishlistCount === 'number' ? store.wishlistCount : 0;
+  const cartCount = typeof store.cartCount === 'number' ? store.cartCount : 0;
+  const openCart = store.openCart || (() => {});
+  const navigateToHome = store.navigateToHome || (() => {});
+  const navigateToShop = store.navigateToShop || (() => {});
+  const navigateToWishlist = store.navigateToWishlist || (() => {});
+  const navigateToProfile = store.navigateToProfile || (() => {});
+  const activeStoreView = store.activeStoreView || 'home';
 
   // Dynamic top-level categories from database, sorted by displayOrder
   const topLevelCategories = React.useMemo(() => {

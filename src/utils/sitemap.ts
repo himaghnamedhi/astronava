@@ -4,7 +4,7 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
+export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'account' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
 
 export interface AppViewRoute {
@@ -141,28 +141,19 @@ export const APP_ROUTES: AppViewRoute[] = [
     lastmod: '2026-09-14',
   },
   {
-    id: 'gemstone-recommender',
-    tab: 'gemstones',
-    path: '/gemstones',
-    aliases: ['/ratna', '/gemstone-calculator'],
-    title: 'Vedic Ratna Calculator & Remedies | Gemstone Recommender | astronava.com',
-    shortTitle: 'Gemstone Recommendations',
-    description: 'Personalized Vedic Gemstone recommendations calculated from Lagna Lord, 5th and 9th Trikona lords. Discover your auspicious Life Stone (Jeevan Ratna), Lucky Stone (Bhagya Ratna), wearing days, metals, mantras, and body weight calibrated Ratti dosage.',
-    keywords: [
-      'gemstone recommendations',
-      'vedic ratna calculator',
-      'lagna lord gemstone',
-      'jeevan ratna',
-      'bhagya ratna',
-      'gemstone weight in ratti',
-      'vedic remedies',
-      'wearing finger and metal'
-    ],
+    id: 'account-dashboard',
+    tab: 'account',
+    path: '/account',
+    aliases: ['/my-account', '/dashboard'],
+    title: 'Account & Member Dashboard | astronava.com',
+    shortTitle: 'Account Dashboard',
+    description: 'Manage your Astronava account, saved birth details, astrological records, and member profile settings.',
+    keywords: ['astronava account', 'member dashboard', 'saved kundlis', 'user profile'],
     ogType: 'website',
     priority: 0.9,
     changefreq: 'weekly',
     category: 'Astrological Tools',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-12',
   },
   {
     id: 'match-finder',

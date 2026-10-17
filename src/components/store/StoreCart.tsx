@@ -17,19 +17,18 @@ import { useAuth } from '../../context/AuthContext';
 
 export const StoreCart: React.FC = () => {
   const { user, openAuthModal } = useAuth();
-  const {
-    cart,
-    cartCount,
-    cartSubtotal,
-    updateQuantity,
-    removeFromCart,
-    clearCart,
-    navigateToShop,
-    navigateToCheckout,
-    appliedCoupon,
-    applyCoupon,
-    removeCoupon,
-  } = useStore();
+  const store = useStore() || {};
+  const cart = Array.isArray(store.cart) ? store.cart : [];
+  const cartCount = typeof store.cartCount === 'number' ? store.cartCount : 0;
+  const cartSubtotal = typeof store.cartSubtotal === 'number' ? store.cartSubtotal : 0;
+  const updateQuantity = store.updateQuantity || (() => {});
+  const removeFromCart = store.removeFromCart || (() => {});
+  const clearCart = store.clearCart || (() => {});
+  const navigateToShop = store.navigateToShop || (() => {});
+  const navigateToCheckout = store.navigateToCheckout || (() => {});
+  const appliedCoupon = store.appliedCoupon || null;
+  const applyCoupon = store.applyCoupon || (async () => ({ success: false, error: 'Not ready' }));
+  const removeCoupon = store.removeCoupon || (() => {});
 
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);

@@ -772,7 +772,7 @@ export async function updateProduct(
   // Update images if passed
   if (imagesData !== undefined) {
     await db.delete(productImages).where(eq(productImages.productId, id));
-    const validImages = imagesData.filter((img) => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+    const validImages = (imagesData || []).filter((img) => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
     if (validImages.length > 0) {
       for (let i = 0; i < validImages.length; i++) {
         const img = validImages[i];

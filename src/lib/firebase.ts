@@ -593,3 +593,35 @@ export async function updateSellerStatusInFirestore(sellerId: string, status: 'a
     handleFirestoreError(error, OperationType.UPDATE, path);
   }
 }
+
+// Caching layer for non-volatile astrological data (localStorage + memory cache)
+const ASTRO_CACHE_PREFIX = 'astronava_astro_cache_';
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+export function getCachedAstrologyData<T>(key: string): T | null {
+  try {
+    const cachedItem = localStorage.getItem(ASTRO_CACHE_PREFIX + key);
+    if (!cachedItem) return null;
+    const { data, timestamp } = JSON.parse(cachedItem);
+    if (Date.now() - timestamp > CACHE_TTL_MS) {
+      localStorage.removeItem(ASTRO_CACHE_PREFIX + key);
+      return null;
+    }
+    return data as T;
+  } catch (err) {
+    console.warn('Cache read error:', err);
+    return null;
+  }
+}
+
+export function setCachedAstrologyData<T>(key: string, data: T): void {
+  try {
+    const item = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(ASTRO_CACHE_PREFIX + key, JSON.stringify(item));
+  } catch (err) {
+    console.warn('Cache write error:', err);
+  }
+}

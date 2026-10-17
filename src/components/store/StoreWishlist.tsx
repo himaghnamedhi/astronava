@@ -16,15 +16,14 @@ import { useAuth } from '../../context/AuthContext.tsx';
 import { StoreProductMedia } from './StoreProductMedia.tsx';
 
 export const StoreWishlist: React.FC = () => {
-  const {
-    wishlist,
-    wishlistCount,
-    removeFromWishlist,
-    moveToCartFromWishlist,
-    navigateToShop,
-    navigateToProduct,
-    navigateToHome,
-  } = useStore();
+  const store = useStore() || {};
+  const wishlist = Array.isArray(store.wishlist) ? store.wishlist : [];
+  const wishlistCount = typeof store.wishlistCount === 'number' ? store.wishlistCount : wishlist.length;
+  const removeFromWishlist = store.removeFromWishlist || (() => {});
+  const moveToCartFromWishlist = store.moveToCartFromWishlist || (() => {});
+  const navigateToShop = store.navigateToShop || (() => {});
+  const navigateToProduct = store.navigateToProduct || (() => {});
+  const navigateToHome = store.navigateToHome || (() => {});
 
   const { user, openAuthModal } = useAuth();
 
