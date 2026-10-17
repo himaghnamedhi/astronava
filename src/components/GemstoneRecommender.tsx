@@ -494,7 +494,7 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
           )}
 
           {/* Input Form Card */}
-          <div className="bg-white rounded-3xl border border-amber-900/15 p-6 sm:p-10 shadow-sm space-y-8 transition-all duration-300 hover:shadow-md w-full">
+          <div className="bg-white rounded-3xl border border-amber-900/15 p-8 sm:p-12 min-h-[520px] shadow-sm space-y-8 transition-all duration-300 hover:shadow-md w-full">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-amber-950 font-vedic">
@@ -2512,8 +2512,8 @@ export const GemstoneRecommender: React.FC<GemstoneRecommenderProps> = ({
       )}
 
       {isMapModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden my-auto border border-amber-900/10">
             <div className="px-6 pt-5 pb-2 flex items-center justify-between bg-white">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center">
