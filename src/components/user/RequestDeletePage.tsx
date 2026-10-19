@@ -126,12 +126,6 @@ export const RequestDeletePage: React.FC<RequestDeletePageProps> = ({ onBackToHo
 
         <DeleteAccountForm user={user} onOpenLogin={onOpenLogin} onBack={onBackToHome} />
 
-        {/* Footer Link Info */}
-        <div className="text-center pt-2 border-t border-stone-100">
-          <p className="text-[11px] text-stone-400">
-            Dedicated Deletion Endpoint: <code className="text-stone-600">app.astronava.com/request-delete</code>
-          </p>
-        </div>
       </div>
     </div>
   );
