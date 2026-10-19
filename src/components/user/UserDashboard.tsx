@@ -1174,12 +1174,13 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                     >
                       Delete My Account
                     </a>
-                    <a
-                      href="/#request-delete"
+                    <button
+                      type="button"
+                      onClick={() => setIsRequestFormModalOpen(true)}
                       className="px-4 py-2 rounded-xl border border-rose-300 text-rose-800 hover:bg-rose-50 text-xs font-bold cursor-pointer text-center inline-flex items-center justify-center"
                     >
                       Request Deletion Form
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
