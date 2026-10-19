@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { HouseNumber, PlanetId, ChartStyle } from './types/astrology';
 import { Header } from './components/Header';
-import { KundliBuilder } from './components/KundliBuilder';
-import { KundliGenerator } from './components/KundliGenerator';
-import { GemstoneRecommender } from './components/GemstoneRecommender';
-import { MatchFinder } from './components/MatchFinder';
-import { NumerologyCalculator } from './components/NumerologyCalculator';
+
+const KundliBuilder = lazy(() => import('./components/KundliBuilder').then(m => ({ default: m.KundliBuilder })));
+const KundliGenerator = lazy(() => import('./components/KundliGenerator').then(m => ({ default: m.KundliGenerator })));
+const GemstoneRecommender = lazy(() => import('./components/GemstoneRecommender').then(m => ({ default: m.GemstoneRecommender })));
+const MatchFinder = lazy(() => import('./components/MatchFinder').then(m => ({ default: m.MatchFinder })));
+const NumerologyCalculator = lazy(() => import('./components/NumerologyCalculator').then(m => ({ default: m.NumerologyCalculator })));
 import { SearchModal } from './components/SearchModal';
 import { CustomReportModal } from './components/CustomReportModal';
-import { FullAstrologyReportModal } from './components/reports/FullAstrologyReportModal';
+const FullAstrologyReportModal = lazy(() => import('./components/reports/FullAstrologyReportModal').then(m => ({ default: m.FullAstrologyReportModal })));
 import { LegalModal } from './components/LegalModal';
 import { LegalPage } from './components/LegalPage';
 import { SitemapModal } from './components/SitemapModal';
@@ -19,10 +20,10 @@ import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, C
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { StoreProvider } from './context/StoreContext';
-import { StoreModule } from './components/store/StoreModule';
+const StoreModule = lazy(() => import('./components/store/StoreModule').then(m => ({ default: m.StoreModule })));
 import { HomePage } from './components/HomePage';
-import { HoroscopeDashboard } from './components/horoscope/HoroscopeDashboard';
-import { UserDashboard } from './components/user/UserDashboard';
+const HoroscopeDashboard = lazy(() => import('./components/horoscope/HoroscopeDashboard').then(m => ({ default: m.HoroscopeDashboard })));
+const UserDashboard = lazy(() => import('./components/user/UserDashboard').then(m => ({ default: m.UserDashboard })));
 import { NotificationToast } from './components/common/NotificationToast';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { RequestDeletePage } from './components/user/RequestDeletePage';
@@ -150,6 +151,15 @@ export function updateTabMetaTags(
   });
 }
 
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center py-24 min-h-[50vh]">
+    <div className="text-center space-y-3">
+      <div className="w-10 h-10 border-4 border-amber-800 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p className="text-xs font-bold text-amber-900 tracking-wider uppercase font-vedic">Loading Vedic Astro Module...</p>
+    </div>
+  </div>
+);
+
 export default function App() {
   const [isSellerPortal] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -157,7 +167,7 @@ export default function App() {
       const p = window.location.pathname;
       const q = window.location.search;
       const hash = window.location.hash;
-      return h.startsWith('seller.') || h.includes('seller.astronava.com') || p.includes('/seller') || q.includes('view=seller') || hash.includes('seller');
+      return h.startsWith('seller.') || h.includes('seller.astronava.com') || p.includes('/seller') || q.includes('view=seller') || hash.includes('seller') || q.includes('seller');
     }
     return false;
   });
@@ -586,111 +596,113 @@ export default function App() {
       >
         
         {/* Dynamic Content Views based on activeTab */}
-        {activeTab === 'home' && (
-          <HomePage
-            onSelectTab={(tab) => {
-              handleTabChange(tab);
-              scrollToTop();
-            }}
-          />
-        )}
-
-        {activeTab === 'horoscope' && <HoroscopeDashboard />}
-
-        {activeTab === 'generator' && (
-          <KundliGenerator
-            onOpenReportModal={(kData) => handleOpenReport('kundli', kData)}
-            onOpenFullReportModal={(kData, yrs, sec) => handleOpenFullReport(kData, yrs, sec)}
-            onKundliGenerated={(kData) => setReportKundliData(kData)}
-            onApplyPlacementsToBuilder={(placements) => {
-              setCustomPlacements(placements);
-              handleTabChange('builder');
-            }}
-          />
-        )}
-
-        {activeTab === 'builder' && (
-          <KundliBuilder
-            placements={customPlacements}
-            setPlacements={setCustomPlacements}
-            onSelectHouse={(hNum) => {
-              setSelectedHouse(hNum);
-            }}
-            onSelectPlanet={handlePlanetSelect}
-            onOpenReport={() => handleOpenReport('kundli')}
-          />
-        )}
-
-        {activeTab === 'gemstones' && (
-          <GemstoneRecommender
-            initialLagna={1}
-            onNavigateToTab={(tab) => {
-              if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
+        <Suspense fallback={<LoadingFallback />}>
+          {activeTab === 'home' && (
+            <HomePage
+              onSelectTab={(tab) => {
                 handleTabChange(tab);
-              }
-            }}
-            onOpenCustomReport={(data) => handleOpenReport('gemstone', data)}
-          />
-        )}
+                scrollToTop();
+              }}
+            />
+          )}
 
-        {activeTab === 'match' && (
-          <MatchFinder
-            onNavigateToTab={(tab) => {
-              if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match' || tab === 'numerology') {
+          {activeTab === 'horoscope' && <HoroscopeDashboard />}
+
+          {activeTab === 'generator' && (
+            <KundliGenerator
+              onOpenReportModal={(kData) => handleOpenReport('kundli', kData)}
+              onOpenFullReportModal={(kData, yrs, sec) => handleOpenFullReport(kData, yrs, sec)}
+              onKundliGenerated={(kData) => setReportKundliData(kData)}
+              onApplyPlacementsToBuilder={(placements) => {
+                setCustomPlacements(placements);
+                handleTabChange('builder');
+              }}
+            />
+          )}
+
+          {activeTab === 'builder' && (
+            <KundliBuilder
+              placements={customPlacements}
+              setPlacements={setCustomPlacements}
+              onSelectHouse={(hNum) => {
+                setSelectedHouse(hNum);
+              }}
+              onSelectPlanet={handlePlanetSelect}
+              onOpenReport={() => handleOpenReport('kundli')}
+            />
+          )}
+
+          {activeTab === 'gemstones' && (
+            <GemstoneRecommender
+              initialLagna={1}
+              onNavigateToTab={(tab) => {
+                if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match') {
+                  handleTabChange(tab);
+                }
+              }}
+              onOpenCustomReport={(data) => handleOpenReport('gemstone', data)}
+            />
+          )}
+
+          {activeTab === 'match' && (
+            <MatchFinder
+              onNavigateToTab={(tab) => {
+                if (tab === 'generator' || tab === 'builder' || tab === 'gemstones' || tab === 'match' || tab === 'numerology') {
+                  handleTabChange(tab);
+                }
+              }}
+              onOpenCustomReport={(data) => handleOpenReport('match', data)}
+            />
+          )}
+
+          {activeTab === 'numerology' && (
+            <NumerologyCalculator
+              initialSection="overview"
+              initialName={reportKundliData?.nativeName || ''}
+              initialDob={{
+                day: reportKundliData?.birthData.day || 17,
+                month: reportKundliData?.birthData.month || 9,
+                year: reportKundliData?.birthData.year || 1950,
+              }}
+            />
+          )}
+
+          {activeTab === 'name-correction' && (
+            <NumerologyCalculator
+              initialSection="name"
+              initialName={reportKundliData?.nativeName || ''}
+              initialDob={{
+                day: reportKundliData?.birthData.day || 17,
+                month: reportKundliData?.birthData.month || 9,
+                year: reportKundliData?.birthData.year || 1950,
+              }}
+            />
+          )}
+
+          {activeTab === 'legal' && (
+            <LegalPage
+              activeDoc={selectedLegalDoc}
+              onSelectDoc={(doc) => handleOpenLegal(doc)}
+              onBack={handleReturnHome}
+            />
+          )}
+
+          {activeTab === 'store' && <StoreModule />}
+
+          {activeTab === 'sitemap' && (
+            <SitemapPage
+              onNavigate={(tab, doc) => {
+                setSelectedLegalDoc(doc);
                 handleTabChange(tab);
-              }
-            }}
-            onOpenCustomReport={(data) => handleOpenReport('match', data)}
-          />
-        )}
+              }}
+              onBack={handleReturnHome}
+            />
+          )}
 
-        {activeTab === 'numerology' && (
-          <NumerologyCalculator
-            initialSection="overview"
-            initialName={reportKundliData?.nativeName || ''}
-            initialDob={{
-              day: reportKundliData?.birthData.day || 17,
-              month: reportKundliData?.birthData.month || 9,
-              year: reportKundliData?.birthData.year || 1950,
-            }}
-          />
-        )}
-
-        {activeTab === 'name-correction' && (
-          <NumerologyCalculator
-            initialSection="name"
-            initialName={reportKundliData?.nativeName || ''}
-            initialDob={{
-              day: reportKundliData?.birthData.day || 17,
-              month: reportKundliData?.birthData.month || 9,
-              year: reportKundliData?.birthData.year || 1950,
-            }}
-          />
-        )}
-
-        {activeTab === 'legal' && (
-          <LegalPage
-            activeDoc={selectedLegalDoc}
-            onSelectDoc={(doc) => handleOpenLegal(doc)}
-            onBack={handleReturnHome}
-          />
-        )}
-
-        {activeTab === 'store' && <StoreModule />}
-
-        {activeTab === 'sitemap' && (
-          <SitemapPage
-            onNavigate={(tab, doc) => {
-              setSelectedLegalDoc(doc);
-              handleTabChange(tab);
-            }}
-            onBack={handleReturnHome}
-          />
-        )}
-
-        {activeTab === 'profile' && (
-          <UserDashboard onNavigateTab={handleTabChange} />
-        )}
+          {activeTab === 'profile' && (
+            <UserDashboard onNavigateTab={handleTabChange} />
+          )}
+        </Suspense>
 
       </main>
 

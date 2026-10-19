@@ -131,7 +131,7 @@ Any changes will become effective immediately upon publication on this page.
 
 If you have any questions regarding this Disclaimer, please contact us:
 
-**Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
+**Email:** [contact@astronava.com](mailto:contact@astronava.com)
 
 **Website:** https://www.astronava.com
 
@@ -309,7 +309,7 @@ Any disputes arising from the use of Astronava shall be subject to the exclusive
 
 If you have any questions regarding these Terms & Conditions, please contact us:
 
-**Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
+**Email:** [contact@astronava.com](mailto:contact@astronava.com)
 
 **Website:** https://www.astronava.com
 
@@ -471,7 +471,7 @@ The updated version will be published on this page with a revised Effective Date
 
 If you have any questions about this Privacy Policy or the way your information is handled, please contact us:
 
-**Email:** [himaaghna@gmail.com](mailto:himaaghna@gmail.com)
+**Email:** [contact@astronava.com](mailto:contact@astronava.com)
 
 **Website:** https://www.astronava.com
 
@@ -480,7 +480,7 @@ If you have any questions about this Privacy Policy or the way your information 
 Thank you for trusting **Astronava**.`;
 
 export const CONTACT_INFO = {
-  email: 'himaaghna@gmail.com',
+  email: 'contact@astronava.com',
   website: 'https://www.astronava.com',
   developerName: 'Himaghna Medhi',
   twitter: 'https://x.com/himaghnamedhi',

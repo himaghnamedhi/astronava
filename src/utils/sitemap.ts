@@ -345,15 +345,67 @@ export const APP_ROUTES: AppViewRoute[] = [
   },
 ];
 
+export const ASTROLOGICAL_REPORT_TYPES = [
+  { id: 'report-kundli', path: '/report/kundli', title: 'Free Janam Kundli Report & Vedic Birth Chart', description: 'Comprehensive Janam Kundli birth chart analysis with planetary positions and dashas.' },
+  { id: 'report-match', path: '/report/match', title: '36 Guna Horoscope Matching Report', description: 'Detailed Ashtakoota compatibility and Guna Milan report for marriage.' },
+  { id: 'report-gemstone', path: '/report/gemstone', title: 'Vedic Gemstone Prescription & Navaratna Report', description: 'Personalized gemstone recommendations based on Lagna and favorable planet lords.' },
+  { id: 'report-horoscope', path: '/report/horoscope', title: 'Daily Vedic Transit & Gochar Horoscope Report', description: 'In-depth daily planetary transit analysis and life domain forecasts.' },
+  { id: 'report-numerology', path: '/report/numerology', title: 'Mulank & Bhagyank Numerology Report', description: 'Vedic Sankhya Shastra psychic root and destiny number report.' },
+  { id: 'report-dasha', path: '/report/dasha', title: 'Vimshottari Dasha Planetary Period Report', description: 'Detailed planetary Mahadasha and Antardasha timeline analysis.' },
+  { id: 'report-ashtakavarga', path: '/report/ashtakavarga', title: 'Sarvashtakavarga Bindus & House Strength Report', description: 'Sarvashtakavarga planetary bindus and house strength breakdown.' },
+  { id: 'report-panchang', path: '/report/panchang', title: 'Vedic Panchang & Muhurat Report', description: 'Precise daily Tithi, Nakshatra, Yoga, Karana, and auspicious timings.' },
+];
+
 /**
- * Returns all active app routes with their canonical URLs.
+ * Pings major search engines (Google and Bing) with the updated sitemap URL.
+ */
+export async function pingSearchEngines(baseUrl: string = getCanonicalBaseUrl()): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const sitemapUrl = `${baseUrl.replace(/\/$/, '')}/sitemap.xml`;
+  const endpoints = [
+    `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+    `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+  ];
+
+  try {
+    await Promise.allSettled(
+      endpoints.map((endpoint) =>
+        fetch(endpoint, { method: 'GET', mode: 'no-cors' }).catch(() => {})
+      )
+    );
+    console.log('Successfully pinged search engines with sitemap:', sitemapUrl);
+  } catch (err) {
+    console.error('Error pinging search engines:', err);
+  }
+}
+
+/**
+ * Returns all active app routes with their canonical URLs, including dynamic astrological report routes.
  */
 export function getAppSitemapRoutes(baseUrl: string = CANONICAL_BASE_URL): (AppViewRoute & { canonicalUrl: string })[] {
   const normalizedBase = baseUrl.replace(/\/$/, '');
-  return APP_ROUTES.map((route) => ({
+  const staticRoutes = APP_ROUTES.map((route) => ({
     ...route,
     canonicalUrl: `${normalizedBase}${route.path === '/' ? '' : route.path}`,
   }));
+
+  const dynamicReportRoutes = ASTROLOGICAL_REPORT_TYPES.map((rep) => ({
+    id: rep.id,
+    tab: 'generator' as AppTabType,
+    path: rep.path,
+    title: `${rep.title} | astronava.com`,
+    shortTitle: rep.title,
+    description: rep.description,
+    keywords: ['vedic report', 'astrology report', rep.id.replace('-', ' ')],
+    ogType: 'website' as const,
+    priority: 0.85,
+    changefreq: 'weekly' as const,
+    category: 'Astrological Tools' as const,
+    lastmod: new Date().toISOString().split('T')[0],
+    canonicalUrl: `${normalizedBase}${rep.path}`,
+  }));
+
+  return [...staticRoutes, ...dynamicReportRoutes];
 }
 
 /**
