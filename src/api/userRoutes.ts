@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { verifyFirebaseToken, AuthenticatedRequest } from '../services/api/auth';
+import { verifyFirebaseToken, AuthenticatedRequest } from '../services/api/auth.ts';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { generateCompleteKundli } from '../data/vedicEphemeris';
+import { generateCompleteKundli } from '../data/vedicEphemeris.ts';
 
 export const userRouter = Router();
 

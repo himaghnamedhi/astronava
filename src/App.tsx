@@ -25,6 +25,7 @@ import { HoroscopeDashboard } from './components/horoscope/HoroscopeDashboard';
 import { UserDashboard } from './components/user/UserDashboard';
 import { NotificationToast } from './components/common/NotificationToast';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
+import { RequestDeletePage } from './components/user/RequestDeletePage';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 /**
@@ -160,6 +161,35 @@ export default function App() {
     }
     return false;
   });
+
+  const [isRequestDeletePage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname;
+      const hash = window.location.hash;
+      const q = window.location.search;
+      return p.includes('/request-delete') || hash.includes('request-delete') || q.includes('view=request-delete');
+    }
+    return false;
+  });
+
+  if (isRequestDeletePage) {
+    return (
+      <AuthProvider>
+        <RequestDeletePage 
+          onBackToHome={() => {
+            window.location.hash = '';
+            window.location.pathname = '/';
+            window.location.reload();
+          }}
+          onOpenLogin={() => {
+            window.location.hash = '';
+            window.location.pathname = '/';
+            window.location.reload();
+          }}
+        />
+      </AuthProvider>
+    );
+  }
 
   if (isSellerPortal) {
     return (

@@ -1165,12 +1165,21 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                   <p className="text-xs text-rose-700 leading-relaxed">
                     Permanently delete your account, birth details, astrological records, and order history from the platform. This action is immediate and cannot be undone.
                   </p>
-                  <button
-                    onClick={() => setIsDeleteModalOpen(true)}
-                    className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold cursor-pointer"
-                  >
-                    Delete My Account
-                  </button>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <button
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold cursor-pointer"
+                    >
+                      Delete My Account
+                    </button>
+                    <a
+                      href="/#request-delete"
+                      className="text-xs text-rose-800 hover:text-rose-950 font-semibold underline underline-offset-2"
+                      title="Data Deletion Request Endpoint"
+                    >
+                      Request Deletion Form (app.astronava.com/request-delete)
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
