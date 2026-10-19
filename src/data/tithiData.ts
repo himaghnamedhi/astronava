@@ -1,4 +1,4 @@
-import { PlanetId } from '../types/astrology';
+import { PlanetId } from '../types/astrology.ts';
 
 export type PakshaType = 'Shukla Paksha (Waxing / Bright)' | 'Krishna Paksha (Waning / Dark)';
 export type TithiGroup = 'Nanda (Joy & Prosperity)' | 'Bhadra (Auspicious & Steady)' | 'Jaya (Victory & Conquest)' | 'Rikta (Power & Transformation)' | 'Poorna (Fullness & Completion)';

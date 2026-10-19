@@ -47,7 +47,7 @@ import {
   BirthDetails, 
   CalculatedBirthProfile 
 } from '../data/vedicAstrologyCalculator';
-import { PlanetId, ChartPlacement } from '../types/astrology';
+import { PlanetId, ChartPlacement } from '../types/astrology.ts';
 import { GemstoneImage } from './GemstoneImage';
 import { useAuth } from '../context/AuthContext';
 

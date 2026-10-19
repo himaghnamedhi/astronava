@@ -1,4 +1,4 @@
-import { HouseNumber } from '../types/astrology';
+import { HouseNumber } from '../types/astrology.ts';
 
 export interface BhavaLifeImpact {
   houseNumber: HouseNumber;

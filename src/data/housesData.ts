@@ -1,4 +1,4 @@
-import { HouseInfo, HouseNumber } from '../types/astrology';
+import { HouseInfo, HouseNumber } from '../types/astrology.ts';
 
 export interface HouseSvgGeometry {
   house: HouseNumber;

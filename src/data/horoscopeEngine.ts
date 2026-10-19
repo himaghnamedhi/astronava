@@ -1,4 +1,4 @@
-import { PlanetId, HouseNumber } from '../types/astrology';
+import { PlanetId, HouseNumber } from '../types/astrology.ts';
 import {
   DailyHoroscopeCategoryKey,
   CategoryScoreDetail,

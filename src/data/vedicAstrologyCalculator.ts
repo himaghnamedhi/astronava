@@ -1,4 +1,4 @@
-import { PlanetId } from '../types/astrology';
+import { PlanetId } from '../types/astrology.ts';
 
 export interface BirthDetails {
   name: string;

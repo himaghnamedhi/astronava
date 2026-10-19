@@ -1,4 +1,4 @@
-import { BlogArticle } from '../types/astrology';
+import { BlogArticle } from '../types/astrology.ts';
 
 export const BLOG_ARTICLES: BlogArticle[] = [
   {

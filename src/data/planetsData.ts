@@ -1,4 +1,4 @@
-import { PlanetId, PlanetInfo } from '../types/astrology';
+import { PlanetId, PlanetInfo } from '../types/astrology.ts';
 
 export const PLANETS_DATA: Record<PlanetId, PlanetInfo> = {
   sun: {

@@ -19,7 +19,7 @@ import {
   Store,
   Compass
 } from 'lucide-react';
-import { ChartStyle } from '../types/astrology';
+import { ChartStyle } from '../types/astrology.ts';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext.tsx';
 import { AppTabType } from '../utils/sitemap';

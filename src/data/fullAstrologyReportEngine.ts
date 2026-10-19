@@ -1,4 +1,4 @@
-import { PlanetId, HouseNumber, ChartStyle } from '../types/astrology';
+import { PlanetId, HouseNumber, ChartStyle } from '../types/astrology.ts';
 import { 
   CompleteKundliData, 
   GrahaSpashta, 

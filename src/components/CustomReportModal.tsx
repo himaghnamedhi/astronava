@@ -21,7 +21,7 @@ import {
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 
-import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology';
+import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology.ts';
 import { HOUSES_DATA, NORTH_CHART_GEOMETRY } from '../data/housesData';
 import { PLANETS_DATA } from '../data/planetsData';
 import { 

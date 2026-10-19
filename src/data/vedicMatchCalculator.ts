@@ -6,7 +6,7 @@ import {
   BirthDetails, 
   calculateVedicBirthProfile 
 } from './vedicAstrologyCalculator';
-import { PlanetId } from '../types/astrology';
+import { PlanetId } from '../types/astrology.ts';
 
 // -------------------------------------------------------------
 // 1. ASHTAKOOTA & VEDIC DATA MAPPINGS

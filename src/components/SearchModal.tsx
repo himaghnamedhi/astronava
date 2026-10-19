@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Search, Sparkles, Compass, Sun, Layers, ArrowRight } from 'lucide-react';
 import { HOUSES_DATA } from '../data/housesData';
 import { PLANETS_DATA } from '../data/planetsData';
-import { HouseNumber, PlanetId } from '../types/astrology';
+import { HouseNumber, PlanetId } from '../types/astrology.ts';
 
 interface SearchModalProps {
   isOpen: boolean;

@@ -31,6 +31,7 @@ import { useStore } from '../../context/StoreContext';
 import { AppTabType } from '../../utils/sitemap';
 import { syncService } from '../../services/api/sync';
 import { WorldCoordinateMap } from '../WorldCoordinateMap';
+import { googleFormsService } from '../../services/api/googleForms';
 
 interface UserDashboardProps {
   onNavigateTab: (tab: AppTabType) => void;
@@ -115,6 +116,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
 
   // Address Modal / Editing
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isRequestFormModalOpen, setIsRequestFormModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
   const [addressFormData, setAddressFormData] = useState<UserAddress>({
     id: '',
@@ -1166,18 +1168,17 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                     Permanently delete your account, birth details, astrological records, and order history from the platform. This action is immediate and cannot be undone.
                   </p>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <button
-                      onClick={() => setIsDeleteModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold cursor-pointer"
-                    >
-                      Delete My Account
-                    </button>
                     <a
                       href="/#request-delete"
-                      className="text-xs text-rose-800 hover:text-rose-950 font-semibold underline underline-offset-2"
-                      title="Data Deletion Request Endpoint"
+                      className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold cursor-pointer text-center inline-flex items-center justify-center"
                     >
-                      Request Deletion Form (app.astronava.com/request-delete)
+                      Delete My Account
+                    </a>
+                    <a
+                      href="/#request-delete"
+                      className="px-4 py-2 rounded-xl border border-rose-300 text-rose-800 hover:bg-rose-50 text-xs font-bold cursor-pointer text-center inline-flex items-center justify-center"
+                    >
+                      Request Deletion Form
                     </a>
                   </div>
                 </div>
@@ -1369,6 +1370,71 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateTab }) =
                 Apply This Location
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {isRequestFormModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-stone-900 font-vedic">
+                Google Forms Account Deletion Request
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsRequestFormModalOpen(false)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              await googleFormsService.submitDeletionRequest({
+                identifier: user?.email || 'Anonymous',
+                reason: 'Requested via in-app Google Form integration',
+                timestamp: new Date().toISOString()
+              });
+              setSuccessMessage('Account deletion request submitted successfully via Google Forms API.');
+              setIsRequestFormModalOpen(false);
+            }} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase mb-1">Username / Email / Phone</label>
+                <input
+                  type="text"
+                  required
+                  defaultValue={user?.email || ''}
+                  placeholder="Enter email or phone"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-300"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase mb-1">Reason (Optional)</label>
+                <textarea
+                  rows={2}
+                  placeholder="Reason for leaving"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-300 resize-none"
+                />
+              </div>
+              <p className="text-[11px] text-stone-500">
+                Connected to Google Forms workspace integration. To execute actual deletion, please use the double-confirmation delete button.
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRequestFormModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-stone-300 text-xs font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-amber-900 text-white text-xs font-bold cursor-pointer"
+                >
+                  Submit Google Form Request
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

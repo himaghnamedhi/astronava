@@ -41,7 +41,7 @@ import html2canvas from 'html2canvas-pro';
 import { useAuth } from '../context/AuthContext';
 import { SkeletonLoader } from './common/SkeletonLoader';
 
-import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology';
+import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology.ts';
 import { 
   BirthDetails, 
   POPULAR_CITIES, 

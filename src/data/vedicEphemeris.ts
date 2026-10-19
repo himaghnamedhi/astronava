@@ -1,4 +1,4 @@
-import { PlanetId, HouseNumber, ChartStyle } from '../types/astrology';
+import { PlanetId, HouseNumber, ChartStyle } from '../types/astrology.ts';
 import { NAKSHATRAS, RASHI_NAMES, RASHI_LORDS, BirthDetails } from './vedicAstrologyCalculator';
 import { calculateTithiFromDegrees, ComputedTithiResult } from './tithiData';
 

@@ -7,17 +7,108 @@ interface RequestDeletePageProps {
   onOpenLogin: () => void;
 }
 
+export const DeleteAccountForm: React.FC<{ user: any; onOpenLogin: () => void; onBack: () => void }> = ({ user, onOpenLogin, onBack }) => {
+  const [confirmText, setConfirmText] = useState('');
+  const [secondConfirm, setSecondConfirm] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+
+  if (!user) {
+    return (
+      <div className="text-center space-y-4 py-6">
+        <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto">
+          <Lock className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-bold text-stone-900 font-vedic">Authentication Required</h3>
+        <p className="text-xs text-stone-600">
+          For security and compliance, you must be logged into your account to request or execute permanent data deletion.
+        </p>
+        <button
+          type="button"
+          onClick={onOpenLogin}
+          className="w-full py-2.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold cursor-pointer"
+        >
+          Log In Now
+        </button>
+      </div>
+    );
+  }
+
+  if (deleted) {
+    return (
+      <div className="text-center space-y-4 py-6">
+        <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+          <CheckCircle2 className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-bold text-stone-900 font-vedic">Account Permanently Deleted</h3>
+        <p className="text-xs text-stone-600">
+          Your account and associated records have been successfully wiped from Astronava servers.
+        </p>
+        <button
+          type="button"
+          onClick={onBack}
+          className="w-full py-2.5 rounded-xl bg-stone-900 text-white text-xs font-bold cursor-pointer"
+        >
+          Return to Home
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-1">
+        <p className="font-bold">Logged in as: {user.email || user.displayName || 'Authenticated User'}</p>
+        <p className="text-[11px] text-rose-700">This action is irreversible. All birth charts, records, and history will be wiped.</p>
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-xs font-bold text-stone-700 uppercase">
+          Type <strong>DELETE</strong> to confirm:
+        </label>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder="DELETE"
+          className="w-full px-3 py-2 text-xs text-center font-bold tracking-wider rounded-xl border border-rose-300 bg-stone-50"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-xs text-stone-700 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={secondConfirm}
+            onChange={(e) => setSecondConfirm(e.target.checked)}
+            className="rounded text-rose-600 focus:ring-rose-500 w-4 h-4"
+          />
+          <span>I understand that this permanent deletion cannot be undone.</span>
+        </label>
+      </div>
+
+      <div className="pt-2 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex-1 py-2.5 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 hover:bg-stone-50 cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={confirmText !== 'DELETE' || !secondConfirm}
+          onClick={() => setDeleted(true)}
+          className="flex-1 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Permanently Delete
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export const RequestDeletePage: React.FC<RequestDeletePageProps> = ({ onBackToHome, onOpenLogin }) => {
   const { user } = useAuth();
-  const [identifier, setIdentifier] = useState('');
-  const [reason, setReason] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmitRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!identifier.trim()) return;
-    setSubmitted(true);
-  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] py-12 px-4 sm:px-6 flex items-center justify-center">
@@ -29,93 +120,11 @@ export const RequestDeletePage: React.FC<RequestDeletePageProps> = ({ onBackToHo
           </div>
           <h1 className="text-xl font-bold text-stone-900 font-vedic">Account Deletion Request</h1>
           <p className="text-xs text-stone-600">
-            Submit your account deletion request. For security and compliance, <strong>account deletion requires you to be logged into your account</strong> and complete a double confirmation.
+            Secure account closure endpoint. You must be authenticated to execute permanent data removal.
           </p>
         </div>
 
-        {!submitted ? (
-          <form onSubmit={handleSubmitRequest} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
-                Username, Email, or Phone Number *
-              </label>
-              <input
-                type="text"
-                required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="e.g. user@astronava.com or +91..."
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-stone-300 bg-stone-50 focus:ring-1 focus:ring-rose-600 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
-                Reason for Deletion (Optional)
-              </label>
-              <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="Let us know why you are leaving..."
-                rows={3}
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-stone-300 bg-stone-50 focus:ring-1 focus:ring-rose-600 focus:outline-none resize-none"
-              />
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
-              <Lock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-              <span>
-                Note: Submitting this form logs your request for review. To instantly wipe your data, please log in and use the secure delete button in your profile settings.
-              </span>
-            </div>
-
-            <div className="pt-2 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onBackToHome}
-                className="flex-1 py-2.5 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 hover:bg-stone-50 cursor-pointer"
-              >
-                Back to Home
-              </button>
-              <button
-                type="submit"
-                className="flex-1 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold shadow-xs cursor-pointer"
-              >
-                Submit Request
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="text-center space-y-4 py-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-stone-900">Deletion Request Logged</h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                We have received your deletion request for <strong>{identifier}</strong>. To complete permanent data erasure, please sign into your account.
-              </p>
-            </div>
-            <div className="pt-2 flex flex-col gap-2">
-              {!user && (
-                <button
-                  type="button"
-                  onClick={onOpenLogin}
-                  className="w-full py-2.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-white text-xs font-bold cursor-pointer"
-                >
-                  Log In to Confirm Deletion
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={onBackToHome}
-                className="w-full py-2.5 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 hover:bg-stone-50 cursor-pointer"
-              >
-                Return to Astronava
-              </button>
-            </div>
-          </div>
-        )}
+        <DeleteAccountForm user={user} onOpenLogin={onOpenLogin} onBack={onBackToHome} />
 
         {/* Footer Link Info */}
         <div className="text-center pt-2 border-t border-stone-100">

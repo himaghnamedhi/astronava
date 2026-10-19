@@ -1,5 +1,5 @@
 import React from 'react';
-import { HouseNumber, PlanetId } from '../types/astrology';
+import { HouseNumber, PlanetId } from '../types/astrology.ts';
 import { PLANETS_DATA } from '../data/planetsData';
 import { HOUSES_DATA } from '../data/housesData';
 import { RefreshCw, BookOpen, FileDown, CheckCircle2, Compass } from 'lucide-react';

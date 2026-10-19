@@ -1,5 +1,5 @@
 import React from 'react';
-import { HouseNumber, PlanetId } from '../types/astrology';
+import { HouseNumber, PlanetId } from '../types/astrology.ts';
 import { GrahaSpashta, DivisionalChartInfo } from '../data/vedicEphemeris';
 
 interface TraditionalVedicChartSvgProps {

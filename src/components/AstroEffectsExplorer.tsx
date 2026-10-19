@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HouseNumber, PlanetId } from '../types/astrology';
+import { HouseNumber, PlanetId } from '../types/astrology.ts';
 import { CompleteKundliData } from '../data/vedicEphemeris';
 import { BHAVA_EFFECTS_DATA } from '../data/bhavaEffectsData';
 import { TITHIS_DATA, calculateTithiFromDegrees, TithiDetails } from '../data/tithiData';
