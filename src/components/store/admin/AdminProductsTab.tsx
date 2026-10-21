@@ -34,12 +34,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ token, categ
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const effectiveToken = token || 'admin_session:himaghnamedhi1@gmail.com';
-  const adminEmail = 'himaghnamedhi1@gmail.com';
-
   const filterCategories = categories && categories.length > 0 ? categories : (DEFAULT_FILTER_CATEGORIES as Category[]);
 
   const fetchProducts = async () => {
+    if (!token) return;
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -49,8 +47,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ token, categ
 
       const res = await fetch(`/api/admin/products?${params.toString()}`, {
         headers: {
-          Authorization: `Bearer ${effectiveToken}`,
-          'X-Admin-Email': adminEmail,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (res.ok) {
@@ -66,7 +63,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ token, categ
 
   useEffect(() => {
     fetchProducts();
-  }, [categoryFilter, effectiveToken]);
+  }, [categoryFilter, token]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,12 +71,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ token, categ
   };
 
   const handleTogglePublish = async (id: number) => {
+    if (!token) return;
     try {
       const res = await fetch(`/api/admin/products/${id}/toggle-publish`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${effectiveToken}`,
-          'X-Admin-Email': adminEmail,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (res.ok) {
@@ -94,15 +91,14 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ token, categ
   };
 
   const handleDeleteProduct = async (id: number, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+    if (!token || !confirm(`Are you sure you want to delete "${name}"?`)) return;
 
     try {
       setDeletingId(id);
       const res = await fetch(`/api/admin/products/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${effectiveToken}`,
-          'X-Admin-Email': adminEmail,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (res.ok) {

@@ -18,7 +18,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '1mb' }));
 
   // Initialize seed data for the store
   seedStoreIfEmpty().catch((err) => {
@@ -58,11 +58,13 @@ async function startServer() {
   app.post('/api/ai/summarize-kundli', async (req, res) => {
     try {
       const { kundliData, focus, depth } = req.body;
-      if (!kundliData) {
+      if (!kundliData || typeof kundliData !== 'object') {
         return res.status(400).json({ error: 'Kundli data is required' });
       }
 
-      const summary = await generateKundliAiSummary(kundliData, focus, depth);
+      const safeFocus = typeof focus === 'string' ? focus.slice(0, 60) : undefined;
+      const safeDepth = typeof depth === 'string' ? depth.slice(0, 60) : undefined;
+      const summary = await generateKundliAiSummary(kundliData, safeFocus, safeDepth);
       res.json(summary);
     } catch (error: any) {
       console.error('AI Summary generation failed:', error);
@@ -74,11 +76,12 @@ async function startServer() {
   app.post('/api/ai/full-astrology-report', async (req, res) => {
     try {
       const { kundliData, forecastYears } = req.body;
-      if (!kundliData) {
+      if (!kundliData || typeof kundliData !== 'object') {
         return res.status(400).json({ error: 'Kundli data is required' });
       }
 
-      const report = await generateFullAstrologyReportWithAi(kundliData, forecastYears || 3);
+      const boundedYears = Math.min(10, Math.max(1, Number(forecastYears) || 3));
+      const report = await generateFullAstrologyReportWithAi(kundliData, boundedYears);
       res.json(report);
     } catch (error: any) {
       console.error('Full Astrology Report generation failed:', error);
@@ -96,8 +99,12 @@ async function startServer() {
         return res.status(400).json({ error: 'Gemini API key not configured' });
       }
 
+      const safeTargetType = String(targetType || 'planet').slice(0, 30);
+      const safeTargetId = String(targetId || '').slice(0, 50);
+      const safePlacements = JSON.stringify(placements || {}).slice(0, 8000);
+
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `Provide classical Vedic astrology insights for ${targetType} ID "${targetId}" given chart placements: ${JSON.stringify(placements)}. Return JSON with fields: title, subtitle, bulletPoints (array of 3 strings), remedy.`;
+      const prompt = `Provide classical Vedic astrology insights for ${safeTargetType} ID "${safeTargetId}" given chart placements: ${safePlacements}. Return JSON with fields: title, subtitle, bulletPoints (array of 3 strings), remedy.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-3.5-flash',

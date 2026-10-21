@@ -2,8 +2,11 @@ import { Router, Request, Response } from 'express';
 import { generateDailyHoroscope } from '../data/horoscopeEngine.ts';
 import { interpretDailyHoroscopeWithAi } from './geminiHoroscope.ts';
 import { HoroscopeUserProfile, AdminDailyJobLog } from '../types/horoscope.ts';
+import { requireAdmin } from '../middleware/auth.ts';
 
 export const horoscopeRouter = Router();
+
+const MAX_ADMIN_JOB_LOGS = 100;
 
 // In-memory admin telemetry logs
 const ADMIN_JOB_LOGS: AdminDailyJobLog[] = [
@@ -78,16 +81,16 @@ horoscopeRouter.post('/send-notification', (req: Request, res: Response) => {
     const selectedChannels = channel ? [channel] : (userProfile.notificationChannels || ['email']);
 
     const notificationPayload = {
-      recipientName: userProfile.name,
-      recipientEmail: userProfile.email,
-      recipientPhone: userProfile.phone || 'N/A',
+      recipientName: String(userProfile.name || '').slice(0, 100),
+      recipientEmail: String(userProfile.email || '').slice(0, 150),
+      recipientPhone: String(userProfile.phone || 'N/A').slice(0, 30),
       horoscopeDate: horoscope.date,
       overallScore: horoscope.overallScore,
       summary: horoscope.summary,
-      opportunity: horoscope.biggestOpportunity.domain,
-      luckyWindow: horoscope.luckyTime.window,
-      luckyColor: horoscope.luckyColor.name,
-      mantra: horoscope.mantra.phonetic,
+      opportunity: horoscope.biggestOpportunity?.domain,
+      luckyWindow: horoscope.luckyTime?.window,
+      luckyColor: horoscope.luckyColor?.name,
+      mantra: horoscope.mantra?.phonetic,
       dispatchedChannels: selectedChannels,
       timestamp: new Date().toISOString(),
       status: 'Delivered',
@@ -95,7 +98,7 @@ horoscopeRouter.post('/send-notification', (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: `Personalized daily horoscope notification successfully dispatched to ${userProfile.name} via ${selectedChannels.join(', ')}.`,
+      message: `Personalized daily horoscope notification successfully dispatched to ${notificationPayload.recipientName} via ${selectedChannels.join(', ')}.`,
       deliveryDetails: notificationPayload,
     });
   } catch (error: any) {
@@ -105,7 +108,7 @@ horoscopeRouter.post('/send-notification', (req: Request, res: Response) => {
 });
 
 // GET /api/horoscope/admin-metrics
-horoscopeRouter.get('/admin-metrics', (_req: Request, res: Response) => {
+horoscopeRouter.get('/admin-metrics', requireAdmin, (_req: Request, res: Response) => {
   try {
     res.json({
       promptVersions: [
@@ -128,23 +131,26 @@ horoscopeRouter.get('/admin-metrics', (_req: Request, res: Response) => {
 });
 
 // POST /api/horoscope/admin-log-entry
-horoscopeRouter.post('/admin-log-entry', (req: Request, res: Response) => {
+horoscopeRouter.post('/admin-log-entry', requireAdmin, (req: Request, res: Response) => {
   try {
     const { log } = req.body;
-    if (log) {
+    if (log && typeof log === 'object') {
       ADMIN_JOB_LOGS.unshift({
         id: `job-${Date.now()}`,
-        date: log.date || new Date().toISOString().split('T')[0],
+        date: String(log.date || new Date().toISOString().split('T')[0]).slice(0, 10),
         timestamp: new Date().toISOString(),
-        totalUsersChecked: log.totalUsersChecked || 1,
-        processedCount: log.processedCount || 1,
-        cacheHitCount: log.cacheHitCount || 0,
-        fallbackCount: log.fallbackCount || 0,
-        errorCount: log.errorCount || 0,
-        promptVersion: log.promptVersion || 'v1.0-Classical',
-        status: log.status || 'Completed',
-        notes: log.notes || 'Batch execution record.',
+        totalUsersChecked: Number(log.totalUsersChecked) || 1,
+        processedCount: Number(log.processedCount) || 1,
+        cacheHitCount: Number(log.cacheHitCount) || 0,
+        fallbackCount: Number(log.fallbackCount) || 0,
+        errorCount: Number(log.errorCount) || 0,
+        promptVersion: String(log.promptVersion || 'v1.0-Classical').slice(0, 40),
+        status: log.status === 'Failed' ? 'Failed' : 'Completed',
+        notes: String(log.notes || 'Batch execution record.').slice(0, 500),
       });
+      if (ADMIN_JOB_LOGS.length > MAX_ADMIN_JOB_LOGS) {
+        ADMIN_JOB_LOGS.length = MAX_ADMIN_JOB_LOGS;
+      }
     }
     res.json({ success: true, count: ADMIN_JOB_LOGS.length });
   } catch (error: any) {

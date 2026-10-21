@@ -72,6 +72,23 @@ storeRouter.post('/orders', async (req: Request, res: Response) => {
 storeRouter.get('/orders/:orderNumber', async (req: Request, res: Response) => {
   const order = await getOrderByOrderNumber(req.params.orderNumber);
   if (!order) return res.status(404).json({ error: 'Order not found' });
+
+  // Protect customer PII unless caller provides matching customer email
+  const queryEmail = typeof req.query.email === 'string' ? req.query.email.trim().toLowerCase() : '';
+  const isEmailMatched = Boolean(queryEmail && order.customerEmail && order.customerEmail.toLowerCase() === queryEmail);
+
+  if (!isEmailMatched) {
+    const maskedEmail = order.customerEmail
+      ? order.customerEmail.replace(/^(.)(.*)(@.*)$/, (_m, a, b, c) => a + '*'.repeat(Math.min(6, b.length)) + c)
+      : '';
+    return res.json({
+      ...order,
+      customerEmail: maskedEmail,
+      customerPhone: order.customerPhone ? '******' + String(order.customerPhone).slice(-4) : '',
+      shippingAddress: 'Redacted for privacy',
+    });
+  }
+
   res.json(order);
 });
 
@@ -123,8 +140,31 @@ storeRouter.put('/inventory', requireSeller, async (req: Request, res: Response)
 });
 
 // Admin endpoints
+adminRouter.get('/check', requireAdmin, (req: AuthRequest, res: Response) => {
+  res.json({ ok: true, email: req.user?.email });
+});
+
 adminRouter.get('/metrics', requireAdmin, async (_req: AuthRequest, res: Response) => {
   res.json(await getAdminMetrics());
+});
+
+adminRouter.get('/products/pending', requireAdmin, async (_req: AuthRequest, res: Response) => {
+  try {
+    const products = await getPendingProducts();
+    res.json(products);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+adminRouter.patch('/products/:id/status', requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const status = req.body.status === 'approved' ? 'approved' : 'rejected';
+    const updated = await updateProductStatus(Number(req.params.id), status);
+    res.json(updated);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 adminRouter.get('/products', requireAdmin, async (req: AuthRequest, res: Response) => {
@@ -134,14 +174,16 @@ adminRouter.get('/products', requireAdmin, async (req: AuthRequest, res: Respons
     categorySlug: categorySlug as string,
     page: page ? Number(page) : 1,
     limit: limit ? Number(limit) : 25,
-    includeDrafts: includeDrafts === 'true',
+    includeDrafts: includeDrafts !== 'false',
   });
   res.json(products);
 });
 
 adminRouter.post('/products', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const { productData, imagesData, variationsData } = req.body;
+    const productData = req.body.productData || req.body.product;
+    const imagesData = req.body.imagesData || req.body.images;
+    const variationsData = req.body.variationsData || req.body.variations;
     const created = await createProduct(productData, imagesData, variationsData);
     res.status(201).json(created);
   } catch (error: any) {
@@ -151,7 +193,9 @@ adminRouter.post('/products', requireAdmin, async (req: AuthRequest, res: Respon
 
 adminRouter.put('/products/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const { productData, imagesData, variationsData } = req.body;
+    const productData = req.body.productData || req.body.product;
+    const imagesData = req.body.imagesData || req.body.images;
+    const variationsData = req.body.variationsData || req.body.variations;
     const updated = await updateProduct(Number(req.params.id), productData, imagesData, variationsData);
     res.json(updated);
   } catch (error: any) {

@@ -355,6 +355,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTab }) => {
               {/* Card Footer / Primary CTA - Clean whitespace without line clutter */}
               <div className="pt-4 sm:pt-6 mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 min-w-0 w-full">
                 <button
+                  type="button"
                   id={`btn-open-${item.id}`}
                   onClick={() => onSelectTab(item.id)}
                   className={`w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r ${item.accentGradient} hover:opacity-95 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xs transition-all duration-300 sm:hover:scale-[1.02] active:scale-95 cursor-pointer`}

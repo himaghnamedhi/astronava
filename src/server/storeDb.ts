@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { desc, asc, eq, and, or, sql, like, inArray, gte, lte, isNull } from 'drizzle-orm';
 import { db } from '../db/index.ts';
 import {
@@ -700,23 +701,34 @@ export async function updateProduct(
     }
   }
 
-  const updateFields: any = {
-    ...productData,
+  const updateFields: Record<string, any> = {
     updatedAt: new Date(),
   };
 
-  if (targetCategoryId) {
-    updateFields.categoryId = targetCategoryId;
-  }
-  if (productData.price) {
-    updateFields.price = String(productData.price).trim();
-  }
+  if (productData.name !== undefined) updateFields.name = String(productData.name).trim();
+  if (productData.slug !== undefined) updateFields.slug = String(productData.slug).trim();
+  if (targetCategoryId) updateFields.categoryId = targetCategoryId;
+  if (productData.brand !== undefined) updateFields.brand = String(productData.brand).trim();
+  if (productData.shortDescription !== undefined) updateFields.shortDescription = String(productData.shortDescription).trim();
+  if (productData.fullDescription !== undefined) updateFields.fullDescription = String(productData.fullDescription).trim();
+  if (productData.price !== undefined) updateFields.price = String(productData.price).trim();
   if (productData.salePrice !== undefined) {
     updateFields.salePrice = productData.salePrice ? String(productData.salePrice).trim() : null;
   }
-  if (productData.stock !== undefined) {
-    updateFields.stock = Number(productData.stock) || 0;
-  }
+  if (productData.sku !== undefined) updateFields.sku = String(productData.sku).trim();
+  if (productData.stock !== undefined) updateFields.stock = Math.max(0, Number(productData.stock) || 0);
+  if (productData.weight !== undefined) updateFields.weight = productData.weight ? String(productData.weight).trim() : null;
+  if (productData.tags !== undefined) updateFields.tags = productData.tags ? String(productData.tags).trim() : null;
+  if (productData.planet !== undefined) updateFields.planet = productData.planet ? String(productData.planet).trim() : null;
+  if (productData.zodiac !== undefined) updateFields.zodiac = productData.zodiac ? String(productData.zodiac).trim() : null;
+  if (productData.certification !== undefined) updateFields.certification = productData.certification ? String(productData.certification).trim() : null;
+  if (productData.benefits !== undefined) updateFields.benefits = productData.benefits ? String(productData.benefits).trim() : null;
+  if (productData.specifications !== undefined) updateFields.specifications = productData.specifications ? String(productData.specifications).trim() : null;
+  if (productData.careInstructions !== undefined) updateFields.careInstructions = productData.careInstructions ? String(productData.careInstructions).trim() : null;
+  if (productData.isFeatured !== undefined) updateFields.isFeatured = Boolean(productData.isFeatured);
+  if (productData.isBestSeller !== undefined) updateFields.isBestSeller = Boolean(productData.isBestSeller);
+  if (productData.isNewArrival !== undefined) updateFields.isNewArrival = Boolean(productData.isNewArrival);
+  if (productData.isPublished !== undefined) updateFields.isPublished = Boolean(productData.isPublished);
 
   const [updated] = await db
     .update(products)
@@ -972,40 +984,116 @@ export interface CreateOrderPayload {
 }
 
 export async function createOrder(payload: CreateOrderPayload) {
-  if (!payload.items || payload.items.length === 0) {
-    throw new Error('Order must contain at least one item');
+  if (!payload.items || !Array.isArray(payload.items) || payload.items.length === 0 || payload.items.length > 50) {
+    throw new Error('Order must contain between 1 and 50 items');
   }
 
-  // 1. Insert or reuse customer
-  const custData = payload.customer as any;
-  const pinCode = custData.pinCode || custData.pincode || custData.pin_code || custData.postalCode || '000000';
+  // 1. Validate items and resolve authoritative server-side prices & stock
+  const verifiedItems: Array<{
+    productId: number;
+    variationId: number | null;
+    productName: string;
+    variantName: string | null;
+    sku: string;
+    price: string;
+    unitPriceNum: number;
+    quantity: number;
+    imageUrl: string | null;
+  }> = [];
+
+  let subtotal = 0;
+
+  for (const rawItem of payload.items as any[]) {
+    const productId = Number(rawItem.productId);
+    const variationId = rawItem.variationId ? Number(rawItem.variationId) : null;
+    const quantity = Number(rawItem.quantity);
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+      throw new Error('Invalid product ID in order');
+    }
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+      throw new Error('Item quantity must be an integer between 1 and 100');
+    }
+
+    const dbProdList = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1);
+
+    if (dbProdList.length === 0) {
+      throw new Error(`Product #${productId} no longer exists`);
+    }
+    const dbProd = dbProdList[0];
+
+    let unitPriceNum = Number(dbProd.salePrice || dbProd.price);
+    let resolvedSku = dbProd.sku;
+    let resolvedVariantName: string | null = rawItem.variantName ? String(rawItem.variantName).slice(0, 120) : null;
+
+    if (variationId) {
+      const dbVarList = await db
+        .select()
+        .from(productVariations)
+        .where(and(eq(productVariations.id, variationId), eq(productVariations.productId, productId)))
+        .limit(1);
+
+      if (dbVarList.length === 0) {
+        throw new Error(`Selected variation for ${dbProd.name} is invalid`);
+      }
+      const dbVar = dbVarList[0];
+      if (dbVar.stock < quantity) {
+        throw new Error(`Insufficient stock for ${dbProd.name} (${dbVar.variationValue})`);
+      }
+      unitPriceNum = Number(dbVar.salePrice || dbVar.price || unitPriceNum);
+      resolvedSku = dbVar.sku || resolvedSku;
+      resolvedVariantName = `${dbVar.variationType}: ${dbVar.variationValue}`;
+    } else if (dbProd.stock < quantity) {
+      throw new Error(`Insufficient stock for ${dbProd.name}`);
+    }
+
+    if (!Number.isFinite(unitPriceNum) || unitPriceNum < 0) {
+      throw new Error(`Invalid catalog price for ${dbProd.name}`);
+    }
+
+    subtotal += unitPriceNum * quantity;
+
+    verifiedItems.push({
+      productId,
+      variationId,
+      productName: dbProd.name,
+      variantName: resolvedVariantName,
+      sku: resolvedSku,
+      price: unitPriceNum.toFixed(2),
+      unitPriceNum,
+      quantity,
+      imageUrl: rawItem.imageUrl ? String(rawItem.imageUrl).slice(0, 500) : null,
+    });
+  }
+
+  // 2. Insert customer record with sanitized fields
+  const custData = (payload.customer || {}) as any;
+  const pinCode = String(custData.pinCode || custData.pincode || custData.pin_code || custData.postalCode || '000000').slice(0, 20);
   const [cust] = await db
     .insert(customers)
     .values({
-      uid: custData.uid || null,
-      name: custData.name,
-      email: custData.email,
-      phone: custData.phone,
-      address: custData.address,
-      city: custData.city,
-      state: custData.state,
+      uid: custData.uid ? String(custData.uid).slice(0, 128) : null,
+      name: String(custData.name || 'Customer').slice(0, 120),
+      email: String(custData.email || '').slice(0, 150),
+      phone: String(custData.phone || '').slice(0, 30),
+      address: String(custData.address || '').slice(0, 300),
+      city: String(custData.city || '').slice(0, 100),
+      state: String(custData.state || '').slice(0, 100),
       pinCode,
     })
     .returning();
 
-  // 2. Compute subtotal
-  let subtotal = 0;
-  for (const item of payload.items) {
-    subtotal += Number(item.price) * item.quantity;
-  }
-
   // 3. Check Coupon
   let discountAmount = 0;
-  if (payload.couponCode) {
+  if (payload.couponCode && typeof payload.couponCode === 'string') {
     const couponList = await db
       .select()
       .from(coupons)
-      .where(and(eq(coupons.code, payload.couponCode.toUpperCase()), eq(coupons.isActive, true)))
+      .where(and(eq(coupons.code, payload.couponCode.trim().toUpperCase()), eq(coupons.isActive, true)))
       .limit(1);
 
     if (couponList.length > 0) {
@@ -1020,7 +1108,7 @@ export async function createOrder(payload: CreateOrderPayload) {
         } else {
           discountAmount = Number(c.discountValue);
         }
-        discountAmount = Math.min(discountAmount, subtotal);
+        discountAmount = Math.max(0, Math.min(discountAmount, subtotal));
 
         // increment coupon usage
         await db
@@ -1034,8 +1122,8 @@ export async function createOrder(payload: CreateOrderPayload) {
   const shippingAmount = subtotal > 1999 ? 0 : 99; // Free shipping over ₹1999
   const totalAmount = Math.max(0, subtotal - discountAmount + shippingAmount);
 
-  // Generate unique order number
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  // Generate cryptographically random unguessable order number
+  const randomSuffix = crypto.randomBytes(4).toString('hex').toUpperCase();
   const orderNumber = `ASTRO-${new Date().getFullYear()}-${randomSuffix}`;
 
   // 4. Create Order
@@ -1055,48 +1143,43 @@ export async function createOrder(payload: CreateOrderPayload) {
       discountAmount: discountAmount.toFixed(2),
       shippingAmount: shippingAmount.toFixed(2),
       totalAmount: totalAmount.toFixed(2),
-      couponCode: payload.couponCode || null,
+      couponCode: payload.couponCode ? String(payload.couponCode).slice(0, 40) : null,
       paymentStatus: 'Confirmed (Demo Pay)',
       paymentMethod: 'Vedic Sanctified Gateway (Demo)',
       orderStatus: 'Confirmed',
-      notes: payload.notes || null,
+      notes: payload.notes ? String(payload.notes).slice(0, 500) : null,
     })
     .returning();
 
   // 5. Insert Order Items and decrement stock
-  for (const item of payload.items) {
-    const rawItem = item as any;
-    const productName = rawItem.productName || rawItem.name || 'Sacred Item';
-    const sku = rawItem.sku || rawItem.productSku || 'SKU-001';
-    const price = String(rawItem.price || '0.00');
-
+  for (const vItem of verifiedItems) {
     await db.insert(orderItems).values({
       orderId: createdOrder.id,
-      productId: rawItem.productId,
-      variationId: rawItem.variationId || null,
-      productName,
-      variantName: rawItem.variantName || null,
-      sku,
-      price,
-      quantity: rawItem.quantity,
-      imageUrl: rawItem.imageUrl || null,
+      productId: vItem.productId,
+      variationId: vItem.variationId,
+      productName: vItem.productName,
+      variantName: vItem.variantName,
+      sku: vItem.sku,
+      price: vItem.price,
+      quantity: vItem.quantity,
+      imageUrl: vItem.imageUrl,
     });
 
     // Deduct stock in products and inventory
     await db
       .update(products)
       .set({
-        stock: sql`GREATEST(0, ${products.stock} - ${item.quantity})`,
+        stock: sql`GREATEST(0, ${products.stock} - ${vItem.quantity})`,
       })
-      .where(eq(products.id, item.productId));
+      .where(eq(products.id, vItem.productId));
 
-    if (item.variationId) {
+    if (vItem.variationId) {
       await db
         .update(productVariations)
         .set({
-          stock: sql`GREATEST(0, ${productVariations.stock} - ${item.quantity})`,
+          stock: sql`GREATEST(0, ${productVariations.stock} - ${vItem.quantity})`,
         })
-        .where(eq(productVariations.id, item.variationId));
+        .where(eq(productVariations.id, vItem.variationId));
     }
   }
 

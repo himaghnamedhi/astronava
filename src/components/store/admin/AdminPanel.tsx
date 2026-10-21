@@ -41,11 +41,9 @@ export const AdminPanel: React.FC = () => {
   const userEmail = user?.email?.toLowerCase().trim();
   const isAllowlistedAdmin = Boolean(userEmail && ADMIN_EMAILS.includes(userEmail));
 
-  const [token, setToken] = useState<string | null>(() => {
-    return isAllowlistedAdmin ? `admin_session:${userEmail}` : null;
-  });
+  const [token, setToken] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(isAllowlistedAdmin);
-  const [checkingAuth, setCheckingAuth] = useState<boolean>(false);
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo' | 'users'>('dashboard');
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
@@ -81,7 +79,7 @@ export const AdminPanel: React.FC = () => {
       const email = user?.email?.toLowerCase().trim();
       const isAllowed = Boolean(email && ADMIN_EMAILS.includes(email));
 
-      if (!user || !isAllowed) {
+      if (!user || !isAllowed || !auth.currentUser) {
         if (!isCancelled) {
           setIsAdmin(false);
           setToken(null);
@@ -90,35 +88,25 @@ export const AdminPanel: React.FC = () => {
         return;
       }
 
-      // User has authorized admin email
-      if (!isCancelled) {
-        setIsAdmin(true);
-      }
-
       try {
-        let idToken: string | null = null;
-        if (auth.currentUser) {
-          try {
-            idToken = await auth.currentUser.getIdToken(false);
-          } catch (e) {
-            console.warn('Could not retrieve Firebase ID token, using session token fallback:', e);
-          }
-        }
-
-        const effectiveToken = idToken || `admin_session:${email}`;
+        const idToken = await auth.currentUser.getIdToken(false);
         if (!isCancelled) {
-          setToken(effectiveToken);
+          setIsAdmin(true);
+          setToken(idToken);
         }
 
         // Verify backend status
         await fetch('/api/admin/check', {
           headers: {
-            Authorization: `Bearer ${effectiveToken}`,
-            'X-Admin-Email': email,
+            Authorization: `Bearer ${idToken}`,
           },
         });
       } catch (err: any) {
         console.warn('verifyAdmin background check caught:', err);
+        if (!isCancelled) {
+          setIsAdmin(false);
+          setToken(null);
+        }
       } finally {
         if (!isCancelled) setCheckingAuth(false);
       }
@@ -133,14 +121,12 @@ export const AdminPanel: React.FC = () => {
 
   // Load dashboard metrics when authorized
   const loadMetrics = async () => {
-    const effectiveToken = token || (user?.email ? `admin_session:${user.email.toLowerCase().trim()}` : null);
-    if (!effectiveToken || !isAdmin) return;
+    if (!token || !isAdmin) return;
     try {
       setLoadingMetrics(true);
       const res = await fetch('/api/admin/metrics', {
         headers: {
-          Authorization: `Bearer ${effectiveToken}`,
-          'X-Admin-Email': user?.email?.toLowerCase().trim() || '',
+          Authorization: `Bearer ${token}`,
         },
       });
       if (res.ok) {

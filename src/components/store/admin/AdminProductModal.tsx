@@ -336,15 +336,15 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
         })),
       };
 
-      const effectiveToken = token || 'admin_session:himaghnamedhi1@gmail.com';
-      const adminEmail = 'himaghnamedhi1@gmail.com';
+      if (!token) {
+        throw new Error('Authentication required: Missing administrator token.');
+      }
 
       const res = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${effectiveToken}`,
-          'X-Admin-Email': adminEmail,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });

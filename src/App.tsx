@@ -277,19 +277,23 @@ export default function App() {
       setActiveTab('legal');
       return true;
     }
+    if (cleanPath === '/horoscope' || cleanPath === '/daily-horoscope' || cleanPath === '/today-horoscope' || cleanPath === 'horoscope' || cleanPath === 'daily-horoscope' || cleanPath === 'today-horoscope') {
+      setActiveTab('horoscope');
+      return true;
+    }
     if (cleanPath === '/builder' || cleanPath === 'builder') {
       setActiveTab('builder');
       return true;
     }
-    if (cleanPath === '/gemstones' || cleanPath === 'gemstones') {
+    if (cleanPath === '/gemstones' || cleanPath === '/ratna' || cleanPath === '/gemstone-calculator' || cleanPath === 'gemstones' || cleanPath === 'ratna' || cleanPath === 'gemstone-calculator') {
       setActiveTab('gemstones');
       return true;
     }
-    if (cleanPath === '/match' || cleanPath === 'match') {
+    if (cleanPath === '/match' || cleanPath === '/kundli-milan' || cleanPath === '/compatibility' || cleanPath === 'match' || cleanPath === 'kundli-milan' || cleanPath === 'compatibility') {
       setActiveTab('match');
       return true;
     }
-    if (cleanPath === '/numerology' || cleanPath === 'numerology') {
+    if (cleanPath === '/numerology' || cleanPath === '/mulank' || cleanPath === '/bhagyank' || cleanPath === 'numerology' || cleanPath === 'mulank' || cleanPath === 'bhagyank') {
       setActiveTab('numerology');
       return true;
     }
@@ -321,53 +325,12 @@ export default function App() {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
-      const search = window.location.search;
       const hash = window.location.hash;
 
-      if (hostname === 'astronava.com' || hostname === 'www.astronava.com') {
+      if (hostname.startsWith('shop.') || hostname.includes('shop.astronava.com')) {
         const cleanPath = pathname.toLowerCase().replace(/\/$/, '') || '/';
-        const isStorePath = cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/cart' || cleanPath === '/checkout';
-        const isAdminPath = cleanPath === '/admin' || cleanPath === '/store/admin';
-        const isLocalPath = 
-          cleanPath === '' || 
-          cleanPath === '/' || 
-          cleanPath === '/home' || 
-          cleanPath === '/privacy-policy' || 
-          cleanPath === '/privacy' || 
-          cleanPath === '/terms-and-conditions' || 
-          cleanPath === '/terms' || 
-          cleanPath === '/disclaimer' || 
-          cleanPath === '/contact' || 
-          cleanPath === '/contact-us' || 
-          cleanPath === '/sitemap' || 
-          cleanPath === '/sitemap.html' ||
-          isAdminPath;
-        
-        if (isStorePath) {
-          window.location.href = `https://shop.astronava.com/#${pathname}${search}${hash}`;
-          return;
-        }
-        if (!isLocalPath) {
-          window.location.href = `https://app.astronava.com/#${pathname}${search}${hash}`;
-          return;
-        }
-      } else if (hostname.startsWith('shop.') || hostname.includes('shop.astronava.com')) {
-        const cleanPath = pathname.toLowerCase().replace(/\/$/, '') || '/';
-        if (cleanPath === '/admin' || cleanPath === '/store/admin') {
-          window.location.href = `https://astronava.com/admin`;
-          return;
-        }
-        if (pathname && pathname !== '/' && !hash) {
-          window.location.replace(`/#${pathname}${search}`);
-          return;
-        }
         if (!hash && (cleanPath === '' || cleanPath === '/')) {
           setActiveTab('store');
-        }
-      } else if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-')) {
-        if (pathname && pathname !== '/' && !hash) {
-          window.location.replace(`/#${pathname}${search}`);
-          return;
         }
       }
     }
@@ -441,7 +404,7 @@ export default function App() {
       if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-') || hostname === 'localhost') {
         const newHash = `#${route.path}`;
         if (window.location.hash !== newHash) {
-          window.location.hash = newHash;
+          window.history.pushState(null, '', newHash);
         }
       } else {
         if (window.location.pathname !== route.path) {
@@ -450,62 +413,33 @@ export default function App() {
       }
     }
     updateTabMetaTags('legal', doc);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
 
   const handleTabChange = (tab: AppTabType) => {
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      const appServices: AppTabType[] = ['generator', 'horoscope', 'match', 'gemstones', 'numerology', 'name-correction', 'profile'];
-      
-      if (hostname === 'astronava.com' || hostname === 'www.astronava.com') {
-        if (tab === 'store') {
-          const route = findRouteByTab(tab, selectedLegalDoc);
-          window.location.href = `https://shop.astronava.com/#${route.path}`;
-          return;
-        }
-        if (appServices.includes(tab)) {
-          const route = findRouteByTab(tab, selectedLegalDoc);
-          window.location.href = `https://app.astronava.com/#${route.path}`;
-          return;
-        }
-      }
-
-      if (hostname.startsWith('shop.') || hostname.includes('shop.astronava.com')) {
-        if (tab !== 'store') {
-          const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
-          if (appServices.includes(tab)) {
-            window.location.href = `https://app.astronava.com/#${route.path}`;
-          } else {
-            window.location.href = `https://astronava.com${route.path}`;
-          }
-          return;
-        }
-      }
-
-      if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-') || hostname === 'localhost') {
-        setActiveTab(tab);
-        const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
-        const newHash = `#${route.path}`;
-        if (window.location.hash !== newHash) {
-          window.location.hash = newHash;
-        }
-        updateTabMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
-        return;
-      }
-    }
-
     setActiveTab(tab);
     const route = findRouteByTab(tab, tab === 'legal' ? selectedLegalDoc : undefined);
-    if (window.location.pathname !== route.path) {
-      window.history.pushState(null, '', route.path);
+
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname.startsWith('app.') || hostname.includes('app.astronava.com') || hostname.includes('ais-') || hostname === 'localhost') {
+        const newHash = `#${route.path}`;
+        if (window.location.hash !== newHash) {
+          window.history.pushState(null, '', newHash);
+        }
+      } else {
+        if (window.location.pathname !== route.path) {
+          window.history.pushState(null, '', route.path);
+        }
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
+
     updateTabMetaTags(tab, tab === 'legal' ? selectedLegalDoc : undefined);
   };
 
   const handleReturnHome = () => {
     handleTabChange('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenReport = (type: 'kundli' | 'match' | 'gemstone' = 'kundli', data?: any) => {
@@ -598,12 +532,7 @@ export default function App() {
         {/* Dynamic Content Views based on activeTab */}
         <Suspense fallback={<LoadingFallback />}>
           {activeTab === 'home' && (
-            <HomePage
-              onSelectTab={(tab) => {
-                handleTabChange(tab);
-                scrollToTop();
-              }}
-            />
+            <HomePage onSelectTab={handleTabChange} />
           )}
 
           {activeTab === 'horoscope' && <HoroscopeDashboard />}

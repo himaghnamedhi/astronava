@@ -45,10 +45,31 @@ userRouter.post('/birth-details', verifyFirebaseToken, async (req: Authenticated
       return res.status(401).json({ error: 'Unauthorized user ID' });
     }
 
-    const birthDetails = req.body;
-    if (!birthDetails || !birthDetails.dob || !birthDetails.tob) {
+    const raw = req.body;
+    if (!raw || typeof raw !== 'object' || typeof raw.dob !== 'string' || typeof raw.tob !== 'string') {
       return res.status(400).json({ error: 'Valid birth details (dob, tob, latitude, longitude) required' });
     }
+
+    const lat = Number(raw.latitude);
+    const lon = Number(raw.longitude);
+    const tz = Number(raw.timezoneOffset ?? 5.5);
+
+    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) {
+      return res.status(400).json({ error: 'Latitude and longitude must be valid geographic coordinates' });
+    }
+
+    const birthDetails = {
+      name: String(raw.name || 'Native').slice(0, 100),
+      dob: String(raw.dob).slice(0, 10),
+      tob: String(raw.tob).slice(0, 10),
+      birthPlace: String(raw.birthPlace || raw.city || '').slice(0, 150),
+      city: String(raw.city || raw.birthPlace || '').slice(0, 150),
+      latitude: lat,
+      longitude: lon,
+      timezoneOffset: Number.isFinite(tz) && tz >= -14 && tz <= 14 ? tz : 5.5,
+      gender: raw.gender === 'female' || raw.gender === 'other' ? raw.gender : 'male',
+      isTobUnknown: Boolean(raw.isTobUnknown),
+    };
 
     const userDocRef = db.collection('users').doc(uid);
     await userDocRef.set(
@@ -59,7 +80,7 @@ userRouter.post('/birth-details', verifyFirebaseToken, async (req: Authenticated
       { merge: true }
     );
 
-    const kundliData = generateCompleteKundli(birthDetails);
+    const kundliData = generateCompleteKundli(birthDetails as any);
     res.json({ success: true, message: 'Birth details saved successfully', birthDetails, kundliData });
   } catch (error: any) {
     console.error('Failed to save user birth details via API:', error);

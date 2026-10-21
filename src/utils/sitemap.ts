@@ -141,6 +141,28 @@ export const APP_ROUTES: AppViewRoute[] = [
     lastmod: '2026-09-14',
   },
   {
+    id: 'gemstone-recommender',
+    tab: 'gemstones',
+    path: '/gemstones',
+    aliases: ['/ratna', '/gemstone-calculator'],
+    title: 'Vedic Gemstone Recommender & Ratna Calculator | astronava.com',
+    shortTitle: 'Gemstone Recommender',
+    description: 'Discover your auspicious Life Stone (Jeevan Ratna), Lucky Stone (Bhagya Ratna), and Dharma Stone with body-weight calibrated Ratti dosages, metals, and Vedic mantras.',
+    keywords: [
+      'gemstone recommender',
+      'vedic ratna calculator',
+      'life stone calculator',
+      'lucky gemstone by birth chart',
+      'pukhraj neelam ruby emerald',
+      'ratti dosage calculator'
+    ],
+    ogType: 'website',
+    priority: 0.9,
+    changefreq: 'weekly',
+    category: 'Astrological Tools',
+    lastmod: '2026-09-14',
+  },
+  {
     id: 'account-dashboard',
     tab: 'account',
     path: '/account',
