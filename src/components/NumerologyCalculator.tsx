@@ -222,34 +222,12 @@ Calculated via Astronava (www.astronava.com)`;
         {/* Header Row: Title, Subtitle, Quick Actions & Presets */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-stone-100">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase tracking-wider">
-                {activeSection === 'name' ? 'Naam Shastra' : 'Ank Jyotish'}
-              </span>
-              {activeSection === 'name' && (
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-900 text-[11px] font-semibold border border-indigo-200">
-                  Chaldean &amp; Pythagorean Name Tuning
-                </span>
-              )}
-            </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold font-vedic text-stone-900 tracking-tight mt-1">
+            <h1 className="text-xl sm:text-2xl font-extrabold font-vedic text-stone-900 tracking-tight">
               {activeSection === 'name' ? 'Vedic Name Numerology & Correction' : 'Numerology Calculator'}
             </h1>
           </div>
 
           <div className="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 sm:gap-2 print:hidden">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              {PRESET_PROFILES.map((p) => (
-                <button
-                  key={p.label}
-                  onClick={() => applyPreset(p)}
-                  className="px-2 sm:px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100/70 hover:text-amber-950 text-stone-700 text-xs font-medium border border-stone-200/80 transition-colors shrink-0"
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div className="h-4 w-px bg-stone-200 mx-1 hidden sm:block" />
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleCopySummary}

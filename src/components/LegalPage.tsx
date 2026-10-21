@@ -1,10 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, Copy, Check, Link2 } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw } from 'lucide-react';
 import {
   LegalDocType,
   DISCLAIMER_CONTENT,
   TERMS_AND_CONDITIONS_CONTENT,
   PRIVACY_POLICY_CONTENT,
+  RETURN_AND_REFUND_POLICY_CONTENT,
   CONTACT_INFO,
 } from '../data/legalPolicies';
 
@@ -20,27 +21,6 @@ export const LegalPage: React.FC<LegalPageProps> = ({
   onBack,
 }) => {
   const tabsRef = useRef<HTMLDivElement>(null);
-  const [copiedUrl, setCopiedUrl] = useState(false);
-
-  const getDocPath = (type: LegalDocType): string => {
-    switch (type) {
-      case 'privacy':
-        return '/privacy-policy';
-      case 'terms':
-        return '/terms-and-conditions';
-      case 'disclaimer':
-        return '/disclaimer';
-      case 'contact':
-        return '/contact';
-    }
-  };
-
-  const handleCopyUrl = () => {
-    const fullUrl = `https://www.astronava.com${getDocPath(activeDoc)}`;
-    navigator.clipboard.writeText(fullUrl);
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
-  };
 
   // Smoothly center the active tab when clicked or selected
   useEffect(() => {
@@ -75,6 +55,8 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         return TERMS_AND_CONDITIONS_CONTENT;
       case 'privacy':
         return PRIVACY_POLICY_CONTENT;
+      case 'return-refund':
+        return RETURN_AND_REFUND_POLICY_CONTENT;
       case 'contact':
         return '';
     }
@@ -230,12 +212,13 @@ export const LegalPage: React.FC<LegalPageProps> = ({
       <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
         
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-stone-200 bg-stone-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 sm:p-6 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 border border-amber-200 shrink-0">
               {activeDoc === 'privacy' && <Shield className="w-5 h-5" />}
               {activeDoc === 'terms' && <FileText className="w-5 h-5" />}
               {activeDoc === 'disclaimer' && <AlertCircle className="w-5 h-5" />}
+              {activeDoc === 'return-refund' && <RotateCcw className="w-5 h-5" />}
               {activeDoc === 'contact' && <Mail className="w-5 h-5" />}
             </div>
             <div>
@@ -243,38 +226,13 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 {activeDoc === 'privacy' && 'Privacy Policy'}
                 {activeDoc === 'terms' && 'Terms & Conditions'}
                 {activeDoc === 'disclaimer' && 'Disclaimer'}
+                {activeDoc === 'return-refund' && 'Return, Refund & Shipping Policy'}
                 {activeDoc === 'contact' && 'Contact Us'}
               </h1>
               <p className="text-xs text-stone-500">
                 Astronava Official Legal Policies &bull; Effective September 2026
               </p>
             </div>
-          </div>
-
-          {/* Canonical Public URL Badge & 1-Click Copy for Google Cloud/OAuth/Firebase */}
-          <div className="flex items-center gap-2 bg-white/95 border border-stone-200 px-3 py-1.5 rounded-xl shadow-2xs text-xs self-start sm:self-auto">
-            <Link2 className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-            <span className="font-mono text-stone-700 text-[11px] sm:text-xs select-all">
-              astronava.com{getDocPath(activeDoc)}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopyUrl}
-              className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 font-semibold transition-colors cursor-pointer text-[10.5px]"
-              title="Copy public URL"
-            >
-              {copiedUrl ? (
-                <>
-                  <Check className="w-3 h-3 text-emerald-600" />
-                  <span className="text-emerald-700">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3 h-3 text-stone-500" />
-                  <span>Copy URL</span>
-                </>
-              )}
-            </button>
           </div>
         </div>
 
@@ -321,6 +279,18 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <span>Disclaimer</span>
           </button>
           <button
+            id="page-tab-return-refund"
+            onClick={() => onSelectDoc('return-refund')}
+            className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              activeDoc === 'return-refund'
+                ? 'border-amber-600 text-amber-900 bg-white shadow-2xs font-bold'
+                : 'border-transparent text-stone-600 hover:text-stone-900 hover:bg-stone-200/50'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Return &amp; Refund Policy</span>
+          </button>
+          <button
             id="page-tab-contact"
             onClick={() => onSelectDoc('contact')}
             className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0 ${
@@ -352,11 +322,11 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
-                {/* Email Card */}
+                {/* General Email Card */}
                 <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Mail className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Direct Email</span>
+                    <span className="text-xs font-bold uppercase tracking-wider">General Inquiries</span>
                   </div>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
@@ -364,10 +334,30 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   >
                     {CONTACT_INFO.email}
                   </a>
+                  <p className="text-[11px] text-stone-500">
+                    General, Legal &amp; Astrological Tools
+                  </p>
+                </div>
+
+                {/* Customer Support & Returns Email Card */}
+                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-800">
+                    <RotateCcw className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Orders, Returns &amp; Refunds</span>
+                  </div>
+                  <a
+                    href={`mailto:${CONTACT_INFO.supportEmail}`}
+                    className="text-stone-900 font-semibold text-sm hover:text-amber-800 transition-colors block break-all"
+                  >
+                    {CONTACT_INFO.supportEmail}
+                  </a>
+                  <p className="text-[11px] text-stone-500">
+                    Store Support, Shipping &amp; Refund Desk
+                  </p>
                 </div>
 
                 {/* Website Card */}
-                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
+                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2 sm:col-span-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Sparkles className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">Official Website</span>
@@ -421,18 +411,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         </div>
 
         {/* Footer actions */}
-        <div className="p-4 border-t border-stone-200 bg-stone-50 flex items-center justify-between text-xs text-stone-500">
-          <button 
-            className="cursor-pointer select-none px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-stone-600 hover:text-stone-900 border border-transparent hover:border-stone-300 transition-all font-medium text-xs"
-            onClick={() => {
-                const count = (parseInt(sessionStorage.getItem('click_count') || '0') + 1);
-                sessionStorage.setItem('click_count', count.toString());
-                if (count >= 7) {
-                    sessionStorage.setItem('click_count', '0');
-                    window.location.href = 'https://ais-dev-zxttfjvhxjhlskfajqp3e3-747336900579.asia-southeast1.run.app';
-                }
-            }}
-          >Astronava &bull; Vedic Astrology Platform</button>
+        <div className="p-4 border-t border-stone-200 bg-stone-50 flex items-center justify-end text-xs text-stone-500">
           <button
             onClick={onBack}
             className="px-4 py-1.5 rounded-lg bg-stone-900 text-white hover:bg-stone-800 font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"

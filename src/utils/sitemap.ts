@@ -5,7 +5,7 @@
  */
 
 export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'account' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
-export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'contact';
+export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'return-refund' | 'contact';
 
 export interface AppViewRoute {
   id: string;
@@ -335,6 +335,22 @@ export const APP_ROUTES: AppViewRoute[] = [
     lastmod: '2026-09-14',
   },
   {
+    id: 'return-refund-policy',
+    tab: 'legal',
+    legalDoc: 'return-refund',
+    path: '/return-refund-policy',
+    aliases: ['/return-policy', '/refund-policy', '/shipping-policy', '/legal/return-refund'],
+    title: 'Return, Refund & Shipping Policy | astronava.com',
+    shortTitle: 'Return, Refund & Shipping Policy',
+    description: 'Official Return, Refund, and Shipping Policy for the Astronava Sacred Store. Learn about our 7-day return eligibility, refund timelines across UPI/Cards/Net Banking, Pan-India & international shipping, and customer support at customer-support@astronava.com.',
+    keywords: ['return policy', 'refund policy', 'shipping policy', 'astronava store returns', 'customer-support@astronava.com'],
+    ogType: 'article',
+    priority: 0.6,
+    changefreq: 'monthly',
+    category: 'Policies & Legal',
+    lastmod: '2026-09-25',
+  },
+  {
     id: 'contact',
     tab: 'legal',
     legalDoc: 'contact',
@@ -600,6 +616,8 @@ export function getTabSeoSuffix(tab: AppTabType, legalDoc?: LegalDocType): strin
           return 'Terms & Conditions | astronava.com';
         case 'disclaimer':
           return 'Legal Disclaimer | astronava.com';
+        case 'return-refund':
+          return 'Return, Refund & Shipping Policy | astronava.com';
         case 'contact':
           return 'Contact Us | astronava.com';
         case 'privacy':

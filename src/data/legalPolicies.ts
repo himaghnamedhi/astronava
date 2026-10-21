@@ -1,4 +1,4 @@
-export type LegalDocType = 'disclaimer' | 'terms' | 'privacy' | 'contact';
+export type LegalDocType = 'disclaimer' | 'terms' | 'privacy' | 'return-refund' | 'contact';
 
 export interface LegalDocItem {
   id: LegalDocType;
@@ -479,10 +479,159 @@ If you have any questions about this Privacy Policy or the way your information 
 
 Thank you for trusting **Astronava**.`;
 
+export const RETURN_AND_REFUND_POLICY_CONTENT = `# Return, Refund & Shipping Policy
+
+Effective Date: September 2026
+
+Welcome to Astronava ("Astronava", "we", "our", or "us"). We take immense pride in the authenticity, laboratory certification, and Vedic consecration (Prana Pratishtha) of every bracelet, gemstone (Ratna), Himalayan Rudraksha, and healing crystal we deliver.
+
+This Return, Refund & Shipping Policy outlines the comprehensive terms, timelines, eligibility criteria, and step-by-step procedures governing order fulfillment, domestic and international shipping, product returns, and refund disbursements for purchases made through the Astronava Sacred Store.
+
+By placing an order on Astronava, you acknowledge that you have read, understood, and agreed to the terms set forth in this policy.
+
+---
+
+# 1. Return Policy Overview & Eligibility
+
+We strive to ensure that every sacred item reaches you in pristine, energized condition. If you experience an issue with your delivered order, you may request a return subject to the following terms:
+
+* Time Frame: Returns are accepted strictly within 7 calendar days of delivery. Any return request submitted after 7 days from the confirmed delivery date will not be eligible for return or replacement.
+* Condition: Items must be unused, unworn, unwashed, and unaltered, and must be returned in their original packaging with all original security seals, product tags, invoices, and the Certificate of Authenticity intact.
+* Reason: Returns and replacements are accepted for in-transit physical damage, wrong product delivered, or verifiable manufacturing and quality issues.
+* Return Shipping: Return shipping is completely free for defective, damaged, or wrong products delivered by us. In such verified cases, Astronava bears the full reverse-logistics cost.
+
+---
+
+# 2. How to Return
+
+To ensure a smooth, secure, and transparent return experience, please follow our four-step return authorization process:
+
+## 1. Contact Us with Your Order Details
+Reach out to our customer support team within 7 days of delivery. Please include your Order ID, original order receipt or invoice, a clear description of the reason for return (damage, wrong product, or quality issue), and clear photographs or an unboxing video showing the product, packaging, and certificate.
+
+## 2. Get Return Authorization
+Our Quality Assurance and Customer Support team will review your submission within 24 to 48 hours. Once your claim is verified as eligible, we will issue an official Return Merchandise Authorization (RMA) along with return shipping instructions or a scheduled reverse-pickup confirmation. Please note that parcels sent back without prior return authorization cannot be accepted.
+
+## 3. Pack the Item Securely
+Place the unused product carefully inside its original premium box, along with the original Certificate of Authenticity, invoice, and all protective cushioning materials. Seal the outer shipping packet securely so that the gemstone, crystal, or bracelet is fully protected during return transit.
+
+## 4. Ship It Back to Us
+Hand over the securely sealed package to our authorized courier partner at the time of scheduled reverse pickup, or dispatch it to our designated return center address provided in your return authorization notice. Once shipped, please share the courier tracking number and dispatch receipt with our support team so we can monitor your return parcel.
+
+---
+
+# 3. Refund Eligibility
+
+To qualify for a refund on an eligible return or cancelled defective order, all of the following conditions must be satisfied:
+
+* Time Frame: Refund requests must be submitted within 7 days of delivery.
+* Condition: Product must be unused, unworn, undamaged by the customer, and returned in its original packaging with all accompanying certificates and accessories intact.
+* Receipt: Original order receipt, digital tax invoice, or valid Astronava Order ID is required for validating and processing any refund claim.
+* Custom Products: Personalized, custom-crafted, resized, or engraved items are crafted specifically for an individual and are strictly non-refundable.
+
+---
+
+# 4. Refund Process
+
+Once you submit a refund request, it progresses through a structured four-step workflow:
+
+## Step 1: Contact Us with Your Order Details
+Submit your refund request to our support team along with your Order ID, registered contact details, original receipt, and supporting information for your claim.
+
+## Step 2: Request Review (24–48 Hours)
+We will review your request, order documentation, and quality inspection report within 24 to 48 hours and update you regarding the approval status.
+
+## Step 3: Refund Initiation
+If approved following verification and inspection of the returned item, we will initiate the refund through our authorized payment gateway and send a confirmation notice to your registered email.
+
+## Step 4: Refund Settlement (5–7 Business Days)
+Refund is processed and credited within 5 to 7 business days, depending on your banking institution or payment provider. Refunds are processed via the original payment method used at the time of purchase.
+
+---
+
+# 5. Payment Methods & Refund Timelines
+
+All approved refunds are returned to the original source of payment. Standard settlement timelines across payment channels are as follows:
+
+* UPI: Instant refunds credited to your source UPI ID upon initiation (in rare inter-bank network delays, settlement may take up to 24 hours).
+* Cards: Refund to original credit or debit card within 5 to 7 business days.
+* Net Banking: Refund to source bank account within 3 to 5 business days.
+* Wallet: Refund to original digital payment wallet within 24 to 48 hours.
+
+---
+
+# 6. Non-Refundable Items
+
+In accordance with hygiene, consecration standards, and quality control policies, the following items are not eligible for return or refund:
+
+* Custom or personalized bracelets and astrological talismans crafted to specific measurements or configurations.
+* Products damaged by mishandling, improper storage, chemical exposure, water damage, or post-delivery wear and tear.
+* Items returned without original packaging, protective box, invoice, or Certificate of Authenticity.
+* Items purchased during promotional sales or with special discount offers (unless the product arrives physically damaged or defective upon delivery).
+
+---
+
+# 7. Delivery Time & Order Processing
+
+Astronava partners with trusted domestic and international courier services to deliver your sacred items safely and on time:
+
+* Standard Shipping: 5 to 7 business days from dispatch for domestic orders across India.
+* International Shipping: 10 to 15 business days from dispatch, subject to destination customs clearance.
+* Order Processing: Orders are processed, verified, and packed within 24 to 48 hours of confirmation.
+* Tracking Notifications: Tracking information will be shared via email and WhatsApp once your order is dispatched.
+
+---
+
+# 8. Shipping Charges
+
+Shipping charges are calculated transparently based on your order value, speed preference, and delivery destination:
+
+* Free Shipping: On all domestic orders above ₹1,000 (Limited time offer).
+* Standard Shipping: ₹50 for domestic orders below ₹1,000.
+* Express Shipping: ₹150 (Available on request prior to dispatch).
+* International Shipping: Calculated dynamically at checkout based on destination and package weight.
+
+---
+
+# 9. Delivery Areas, Packaging & Order Tracking
+
+## Delivery Areas
+* Pan India Delivery: Available across all major cities and towns throughout India.
+* International Delivery: Available worldwide across supported international destinations.
+* Remote Areas: Delivery to remote or outlying areas may take an additional 2 to 3 business days.
+* Courier Partners: We ship exclusively via trusted, insured courier partners.
+
+## Packaging
+* Each bracelet and sacred item is carefully packed in a signature premium box.
+* We use eco-friendly and sustainable packaging materials.
+* Every order includes a Certificate of Authenticity.
+* Gift wrapping is available on request.
+
+## Order Tracking
+* Track your order anytime via the tracking link sent to your email.
+* Receive real-time dispatch and delivery updates via WhatsApp.
+* Customer support is available for any tracking assistance you may need.
+
+---
+
+# 10. Contact Us
+
+If you have any questions regarding returns, refunds, shipping, or order tracking, please contact us:
+
+Email: [customer-support@astronava.com](mailto:customer-support@astronava.com)
+
+Website: https://www.astronava.com
+
+---
+
+Thank you for shopping with Astronava.`;
+
 export const CONTACT_INFO = {
   email: 'contact@astronava.com',
+  supportEmail: 'customer-support@astronava.com',
   website: 'https://www.astronava.com',
   developerName: 'Himaghna Medhi',
   twitter: 'https://x.com/himaghnamedhi',
   effectiveDate: 'September 2026',
 };
+

@@ -145,7 +145,7 @@ horoscopeRouter.post('/admin-log-entry', requireAdmin, (req: Request, res: Respo
         fallbackCount: Number(log.fallbackCount) || 0,
         errorCount: Number(log.errorCount) || 0,
         promptVersion: String(log.promptVersion || 'v1.0-Classical').slice(0, 40),
-        status: log.status === 'Failed' ? 'Failed' : 'Completed',
+        status: log.status === 'Failed' ? 'Error' : 'Completed',
         notes: String(log.notes || 'Batch execution record.').slice(0, 500),
       });
       if (ADMIN_JOB_LOGS.length > MAX_ADMIN_JOB_LOGS) {

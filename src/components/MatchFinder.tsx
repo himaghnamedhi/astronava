@@ -1086,13 +1086,6 @@ Calculated via Astronava Match Finder`;
 
       {/* CALCULATE & REPORT ACTION ROW - Clean whitespace without line clutter */}
       <div className="flex flex-col items-center justify-center gap-3 pt-2">
-        {(!user || user.isAnonymous) && (
-          <div className="flex items-center gap-2 text-xs text-amber-900 bg-amber-50/90 px-4 py-2.5 rounded-xl border border-amber-200/80 max-w-xl text-center shadow-2xs">
-            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
-            <span>Guest Seeker: Explore preset matches above freely. Sign up as an Astronava Member to calculate compatibility between two custom horoscopes.</span>
-          </div>
-        )}
-
         <div className="flex flex-wrap items-center justify-center gap-3">
           {hasCalculated && (
             <button

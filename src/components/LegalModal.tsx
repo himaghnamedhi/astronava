@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles } from 'lucide-react';
+import { X, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw } from 'lucide-react';
 import {
   LegalDocType,
   DISCLAIMER_CONTENT,
   TERMS_AND_CONDITIONS_CONTENT,
   PRIVACY_POLICY_CONTENT,
+  RETURN_AND_REFUND_POLICY_CONTENT,
   CONTACT_INFO,
 } from '../data/legalPolicies';
 
@@ -49,6 +50,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         return TERMS_AND_CONDITIONS_CONTENT;
       case 'privacy':
         return PRIVACY_POLICY_CONTENT;
+      case 'return-refund':
+        return RETURN_AND_REFUND_POLICY_CONTENT;
       case 'contact':
         return '';
     }
@@ -203,6 +206,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               {activeTab === 'privacy' && <Shield className="w-5 h-5" />}
               {activeTab === 'terms' && <FileText className="w-5 h-5" />}
               {activeTab === 'disclaimer' && <AlertCircle className="w-5 h-5" />}
+              {activeTab === 'return-refund' && <RotateCcw className="w-5 h-5" />}
               {activeTab === 'contact' && <Mail className="w-5 h-5" />}
             </div>
             <div>
@@ -210,6 +214,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                 {activeTab === 'privacy' && 'Privacy Policy'}
                 {activeTab === 'terms' && 'Terms & Conditions'}
                 {activeTab === 'disclaimer' && 'Disclaimer'}
+                {activeTab === 'return-refund' && 'Return, Refund & Shipping Policy'}
                 {activeTab === 'contact' && 'Contact Us'}
               </h3>
               <p className="text-xs text-stone-500">
@@ -269,6 +274,18 @@ export const LegalModal: React.FC<LegalModalProps> = ({
             <span>Disclaimer</span>
           </button>
           <button
+            id="tab-return-refund"
+            onClick={() => setActiveTab('return-refund')}
+            className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'return-refund'
+                ? 'border-amber-600 text-amber-900 bg-white shadow-2xs font-bold'
+                : 'border-transparent text-stone-600 hover:text-stone-900 hover:bg-stone-200/50'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Return &amp; Refund Policy</span>
+          </button>
+          <button
             id="tab-contact-me"
             onClick={() => setActiveTab('contact')}
             className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
@@ -278,7 +295,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Contact Me</span>
+            <span>Contact Us</span>
           </button>
         </div>
 
@@ -300,11 +317,11 @@ export const LegalModal: React.FC<LegalModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
                 
-                {/* Email Card */}
+                {/* General Email Card */}
                 <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Mail className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Direct Email</span>
+                    <span className="text-xs font-bold uppercase tracking-wider">General Inquiries</span>
                   </div>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
@@ -312,10 +329,30 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                   >
                     {CONTACT_INFO.email}
                   </a>
+                  <p className="text-[11px] text-stone-500">
+                    General, Legal &amp; Astrological Tools
+                  </p>
+                </div>
+
+                {/* Customer Support & Returns Email Card */}
+                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-800">
+                    <RotateCcw className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Orders, Returns &amp; Refunds</span>
+                  </div>
+                  <a
+                    href={`mailto:${CONTACT_INFO.supportEmail}`}
+                    className="text-stone-900 font-semibold text-sm hover:text-amber-800 transition-colors block break-all"
+                  >
+                    {CONTACT_INFO.supportEmail}
+                  </a>
+                  <p className="text-[11px] text-stone-500">
+                    Store Support, Shipping &amp; Refund Desk
+                  </p>
                 </div>
 
                 {/* Website Card */}
-                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
+                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2 sm:col-span-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Sparkles className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">Official Website</span>
@@ -369,8 +406,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         </div>
 
         {/* Footer actions */}
-        <div className="p-3.5 sm:p-4 border-t border-stone-200 bg-stone-50 flex items-center justify-between text-xs text-stone-500">
-          <span>Astronava &bull; Vedic Astrology Platform</span>
+        <div className="p-3.5 sm:p-4 border-t border-stone-200 bg-stone-50 flex items-center justify-end text-xs text-stone-500">
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg bg-stone-900 text-white hover:bg-stone-800 font-medium transition-colors cursor-pointer"

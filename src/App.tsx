@@ -16,7 +16,7 @@ import { SitemapModal } from './components/SitemapModal';
 import { SitemapPage } from './components/SitemapPage';
 import { LegalDocType } from './data/legalPolicies';
 import { CompleteKundliData, generateCompleteKundli } from './data/vedicEphemeris';
-import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass } from 'lucide-react';
+import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass, RotateCcw } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { StoreProvider } from './context/StoreContext';
@@ -45,6 +45,7 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
   'name-correction': 'Vedic Name Correction & Spelling Tuning | astronava.com',
   store: 'Store | astronava.com',
   profile: 'My Profile & Account Dashboard | astronava.com',
+  account: 'My Account & Preferences | astronava.com',
   sitemap: 'Sitemap Directory | astronava.com',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
@@ -52,6 +53,8 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
         return 'Terms & Conditions | astronava.com';
       case 'disclaimer':
         return 'Legal Disclaimer | astronava.com';
+      case 'return-refund':
+        return 'Return, Refund & Shipping Policy | astronava.com';
       case 'contact':
         return 'Contact Us | astronava.com';
       case 'privacy':
@@ -76,12 +79,16 @@ export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) =>
   'name-correction': 'Vedic Name Correction & Chaldean Spelling Harmonizer',
   store: 'Certified Gemstones, Nepali Rudraksha & Crystals',
   profile: 'Astronava Member Dashboard & Astrological Records',
+  account: 'Astronava User Account & Dashboard Settings',
+  sitemap: 'Directory of All Astronava Astrology Tools & Services',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
       case 'terms':
         return 'Astrology Service Terms of Use';
       case 'disclaimer':
         return 'Educational Astrological Notice';
+      case 'return-refund':
+        return 'Store Return, Refund & Shipping Policy';
       case 'contact':
         return 'Customer Support & Inquiries';
       case 'privacy':
@@ -269,6 +276,22 @@ export default function App() {
     }
     if (cleanPath === '/disclaimer' || cleanPath === '/legal/disclaimer' || cleanPath === 'disclaimer' || cleanPath === 'legal/disclaimer') {
       setSelectedLegalDoc('disclaimer');
+      setActiveTab('legal');
+      return true;
+    }
+    if (
+      cleanPath === '/return-refund-policy' ||
+      cleanPath === '/return-policy' ||
+      cleanPath === '/refund-policy' ||
+      cleanPath === '/shipping-policy' ||
+      cleanPath === '/legal/return-refund' ||
+      cleanPath === 'return-refund-policy' ||
+      cleanPath === 'return-policy' ||
+      cleanPath === 'refund-policy' ||
+      cleanPath === 'shipping-policy' ||
+      cleanPath === 'legal/return-refund'
+    ) {
+      setSelectedLegalDoc('return-refund');
       setActiveTab('legal');
       return true;
     }
@@ -792,6 +815,19 @@ export default function App() {
                 </li>
                 <li>
                   <a
+                    href="/return-refund-policy"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenLegal('return-refund');
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Return &amp; Refund Policy</span>
+                  </a>
+                </li>
+                <li>
+                  <a
                     href="/disclaimer"
                     onClick={(e) => {
                       e.preventDefault();
@@ -857,6 +893,17 @@ export default function App() {
                 className="hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Terms &amp; Conditions
+              </a>
+              <span>&bull;</span>
+              <a
+                href="/return-refund-policy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOpenLegal('return-refund');
+                }}
+                className="hover:text-amber-400 transition-colors cursor-pointer"
+              >
+                Return &amp; Refund Policy
               </a>
               <span>&bull;</span>
               <a

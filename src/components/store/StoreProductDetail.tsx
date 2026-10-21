@@ -499,7 +499,7 @@ export const StoreProductDetail: React.FC = () => {
             <div className="p-3 rounded-xl bg-stone-100/60 border border-stone-200/60 flex flex-col items-center gap-1">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
               <span className="font-bold text-stone-900">Lab Certified</span>
-              <span className="text-[10px] text-stone-500">Government / IGI</span>
+              <span className="text-[10px] text-stone-500">Certificate Included</span>
             </div>
             <div className="p-3 rounded-xl bg-stone-100/60 border border-stone-200/60 flex flex-col items-center gap-1">
               <Sparkles className="w-4 h-4 text-amber-700" />
@@ -508,8 +508,8 @@ export const StoreProductDetail: React.FC = () => {
             </div>
             <div className="p-3 rounded-xl bg-stone-100/60 border border-stone-200/60 flex flex-col items-center gap-1">
               <Truck className="w-4 h-4 text-amber-900" />
-              <span className="font-bold text-stone-900">Insured Shipping</span>
-              <span className="text-[10px] text-stone-500">Free over ₹1,999</span>
+              <span className="font-bold text-stone-900">Free Shipping</span>
+              <span className="text-[10px] text-stone-500">Orders above ₹1,000</span>
             </div>
           </div>
         </div>
@@ -522,7 +522,7 @@ export const StoreProductDetail: React.FC = () => {
             { id: 'benefits', label: 'Vedic Astrological Benefits' },
             { id: 'specs', label: 'Gemological Specifications' },
             { id: 'rituals', label: 'Consecration & Wearing Muhurat' },
-            { id: 'guarantee', label: 'Certification & Purity Guarantee' },
+            { id: 'guarantee', label: 'Shipping, Returns & Purity Guarantee' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -607,15 +607,16 @@ export const StoreProductDetail: React.FC = () => {
           {activeTab === 'guarantee' && (
             <div className="space-y-4">
               <h3 className="text-base font-bold text-stone-900 font-vedic">
-                The Astronava Purity Guarantee
+                The Astronava Purity, Return &amp; Shipping Guarantee
               </h3>
               <p>
-                We maintain an uncompromising zero-tolerance policy against synthetic stones, heat treatments, glass fillings, and artificial irradiations. Every gemstone and rudraksha bead is individually tested and verified.
+                We maintain an uncompromising zero-tolerance policy against synthetic stones, heat treatments, glass fillings, and artificial irradiations. Every bracelet, gemstone, and Rudraksha bead is carefully packed in a premium eco-friendly box with an official Certificate of Authenticity.
               </p>
-              <ul className="list-disc pl-5 space-y-1 text-stone-600">
-                <li>100% Genuine, untreated natural gemstone guaranteed for life</li>
-                <li>Verifiable certificate of authenticity included in the parcel</li>
-                <li>10-day no-questions-asked return window if lab test indicates alteration</li>
+              <ul className="list-disc pl-5 space-y-1.5 text-stone-600">
+                <li><strong>Delivery Time:</strong> 24–48 hr dispatch processing; 5–7 business days Standard Pan-India delivery (10–15 business days International).</li>
+                <li><strong>Shipping Charges:</strong> Free Shipping on orders above ₹1,000 (₹50 standard shipping below ₹1,000; ₹150 Express shipping on request).</li>
+                <li><strong>7-Day Return &amp; Refund Policy:</strong> Returns accepted within 7 days of delivery for unused items in original packaging with receipt for damage, wrong product, or quality issues (Free return shipping for defective products).</li>
+                <li><strong>Support Desk:</strong> Reach out anytime at <a href="mailto:customer-support@astronava.com" className="text-amber-800 font-semibold underline">customer-support@astronava.com</a>.</li>
               </ul>
             </div>
           )}
