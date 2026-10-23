@@ -878,10 +878,10 @@ export default function App() {
               <div className="space-y-2">
                 <span className="text-[11px] text-stone-400 block font-medium">Follow &amp; Connect</span>
                 
-                {/* LinkedIn filled social media button */}
+                {/* Social media filled buttons: LinkedIn 1st, Facebook 2nd */}
                 <div className="flex items-center gap-2.5 pt-0.5">
                   <a
-                    href="https://www.linkedin.com/company/astronava_official/"
+                    href="https://www.linkedin.com/company/astronavaofficial/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-stone-900/90 border border-stone-700/80 hover:border-amber-400 hover:bg-stone-800 text-stone-200 hover:text-amber-300 flex items-center justify-center transition-all shadow-sm hover:scale-105 cursor-pointer group"
@@ -894,6 +894,23 @@ export default function App() {
                       aria-hidden="true"
                     >
                       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
+                    </svg>
+                  </a>
+
+                  <a
+                    href="https://www.facebook.com/astronavaofficial"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-stone-900/90 border border-stone-700/80 hover:border-amber-400 hover:bg-stone-800 text-stone-200 hover:text-amber-300 flex items-center justify-center transition-all shadow-sm hover:scale-105 cursor-pointer group"
+                    title="Follow Astronava on Facebook"
+                    aria-label="Follow Astronava on Facebook"
+                  >
+                    <svg
+                      className="w-4 h-4 fill-current transition-transform group-hover:scale-110"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z" />
                     </svg>
                   </a>
                 </div>

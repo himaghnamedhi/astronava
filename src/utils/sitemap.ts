@@ -964,7 +964,8 @@ export function injectDynamicMetaTags(
     url: normalizedBase,
     logo: `${normalizedBase}/icons/app_logo.svg`,
     sameAs: [
-      'https://www.linkedin.com/company/astronava_official/',
+      'https://www.linkedin.com/company/astronavaofficial/',
+      'https://www.facebook.com/astronavaofficial',
       'https://x.com/himaghnamedhi',
     ],
   });
