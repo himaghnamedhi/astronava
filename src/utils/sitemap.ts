@@ -572,6 +572,143 @@ export function findRouteByPath(rawPath: string): AppViewRoute | undefined {
 }
 
 /**
+ * Section definitions for the modular Sitemap Index
+ */
+export interface SitemapSectionDefinition {
+  id: string;
+  filename: string;
+  title: string;
+  description: string;
+  path: string;
+  filter: (route: AppViewRoute) => boolean;
+}
+
+export const SITEMAP_SECTIONS: SitemapSectionDefinition[] = [
+  {
+    id: 'tools',
+    filename: 'sitemap-tools.xml',
+    path: '/sitemap-tools.xml',
+    title: 'Vedic Astrological Tools & Calculators',
+    description: 'Janam Kundli Maker, Kundli Builder, Daily Horoscope, Gemstones, Match Finder, and Numerology calculators',
+    filter: (r) => r.category === 'Astrological Tools' || r.category === 'Kundli Calculations' || r.category === 'Horoscope & Panchang',
+  },
+  {
+    id: 'store',
+    filename: 'sitemap-store.xml',
+    path: '/sitemap-store.xml',
+    title: 'Sacred Store & Items',
+    description: 'Certified Vedic gemstones, energized Rudraksha beads, sacred yantras, healing bracelets, and japa malas',
+    filter: (r) => r.category === 'Sacred Store & Items' || r.path.startsWith('/store'),
+  },
+  {
+    id: 'reports',
+    filename: 'sitemap-reports.xml',
+    path: '/sitemap-reports.xml',
+    title: 'Astrology Reports & Forecast Endpoints',
+    description: '20-section comprehensive life reports, Vimshottari dasha timelines, and Vedic calculation endpoints',
+    filter: (r) => r.category === 'Astrology Reports' || r.path.startsWith('/report') || r.path.startsWith('/full-astrology-report'),
+  },
+  {
+    id: 'legal',
+    filename: 'sitemap-legal.xml',
+    path: '/sitemap-legal.xml',
+    title: 'Policies, Terms & Legal Documentation',
+    description: 'Privacy policy, terms and conditions, astrological disclaimer, return & refund policy, and contact channels',
+    filter: (r) => r.category === 'Policies & Legal' || r.tab === 'legal',
+  },
+  {
+    id: 'general',
+    filename: 'sitemap-general.xml',
+    path: '/sitemap-general.xml',
+    title: 'Core Platform & Directory Pages',
+    description: 'Homepage, complete navigation directory, and authenticated user services',
+    filter: (r) => r.path === '/' || r.path === '/sitemap' || r.category === 'User Services' || r.tab === 'profile',
+  },
+];
+
+/**
+ * Generates an RFC-compliant Sitemap Index XML string (sitemap-index.xml)
+ * referencing different modular sitemap sections.
+ */
+export function generateSitemapIndexXml(baseUrl: string = CANONICAL_BASE_URL): string {
+  const normalizedBase = baseUrl.replace(/\/$/, '');
+  const today = new Date().toISOString().split('T')[0];
+  const lines = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ];
+
+  for (const section of SITEMAP_SECTIONS) {
+    lines.push('  <sitemap>');
+    lines.push(`    <loc>${normalizedBase}/${section.filename}</loc>`);
+    lines.push(`    <lastmod>${today}</lastmod>`);
+    lines.push('  </sitemap>');
+  }
+
+  // Also include the consolidated comprehensive sitemap.xml in index
+  lines.push('  <sitemap>');
+  lines.push(`    <loc>${normalizedBase}/sitemap.xml</loc>`);
+  lines.push(`    <lastmod>${today}</lastmod>`);
+  lines.push('  </sitemap>');
+
+  lines.push('</sitemapindex>');
+  return lines.join('\n');
+}
+
+/**
+ * Generates section-specific sitemap XML (e.g. sitemap-tools.xml, sitemap-store.xml)
+ */
+export function generateSectionSitemapXml(sectionId: string, baseUrl: string = CANONICAL_BASE_URL): string {
+  const section = SITEMAP_SECTIONS.find((s) => s.id === sectionId || s.filename === sectionId);
+  if (!section) {
+    return generateClientSitemapXml(baseUrl);
+  }
+
+  const allRoutes = getAppSitemapRoutes(baseUrl);
+  let sectionRoutes: (AppViewRoute & { canonicalUrl: string })[] = [];
+
+  if (section.id === 'reports') {
+    sectionRoutes = allRoutes.filter((r) => section.filter(r));
+  } else if (section.id === 'store') {
+    const baseStore = allRoutes.find((r) => r.path === '/store') || allRoutes[0];
+    const storeCategories = ['gemstones', 'rudraksha', 'yantras', 'bracelets', 'malas', 'dhoop'];
+    const catRoutes = storeCategories.map((cat) => ({
+      ...baseStore,
+      id: `store-${cat}`,
+      path: `/store?category=${cat}`,
+      canonicalUrl: `${baseUrl.replace(/\/$/, '')}/store?category=${cat}`,
+      title: `${cat.charAt(0).toUpperCase() + cat.slice(1)} Collection | Sacred Store | astronava.com`,
+      shortTitle: `${cat.charAt(0).toUpperCase() + cat.slice(1)} Collection`,
+      priority: 0.85,
+      changefreq: 'weekly' as const,
+      category: 'Sacred Store & Items' as const,
+    }));
+    sectionRoutes = [baseStore, ...catRoutes];
+  } else {
+    sectionRoutes = allRoutes.filter((r) => section.filter(r));
+  }
+
+  const xmlLines = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+    '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">',
+  ];
+
+  for (const route of sectionRoutes) {
+    xmlLines.push('  <url>');
+    xmlLines.push(`    <loc>${escapeXml(route.canonicalUrl)}</loc>`);
+    xmlLines.push(`    <lastmod>${route.lastmod}</lastmod>`);
+    xmlLines.push(`    <changefreq>${route.changefreq}</changefreq>`);
+    xmlLines.push(`    <priority>${route.priority.toFixed(1)}</priority>`);
+    xmlLines.push('  </url>');
+  }
+
+  xmlLines.push('</urlset>');
+  return xmlLines.join('\n');
+}
+
+/**
  * Generates an RFC-compliant XML Sitemap string for all app views.
  * Can be rendered on client or returned via API.
  */
@@ -826,7 +963,10 @@ export function injectDynamicMetaTags(
     name: 'Astronava',
     url: normalizedBase,
     logo: `${normalizedBase}/icons/app_logo.svg`,
-    sameAs: ['https://x.com/himaghnamedhi'],
+    sameAs: [
+      'https://www.linkedin.com/company/astronava_official/',
+      'https://x.com/himaghnamedhi',
+    ],
   });
 
   // 9. JSON-LD SiteNavigationElement for Full Site Indexing
@@ -859,6 +999,40 @@ export function downloadSitemapXmlFile(baseUrl: string = CANONICAL_BASE_URL): vo
   const link = document.createElement('a');
   link.href = url;
   link.download = 'sitemap.xml';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Triggers a client-side download of the sitemap-index.xml file.
+ */
+export function downloadSitemapIndexXmlFile(baseUrl: string = CANONICAL_BASE_URL): void {
+  if (typeof window === 'undefined') return;
+  const xml = generateSitemapIndexXml(baseUrl);
+  const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'sitemap-index.xml';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Triggers a client-side download of a specific section sitemap file.
+ */
+export function downloadSectionSitemapXmlFile(sectionId: string, filename: string, baseUrl: string = CANONICAL_BASE_URL): void {
+  if (typeof window === 'undefined') return;
+  const xml = generateSectionSitemapXml(sectionId, baseUrl);
+  const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

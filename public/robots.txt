@@ -5,4 +5,5 @@ Disallow: /api/
 Disallow: /admin
 Disallow: /store/admin
 
+Sitemap: https://www.astronava.com/sitemap-index.xml
 Sitemap: https://www.astronava.com/sitemap.xml

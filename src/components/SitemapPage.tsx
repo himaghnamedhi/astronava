@@ -31,13 +31,18 @@ import {
 import {
   APP_ROUTES,
   ASTROLOGICAL_REPORT_TYPES,
+  SITEMAP_SECTIONS,
   AppTabType,
   LegalDocType,
   SitemapCategoryType,
   getCanonicalBaseUrl,
   generateClientSitemapXml,
+  generateSitemapIndexXml,
+  generateSectionSitemapXml,
   generateClientSitemapJson,
   downloadSitemapXmlFile,
+  downloadSitemapIndexXmlFile,
+  downloadSectionSitemapXmlFile,
   pingSearchEngines,
 } from '../utils/sitemap';
 
@@ -77,8 +82,23 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
   });
 
   const baseUrl = getCanonicalBaseUrl();
+  const sitemapIndexXmlUrl = `${baseUrl}/sitemap-index.xml`;
   const sitemapXmlUrl = `${baseUrl}/sitemap.xml`;
   const robotsTxtUrl = `${baseUrl}/robots.txt`;
+
+  const [selectedXmlFile, setSelectedXmlFile] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.toLowerCase();
+      if (p.includes('sitemap-tools.xml')) return 'sitemap-tools.xml';
+      if (p.includes('sitemap-store.xml')) return 'sitemap-store.xml';
+      if (p.includes('sitemap-reports.xml')) return 'sitemap-reports.xml';
+      if (p.includes('sitemap-legal.xml')) return 'sitemap-legal.xml';
+      if (p.includes('sitemap-general.xml')) return 'sitemap-general.xml';
+      if (p.includes('sitemap.xml')) return 'sitemap.xml';
+      if (p.includes('sitemap-index.xml')) return 'sitemap-index.xml';
+    }
+    return 'sitemap-index.xml';
+  });
 
   // Categories list
   const categories: { key: string; label: string; count: number; icon: React.ReactNode }[] = useMemo(() => {
@@ -152,7 +172,17 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const xmlContent = useMemo(() => generateClientSitemapXml(baseUrl), [baseUrl]);
+  const sitemapIndexContent = useMemo(() => generateSitemapIndexXml(baseUrl), [baseUrl]);
+  const sitemapFullContent = useMemo(() => generateClientSitemapXml(baseUrl), [baseUrl]);
+
+  const activeXmlContent = useMemo(() => {
+    if (selectedXmlFile === 'sitemap-index.xml') return sitemapIndexContent;
+    if (selectedXmlFile === 'sitemap.xml') return sitemapFullContent;
+    const sec = SITEMAP_SECTIONS.find((s) => s.filename === selectedXmlFile);
+    if (sec) return generateSectionSitemapXml(sec.id, baseUrl);
+    return sitemapIndexContent;
+  }, [selectedXmlFile, baseUrl, sitemapIndexContent, sitemapFullContent]);
+
   const jsonContent = useMemo(() => generateClientSitemapJson(baseUrl), [baseUrl]);
 
   return (
@@ -175,30 +205,31 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => handleCopyText(sitemapXmlUrl, 'xml-url')}
+              onClick={() => handleCopyText(sitemapIndexXmlUrl, 'index-url')}
               className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-              title="Copy Sitemap XML URL for Google Search Console"
+              title="Copy Master Sitemap Index URL (sitemap-index.xml)"
             >
-              {copiedUrl === 'xml-url' ? (
+              {copiedUrl === 'index-url' ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-emerald-700">Copied XML URL!</span>
+                  <span className="text-emerald-700">Copied Index URL!</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Copy Sitemap URL</span>
+                  <span>Copy Index URL</span>
                 </>
               )}
             </button>
             <a
-              href="/sitemap.xml"
+              href="/sitemap-index.xml"
               target="_blank"
               rel="noopener noreferrer"
               className="px-3.5 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+              title="Open sitemap-index.xml in new tab"
             >
               <FileCode className="w-3.5 h-3.5" />
-              <span>Open sitemap.xml</span>
+              <span>sitemap-index.xml</span>
               <ExternalLink className="w-3 h-3 opacity-70" />
             </a>
           </div>
@@ -621,38 +652,149 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
 
         {/* TAB 2: RAW XML FEED */}
         {activeViewTab === 'xml' && (
-          <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-7 space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+          <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-7 space-y-5">
+            {/* Sitemaps Selector Tabs */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-500 uppercase tracking-wider font-mono">
+                  Select XML Sitemap File
+                </span>
+                <span className="text-[11px] text-amber-900 font-semibold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+                  {selectedXmlFile === 'sitemap-index.xml' ? 'Master Sitemap Index' : 'Section Sub-Sitemap'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-index.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-index.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>sitemap-index.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-tools.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-tools.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>sitemap-tools.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-store.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-store.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>sitemap-store.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-reports.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-reports.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>sitemap-reports.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-legal.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-legal.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>sitemap-legal.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap-general.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap-general.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>sitemap-general.xml</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedXmlFile('sitemap.xml')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedXmlFile === 'sitemap.xml'
+                      ? 'bg-amber-800 text-white shadow-xs'
+                      : 'bg-[#FAF8F5] hover:bg-stone-200/70 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5" />
+                  <span>sitemap.xml (Full)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Header for Current Selection */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-b border-stone-100 py-4">
               <div>
                 <h3 className="text-base font-bold font-vedic text-stone-950 flex items-center gap-2">
                   <FileCode className="w-4 h-4 text-amber-800" />
-                  <span>Standard RFC Sitemap XML</span>
+                  <span>{selectedXmlFile}</span>
+                  {selectedXmlFile === 'sitemap-index.xml' && (
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold">Master Index</span>
+                  )}
                 </h3>
                 <p className="text-xs text-stone-500">
-                  Served natively at <a href="/sitemap.xml" target="_blank" className="text-amber-800 font-mono underline">/sitemap.xml</a> with XML schema definitions.
+                  Served natively at <a href={`/${selectedXmlFile}`} target="_blank" className="text-amber-800 font-mono underline">/{selectedXmlFile}</a> with standard sitemaps.org XML schema.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleCopyText(xmlContent, 'xml-raw')}
+                  onClick={() => handleCopyText(activeXmlContent, 'xml-raw')}
                   className="px-3.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copiedUrl === 'xml-raw' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedUrl === 'xml-raw' ? 'Copied XML!' : 'Copy Code'}</span>
+                  <span>{copiedUrl === 'xml-raw' ? 'Copied Code!' : 'Copy Code'}</span>
                 </button>
                 <button
-                  onClick={() => downloadSitemapXmlFile(baseUrl)}
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  onClick={() => {
+                    if (selectedXmlFile === 'sitemap-index.xml') {
+                      downloadSitemapIndexXmlFile(baseUrl);
+                    } else if (selectedXmlFile === 'sitemap.xml') {
+                      downloadSitemapXmlFile(baseUrl);
+                    } else {
+                      const sec = SITEMAP_SECTIONS.find((s) => s.filename === selectedXmlFile);
+                      if (sec) downloadSectionSitemapXmlFile(sec.id, sec.filename, baseUrl);
+                    }
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Download .xml</span>
+                  <span>Download .{selectedXmlFile.endsWith('.xml') ? 'xml' : 'file'}</span>
                 </button>
               </div>
             </div>
 
             <pre className="p-4 rounded-2xl bg-stone-950 font-mono text-[11px] text-amber-200/95 overflow-x-auto max-h-[60vh] leading-relaxed select-all">
-              {xmlContent}
+              {activeXmlContent}
             </pre>
           </div>
         )}
@@ -694,7 +836,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
               Standard Compliant Navigation &amp; Search Indexing
             </h4>
             <p>
-              Astronava delivers server-side compliant <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/sitemap.xml</code> and <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/robots.txt</code> endpoints. All dynamic routes include canonical tags, mobile responsive meta tags, OpenGraph share banners, and Schema.org ItemList site navigation elements.
+              Astronava delivers server-side compliant <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/sitemap-index.xml</code>, <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/sitemap.xml</code> and <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/robots.txt</code> endpoints. All dynamic routes include canonical tags, mobile responsive meta tags, OpenGraph share banners, and Schema.org ItemList site navigation elements.
             </p>
           </div>
         </div>
@@ -707,6 +849,10 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
           &copy; {new Date().getFullYear()} <strong className="text-white">Astronava</strong>. Vedic Astrological Directory &amp; Sitemaps.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-stone-400">
+          <a href="/sitemap-index.xml" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors font-mono">
+            sitemap-index.xml
+          </a>
+          <span>•</span>
           <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">
             sitemap.xml
           </a>

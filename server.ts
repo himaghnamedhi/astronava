@@ -3,7 +3,12 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { generateKundliAiSummary, generateFullAstrologyReportWithAi } from './src/server/geminiAstrology.ts';
-import { generateClientSitemapXml } from './src/utils/sitemap.ts';
+import {
+  generateClientSitemapXml,
+  generateSitemapIndexXml,
+  generateSectionSitemapXml,
+  SITEMAP_SECTIONS,
+} from './src/utils/sitemap.ts';
 import { storeRouter, adminRouter } from './src/server/storeRoutes.ts';
 import { seedStoreIfEmpty } from './src/server/storeDb.ts';
 import { horoscopeRouter } from './src/server/horoscopeRoutes.ts';
@@ -73,12 +78,52 @@ async function startServer() {
   app.use('/api/horoscope', horoscopeRouter);
   app.use('/api/user', userRouter);
 
-  // Dynamic XML Sitemap Endpoint for Web Crawlers and Google Search Console
+  // Helper to determine canonical base URL from request
+  const getRequestBaseUrl = (req: express.Request) => {
+    const host = req.get('host') || 'www.astronava.com';
+    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    return host.includes('localhost') ? `${protocol}://${host}` : 'https://www.astronava.com';
+  };
+
+  // Master Sitemap Index Endpoint (sitemaps.org <sitemapindex>)
+  app.get('/sitemap-index.xml', (req, res) => {
+    try {
+      const baseUrl = getRequestBaseUrl(req);
+      const xml = generateSitemapIndexXml(baseUrl);
+      res.header('Content-Type', 'application/xml; charset=utf-8');
+      res.header('Cache-Control', 'public, max-age=3600');
+      res.send(xml);
+    } catch (error) {
+      console.error('Failed to generate sitemap-index.xml:', error);
+      res.status(500).send('Error generating sitemap index');
+    }
+  });
+
+  // Section-Specific Sitemap Endpoints (e.g. /sitemap-tools.xml, /sitemap-store.xml)
+  app.get('/sitemap-:section.xml', (req, res, next) => {
+    try {
+      const sectionId = req.params.section;
+      const matchedSection = SITEMAP_SECTIONS.find(
+        (s) => s.id === sectionId || s.filename === `sitemap-${sectionId}.xml`
+      );
+      if (!matchedSection) {
+        return next();
+      }
+      const baseUrl = getRequestBaseUrl(req);
+      const xml = generateSectionSitemapXml(matchedSection.id, baseUrl);
+      res.header('Content-Type', 'application/xml; charset=utf-8');
+      res.header('Cache-Control', 'public, max-age=3600');
+      res.send(xml);
+    } catch (error) {
+      console.error(`Failed to generate sitemap-${req.params.section}.xml:`, error);
+      res.status(500).send('Error generating section sitemap');
+    }
+  });
+
+  // Comprehensive XML Sitemap Endpoint for Web Crawlers and Google Search Console
   app.get('/sitemap.xml', (req, res) => {
     try {
-      const host = req.get('host') || 'www.astronava.com';
-      const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-      const baseUrl = host.includes('localhost') ? `${protocol}://${host}` : 'https://www.astronava.com';
+      const baseUrl = getRequestBaseUrl(req);
       const xml = generateClientSitemapXml(baseUrl);
       res.header('Content-Type', 'application/xml; charset=utf-8');
       res.header('Cache-Control', 'public, max-age=3600');
@@ -91,9 +136,7 @@ async function startServer() {
 
   // Robots.txt Directives for Google Search Console & Search Crawlers
   app.get('/robots.txt', (req, res) => {
-    const host = req.get('host') || 'www.astronava.com';
-    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-    const baseUrl = host.includes('localhost') ? `${protocol}://${host}` : 'https://www.astronava.com';
+    const baseUrl = getRequestBaseUrl(req);
     const robotsTxt = [
       '# Astronava Vedic Astrology - Search Crawler Directives',
       'User-agent: *',
@@ -102,7 +145,9 @@ async function startServer() {
       'Disallow: /admin',
       'Disallow: /store/admin',
       '',
+      `Sitemap: ${baseUrl}/sitemap-index.xml`,
       `Sitemap: ${baseUrl}/sitemap.xml`,
+      'Sitemap: https://www.astronava.com/sitemap-index.xml',
       'Sitemap: https://www.astronava.com/sitemap.xml',
     ].join('\n');
     res.header('Content-Type', 'text/plain; charset=utf-8');

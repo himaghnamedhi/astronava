@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap-tools.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap-store.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap-reports.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap-legal.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap-general.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.astronava.com/sitemap.xml</loc>
+    <lastmod>2026-10-23</lastmod>
+  </sitemap>
+</sitemapindex>
