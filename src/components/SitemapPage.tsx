@@ -56,6 +56,13 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
   const [showConsoleGuide, setShowConsoleGuide] = useState<boolean>(true);
   const [isPinging, setIsPinging] = useState<boolean>(false);
   const [pingSuccess, setPingSuccess] = useState<boolean>(false);
+  const [showWebmasterTools, setShowWebmasterTools] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('admin') === 'true' || params.get('webmaster') === 'true' || params.get('gsc') === 'true';
+    }
+    return false;
+  });
 
   const baseUrl = getCanonicalBaseUrl();
   const sitemapXmlUrl = `${baseUrl}/sitemap.xml`;
@@ -191,7 +198,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
           <div className="relative z-10 space-y-4 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold">
               <Compass className="w-3.5 h-3.5 text-amber-400" />
-              <span>Official Google Search Console Indexable Sitemap</span>
+              <span>Vedic Directory &amp; Navigation Index</span>
             </div>
             
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-vedic text-stone-100 tracking-tight leading-tight">
@@ -199,145 +206,156 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
             </h1>
 
             <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
-              Complete index of all authentic Vedic astrology tools, Janam Kundli charts, personalized horoscopes, certified sacred gemstones, and legal policies on <span className="font-semibold text-amber-300">astronava.com</span>. Formatted for both seekers and search engine crawlers.
+              Complete index of all authentic Vedic astrology tools, Janam Kundli charts, personalized horoscopes, certified sacred gemstones, and legal policies on <span className="font-semibold text-amber-300">astronava.com</span>.
             </p>
 
             {/* Quick Metrics Bar */}
             <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 border-t border-stone-800">
               <div className="bg-stone-900/80 rounded-2xl p-3 border border-stone-800">
-                <span className="text-[11px] text-stone-400 block">Total Indexable URLs</span>
+                <span className="text-[11px] text-stone-400 block">Total Vedic Pages</span>
                 <span className="text-xl font-black font-mono text-amber-400">{APP_ROUTES.length} Routes</span>
               </div>
               <div className="bg-stone-900/80 rounded-2xl p-3 border border-stone-800">
-                <span className="text-[11px] text-stone-400 block">XML Schema Standard</span>
-                <span className="text-xs font-bold text-stone-200 mt-1 block">sitemaps.org 0.9</span>
+                <span className="text-[11px] text-stone-400 block">Astrological Modules</span>
+                <span className="text-xs font-bold text-stone-200 mt-1 block">7 Core Categories</span>
               </div>
               <div className="bg-stone-900/80 rounded-2xl p-3 border border-stone-800">
-                <span className="text-[11px] text-stone-400 block">Robots Directives</span>
-                <a href="/robots.txt" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1 mt-1">
-                  <span>/robots.txt</span>
+                <span className="text-[11px] text-stone-400 block">XML Sitemaps</span>
+                <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1 mt-1">
+                  <span>/sitemap.xml</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
               <div className="bg-stone-900/80 rounded-2xl p-3 border border-stone-800">
-                <span className="text-[11px] text-stone-400 block">Google Verification</span>
-                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 mt-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Configured</span>
-                </span>
+                <span className="text-[11px] text-stone-400 block">Robots Directives</span>
+                <a href="/robots.txt" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1 mt-1">
+                  <span>/robots.txt</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* GOOGLE SEARCH CONSOLE ASSISTANT CARD */}
-        <div className="bg-white rounded-3xl border border-amber-200/80 p-5 sm:p-7 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center shrink-0">
-                <Globe className="w-5 h-5 text-amber-800" />
+        {/* GOOGLE SEARCH CONSOLE ASSISTANT CARD (Hidden from normal users; shown only if webmaster tools enabled) */}
+        {showWebmasterTools && (
+          <div className="bg-white rounded-3xl border border-amber-200/80 p-5 sm:p-7 shadow-sm space-y-4 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center shrink-0">
+                  <Globe className="w-5 h-5 text-amber-800" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold font-vedic text-stone-950 flex items-center gap-2">
+                    <span>Google Search Console Integration</span>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold">Live</span>
+                  </h2>
+                  <p className="text-xs text-stone-600">
+                    Submit this URL directly in Google Search Console under <strong className="text-stone-800">Indexing &gt; Sitemaps</strong>.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold font-vedic text-stone-950 flex items-center gap-2">
-                  <span>Google Search Console Integration</span>
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold">Live</span>
-                </h2>
-                <p className="text-xs text-stone-600">
-                  Submit this URL directly in Google Search Console under <strong className="text-stone-800">Indexing &gt; Sitemaps</strong>.
-                </p>
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  onClick={() => setShowConsoleGuide(!showConsoleGuide)}
+                  className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>{showConsoleGuide ? 'Hide Instructions' : 'Show Instructions'}</span>
+                  {showConsoleGuide ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => setShowWebmasterTools(false)}
+                  className="text-xs font-medium text-stone-400 hover:text-stone-600 px-2 py-1 rounded-md hover:bg-stone-100 transition-colors cursor-pointer"
+                  title="Close webmaster assistant"
+                >
+                  Hide
+                </button>
               </div>
             </div>
 
-            <button
-              onClick={() => setShowConsoleGuide(!showConsoleGuide)}
-              className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 cursor-pointer self-start sm:self-auto"
-            >
-              <span>{showConsoleGuide ? 'Hide Instructions' : 'Show Instructions'}</span>
-              {showConsoleGuide ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+            {/* Sitemap URL Input Box */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-[#FAF8F5] p-2.5 rounded-2xl border border-stone-200">
+              <div className="flex-1 px-3 py-1 font-mono text-xs text-stone-800 break-all select-all font-semibold flex items-center gap-2">
+                <FileCode className="w-4 h-4 text-amber-800 shrink-0" />
+                <span>{sitemapXmlUrl}</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => handleCopyText(sitemapXmlUrl, 'main-url')}
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  {copiedUrl === 'main-url' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-300" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy URL</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handlePing}
+                  disabled={isPinging}
+                  className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Ping Google and Bing with updated sitemap"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin text-amber-800' : ''}`} />
+                  <span>{pingSuccess ? 'Engines Notified!' : 'Ping Search Engines'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Collapsible Step-by-Step Instructions */}
+            {showConsoleGuide && (
+              <div className="pt-2 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs text-stone-600">
+                <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
+                  <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
+                    <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">1</span>
+                    <span>Open Console</span>
+                  </span>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Visit <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-amber-800 font-semibold underline">Google Search Console</a> and select your verified property.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
+                  <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
+                    <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">2</span>
+                    <span>Navigate Sitemaps</span>
+                  </span>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    On the left navigation menu, click <strong className="text-stone-800">Sitemaps</strong> under the Index section.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
+                  <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
+                    <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">3</span>
+                    <span>Enter Path</span>
+                  </span>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Under &ldquo;Add a new sitemap&rdquo;, type <code className="bg-stone-200 px-1 py-0.5 rounded font-mono text-amber-900">sitemap.xml</code> and click <strong className="text-stone-800">Submit</strong>.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
+                  <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
+                    <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">4</span>
+                    <span>Confirm Status</span>
+                  </span>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Googlebot will crawl and report &ldquo;Success&rdquo; with all discovered pages and rich snippet metadata.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Sitemap URL Input Box */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-[#FAF8F5] p-2.5 rounded-2xl border border-stone-200">
-            <div className="flex-1 px-3 py-1 font-mono text-xs text-stone-800 break-all select-all font-semibold flex items-center gap-2">
-              <FileCode className="w-4 h-4 text-amber-800 shrink-0" />
-              <span>{sitemapXmlUrl}</span>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => handleCopyText(sitemapXmlUrl, 'main-url')}
-                className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                {copiedUrl === 'main-url' ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-300" />
-                    <span>Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copy URL</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={handlePing}
-                disabled={isPinging}
-                className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                title="Ping Google and Bing with updated sitemap"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin text-amber-800' : ''}`} />
-                <span>{pingSuccess ? 'Engines Notified!' : 'Ping Search Engines'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Collapsible Step-by-Step Instructions */}
-          {showConsoleGuide && (
-            <div className="pt-2 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs text-stone-600">
-              <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
-                <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
-                  <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">1</span>
-                  <span>Open Console</span>
-                </span>
-                <p className="text-[11px] text-stone-600 leading-relaxed">
-                  Visit <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-amber-800 font-semibold underline">Google Search Console</a> and select your verified property.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
-                <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
-                  <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">2</span>
-                  <span>Navigate Sitemaps</span>
-                </span>
-                <p className="text-[11px] text-stone-600 leading-relaxed">
-                  On the left navigation menu, click <strong className="text-stone-800">Sitemaps</strong> under the Index section.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
-                <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
-                  <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">3</span>
-                  <span>Enter Path</span>
-                </span>
-                <p className="text-[11px] text-stone-600 leading-relaxed">
-                  Under &ldquo;Add a new sitemap&rdquo;, type <code className="bg-stone-200 px-1 py-0.5 rounded font-mono text-amber-900">sitemap.xml</code> and click <strong className="text-stone-800">Submit</strong>.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-1">
-                <span className="font-bold text-amber-900 flex items-center gap-1.5 font-vedic">
-                  <span className="w-4 h-4 rounded-full bg-amber-800 text-white text-[10px] inline-flex items-center justify-center">4</span>
-                  <span>Confirm Status</span>
-                </span>
-                <p className="text-[11px] text-stone-600 leading-relaxed">
-                  Googlebot will crawl and report &ldquo;Success&rdquo; with all discovered pages and rich snippet metadata.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* VIEW MODE TOGGLE (Directory vs XML vs JSON-LD) */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-stone-200 pb-4">
@@ -661,7 +679,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
           <Info className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h4 className="font-bold text-amber-950 font-vedic text-sm">
-              Search Crawler &amp; Google Search Console Guarantee
+              Standard Compliant Navigation &amp; Search Indexing
             </h4>
             <p>
               Astronava delivers server-side compliant <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/sitemap.xml</code> and <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-amber-950">/robots.txt</code> endpoints. All dynamic routes include canonical tags, mobile responsive meta tags, OpenGraph share banners, and Schema.org ItemList site navigation elements.
@@ -674,9 +692,9 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
       {/* SITEMAP FOOTER */}
       <footer className="bg-stone-900 text-stone-400 border-t border-stone-800 mt-16 py-8 px-6 text-center text-xs space-y-2">
         <p>
-          &copy; {new Date().getFullYear()} <strong className="text-white">Astronava</strong>. Official Google Search Console Indexable Sitemap &amp; Astrological Directory.
+          &copy; {new Date().getFullYear()} <strong className="text-white">Astronava</strong>. Vedic Astrological Directory &amp; Sitemaps.
         </p>
-        <div className="flex items-center justify-center gap-4 text-[11px] text-stone-400">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-stone-400">
           <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">
             sitemap.xml
           </a>
@@ -692,6 +710,18 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
           <a href="/terms-and-conditions" onClick={(e) => handleRouteClick(e, 'legal', 'terms')} className="hover:text-amber-400 transition-colors">
             Terms of Service
           </a>
+          <span>•</span>
+          <button
+            onClick={() => {
+              setShowWebmasterTools((prev) => !prev);
+              if (!showWebmasterTools) {
+                window.scrollTo({ top: 180, behavior: 'smooth' });
+              }
+            }}
+            className="hover:text-amber-400 text-stone-500 transition-colors cursor-pointer"
+          >
+            {showWebmasterTools ? 'Hide SEO Console' : 'Webmaster Tools'}
+          </button>
         </div>
       </footer>
     </div>
