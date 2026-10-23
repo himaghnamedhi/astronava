@@ -346,9 +346,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   id="btn-user-profile"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="h-9 px-3.5 sm:px-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer"
+                  className="h-9 px-3.5 sm:px-4 rounded-full bg-[#78350F] hover:bg-[#5f280a] text-white text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer border border-amber-800/80"
                 >
-                  <div className="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-extrabold shadow-sm ring-2 ring-white/30">
+                  <div className="w-6 h-6 rounded-full bg-amber-950 text-amber-200 flex items-center justify-center text-[11px] font-extrabold shadow-sm ring-1 ring-amber-400/30">
                     {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <span className="max-w-[70px] sm:max-w-[100px] truncate hidden xs:inline">
@@ -420,12 +420,12 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => openAuthModal('Sign in to access your Astronava Member Profile & Birth Details')}
                 className={`h-9 px-4 sm:px-5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer shrink-0 border ${
                   activeTab === 'profile'
-                    ? 'bg-amber-900 text-amber-50 border-amber-800 shadow-md'
-                    : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-orange-400/40'
+                    ? 'bg-[#78350F] text-amber-50 border-amber-800 shadow-md ring-1 ring-amber-400/30'
+                    : 'bg-[#78350F] hover:bg-[#5f280a] text-white border-amber-800/80'
                 }`}
                 title="Astronava Member Profile"
               >
-                <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <User className="w-3.5 h-3.5 text-amber-200 shrink-0" />
                 <span>Profile</span>
               </button>
             )}
