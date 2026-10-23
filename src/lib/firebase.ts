@@ -22,7 +22,7 @@ import firebaseConfig from '../../firebase-applet-config.json';
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // CRITICAL: Connect to the specific firestoreDatabaseId from firebase-applet-config.json
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
 export const auth = getAuth(app);
 
 export enum OperationType {

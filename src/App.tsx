@@ -840,13 +840,18 @@ export default function App() {
                   </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => setIsSitemapOpen(true)}
+                  <a
+                    href="/sitemap"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleTabChange('sitemap');
+                      scrollToTop();
+                    }}
                     className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
                   >
                     <Compass className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span>Sitemap &amp; Index</span>
-                  </button>
+                    <span>Sitemap Directory</span>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -940,12 +945,17 @@ export default function App() {
                 Store
               </a>
               <span>&bull;</span>
-              <button
-                onClick={() => setIsSitemapOpen(true)}
+              <a
+                href="/sitemap"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTabChange('sitemap');
+                  scrollToTop();
+                }}
                 className="hover:text-amber-400 transition-colors cursor-pointer font-medium"
               >
                 Sitemap
-              </button>
+              </a>
 
             </div>
 

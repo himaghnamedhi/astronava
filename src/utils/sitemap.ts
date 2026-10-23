@@ -7,6 +7,15 @@
 export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'account' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
 export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'return-refund' | 'contact';
 
+export type SitemapCategoryType =
+  | 'Astrological Tools'
+  | 'Kundli Calculations'
+  | 'Horoscope & Panchang'
+  | 'Sacred Store & Items'
+  | 'Astrology Reports'
+  | 'Policies & Legal'
+  | 'User Services';
+
 export interface AppViewRoute {
   id: string;
   tab: AppTabType;
@@ -20,7 +29,7 @@ export interface AppViewRoute {
   ogType: 'website' | 'article';
   priority: number; // 0.0 to 1.0
   changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
-  category: 'Astrological Tools' | 'Kundli Calculations' | 'Policies & Legal';
+  category: SitemapCategoryType;
   lastmod: string;
 }
 
@@ -65,7 +74,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 1.0,
     changefreq: 'daily',
     category: 'Astrological Tools',
-    lastmod: '2026-09-19',
+    lastmod: '2026-10-23',
   },
   {
     id: 'daily-horoscope',
@@ -89,8 +98,8 @@ export const APP_ROUTES: AppViewRoute[] = [
     ogType: 'website',
     priority: 0.95,
     changefreq: 'daily',
-    category: 'Astrological Tools',
-    lastmod: '2026-09-21',
+    category: 'Horoscope & Panchang',
+    lastmod: '2026-10-23',
   },
   {
     id: 'kundli-maker',
@@ -112,10 +121,10 @@ export const APP_ROUTES: AppViewRoute[] = [
       'lagna chart'
     ],
     ogType: 'website',
-    priority: 0.9,
+    priority: 0.95,
     changefreq: 'daily',
-    category: 'Astrological Tools',
-    lastmod: '2026-09-14',
+    category: 'Kundli Calculations',
+    lastmod: '2026-10-23',
   },
   {
     id: 'kundli-builder',
@@ -137,8 +146,29 @@ export const APP_ROUTES: AppViewRoute[] = [
     ogType: 'website',
     priority: 0.9,
     changefreq: 'weekly',
-    category: 'Astrological Tools',
-    lastmod: '2026-09-14',
+    category: 'Kundli Calculations',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'full-astrology-report',
+    tab: 'home',
+    path: '/full-astrology-report',
+    aliases: ['/full-report'],
+    title: '20-Section Comprehensive Vedic Astrology Life Report & Multi-Year Forecast | astronava.com',
+    shortTitle: '20-Section Full Astrology Report',
+    description: 'Full life Vedic astrology report featuring 20 distinct analytical sections: Lagna & Navamsha analysis, Mahadasha timing, career, wealth, relationships, health, spiritual remedies, and multi-year planetary forecasts.',
+    keywords: [
+      'full astrology report',
+      'comprehensive kundli report',
+      'life horoscope prediction',
+      'multi year forecast',
+      'astrology forecast pdf'
+    ],
+    ogType: 'website',
+    priority: 0.9,
+    changefreq: 'daily',
+    category: 'Astrology Reports',
+    lastmod: '2026-10-23',
   },
   {
     id: 'gemstone-recommender',
@@ -160,22 +190,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 0.9,
     changefreq: 'weekly',
     category: 'Astrological Tools',
-    lastmod: '2026-09-14',
-  },
-  {
-    id: 'account-dashboard',
-    tab: 'account',
-    path: '/account',
-    aliases: ['/my-account', '/dashboard'],
-    title: 'Account & Member Dashboard | astronava.com',
-    shortTitle: 'Account Dashboard',
-    description: 'Manage your Astronava account, saved birth details, astrological records, and member profile settings.',
-    keywords: ['astronava account', 'member dashboard', 'saved kundlis', 'user profile'],
-    ogType: 'website',
-    priority: 0.9,
-    changefreq: 'weekly',
-    category: 'Astrological Tools',
-    lastmod: '2026-10-12',
+    lastmod: '2026-10-23',
   },
   {
     id: 'match-finder',
@@ -199,7 +214,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 0.9,
     changefreq: 'weekly',
     category: 'Astrological Tools',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'numerology-calculator',
@@ -219,10 +234,10 @@ export const APP_ROUTES: AppViewRoute[] = [
       'life path number'
     ],
     ogType: 'website',
-    priority: 0.8,
+    priority: 0.85,
     changefreq: 'weekly',
     category: 'Astrological Tools',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'name-correction',
@@ -245,7 +260,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 0.85,
     changefreq: 'weekly',
     category: 'Astrological Tools',
-    lastmod: '2026-09-21',
+    lastmod: '2026-10-23',
   },
   {
     id: 'sacred-store',
@@ -253,7 +268,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     path: '/store',
     aliases: ['/shop', '/products'],
     title: 'Certified Vedic Gemstones, Nepali Rudraksha & Crystals | Sacred Store | astronava.com',
-    shortTitle: 'Sacred Store (Gemstones & Rudraksha)',
+    shortTitle: 'Sacred Store (All Items)',
     description: 'Shop energized, lab-certified Vedic gemstones (Pukhraj, Neelam, Manik), authentic Himalayan Rudraksha beads, and sacred energizing crystals with complimentary Vedic Prana Pratishtha rituals.',
     keywords: [
       'vedic store',
@@ -268,8 +283,83 @@ export const APP_ROUTES: AppViewRoute[] = [
     ogType: 'website',
     priority: 0.9,
     changefreq: 'daily',
-    category: 'Astrological Tools',
-    lastmod: '2026-09-18',
+    category: 'Sacred Store & Items',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'store-gemstones',
+    tab: 'store',
+    path: '/store?category=gemstones',
+    aliases: ['/store/gemstones'],
+    title: '100% Natural Lab-Certified Vedic Gemstones | Sacred Store | astronava.com',
+    shortTitle: 'Gemstones Collection',
+    description: 'Authentic untreated Yellow Sapphire, Blue Sapphire, Natural Ruby, Emerald, and Red Coral lab-certified for astrological remedies with sanctified Vedic consecration.',
+    keywords: ['natural gemstones', 'yellow sapphire pukhraj', 'blue sapphire neelam', 'burma ruby', 'colombian emerald'],
+    ogType: 'website',
+    priority: 0.85,
+    changefreq: 'daily',
+    category: 'Sacred Store & Items',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'store-rudraksha',
+    tab: 'store',
+    path: '/store?category=rudraksha',
+    aliases: ['/store/rudraksha'],
+    title: 'Authentic Himalayan Nepali Rudraksha Beads & Japa Malas | astronava.com',
+    shortTitle: 'Rudraksha & Malas',
+    description: 'Genuine Nepal-sourced 1 to 21 Mukhi collector Rudraksha beads, Siddh Mala combinations, and protective silver-capped bracelets energized by Vedic priests.',
+    keywords: ['nepali rudraksha', '5 mukhi rudraksha', '7 mukhi rudraksha', 'siddh mala', 'rudraksha japa mala'],
+    ogType: 'website',
+    priority: 0.85,
+    changefreq: 'daily',
+    category: 'Sacred Store & Items',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'store-crystals',
+    tab: 'store',
+    path: '/store?category=crystals',
+    aliases: ['/store/crystals'],
+    title: 'Natural Healing Crystals, Pyramids & Sphatik Malas | astronava.com',
+    shortTitle: 'Healing Crystals',
+    description: 'High-vibrational Clear Quartz, Rose Quartz, Amethyst, Citrine towers, and Himalayan Sphatik rosaries for chakra balance and spatial aura protection.',
+    keywords: ['sphatik mala', 'amethyst cluster', 'citrine pyramid', 'clear quartz', 'healing crystals'],
+    ogType: 'website',
+    priority: 0.85,
+    changefreq: 'daily',
+    category: 'Sacred Store & Items',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'seller-portal',
+    tab: 'home',
+    path: '/seller',
+    aliases: ['/store/seller'],
+    title: 'Artisan & Vedic Merchant Onboarding Portal | astronava.com',
+    shortTitle: 'Artisan Seller Portal',
+    description: 'Join the Astronava certified network of sacred gemologists, Himalayan collectors, and spiritual crafts merchants.',
+    keywords: ['astronava seller', 'artisan portal', 'vedic merchant', 'sell gemstones'],
+    ogType: 'website',
+    priority: 0.7,
+    changefreq: 'monthly',
+    category: 'Sacred Store & Items',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'account-dashboard',
+    tab: 'account',
+    path: '/account',
+    aliases: ['/my-account', '/dashboard'],
+    title: 'Account & Member Dashboard | astronava.com',
+    shortTitle: 'Account Dashboard',
+    description: 'Manage your Astronava account, saved birth details, astrological records, and member profile settings.',
+    keywords: ['astronava account', 'member dashboard', 'saved kundlis', 'user profile'],
+    ogType: 'website',
+    priority: 0.8,
+    changefreq: 'weekly',
+    category: 'User Services',
+    lastmod: '2026-10-23',
   },
   {
     id: 'user-profile',
@@ -283,8 +373,23 @@ export const APP_ROUTES: AppViewRoute[] = [
     ogType: 'website',
     priority: 0.8,
     changefreq: 'daily',
-    category: 'Astrological Tools',
-    lastmod: '2026-09-21',
+    category: 'User Services',
+    lastmod: '2026-10-23',
+  },
+  {
+    id: 'request-delete',
+    tab: 'home',
+    path: '/request-delete',
+    aliases: ['/delete-account', '/privacy-delete'],
+    title: 'Data & Account Erasure Request | Privacy Controls | astronava.com',
+    shortTitle: 'Delete Account & Data',
+    description: 'Submit an immediate, GDPR/CCPA compliant request to delete your Astronava account, saved birth charts, astrological records, and personal profile data.',
+    keywords: ['delete account', 'data deletion', 'gdpr deletion', 'privacy rights'],
+    ogType: 'website',
+    priority: 0.5,
+    changefreq: 'yearly',
+    category: 'User Services',
+    lastmod: '2026-10-23',
   },
   {
     id: 'privacy-policy',
@@ -297,10 +402,10 @@ export const APP_ROUTES: AppViewRoute[] = [
     description: 'Official Privacy Policy for astronava.com. Learn how we handle your birth data, Google authentication, and security protections across all Vedic astrology tools.',
     keywords: ['astronava privacy policy', 'vedic astrology privacy', 'data protection', 'user privacy'],
     ogType: 'article',
-    priority: 0.5,
+    priority: 0.6,
     changefreq: 'monthly',
     category: 'Policies & Legal',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'terms-and-conditions',
@@ -313,10 +418,10 @@ export const APP_ROUTES: AppViewRoute[] = [
     description: 'Terms and conditions governing the use of astronava.com astrology software, Kundli generation, calculation algorithms, and educational resources.',
     keywords: ['terms and conditions', 'astronava terms of service', 'user agreement'],
     ogType: 'article',
-    priority: 0.5,
+    priority: 0.6,
     changefreq: 'monthly',
     category: 'Policies & Legal',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'disclaimer',
@@ -329,10 +434,10 @@ export const APP_ROUTES: AppViewRoute[] = [
     description: 'Astrological disclaimer and terms for astronava.com. Educational and informational Vedic Jyotish calculations provided without warranties or medical/financial advice.',
     keywords: ['astrology disclaimer', 'educational astrology notice', 'terms of information'],
     ogType: 'article',
-    priority: 0.5,
+    priority: 0.6,
     changefreq: 'monthly',
     category: 'Policies & Legal',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'return-refund-policy',
@@ -348,7 +453,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 0.6,
     changefreq: 'monthly',
     category: 'Policies & Legal',
-    lastmod: '2026-09-25',
+    lastmod: '2026-10-23',
   },
   {
     id: 'contact',
@@ -364,7 +469,7 @@ export const APP_ROUTES: AppViewRoute[] = [
     priority: 0.6,
     changefreq: 'monthly',
     category: 'Policies & Legal',
-    lastmod: '2026-09-14',
+    lastmod: '2026-10-23',
   },
   {
     id: 'sitemap-directory',
@@ -373,13 +478,13 @@ export const APP_ROUTES: AppViewRoute[] = [
     aliases: ['/sitemap.html'],
     title: 'Astronava Directory & Sitemap | All Astrological Tools & Pages',
     shortTitle: 'Sitemap',
-    description: 'Complete HTML sitemap directory of all Vedic astrology tools, Kundli generators, gemstone calculators, and legal policies on astronava.com.',
-    keywords: ['astronava sitemap', 'site index', 'vedic tools directory', 'kundli tool list'],
+    description: 'Complete HTML sitemap directory of all Vedic astrology tools, Kundli generators, gemstone calculators, and legal policies on astronava.com for Google Search Console.',
+    keywords: ['astronava sitemap', 'site index', 'vedic tools directory', 'google search console sitemap', 'kundli tool list'],
     ogType: 'website',
     priority: 0.8,
     changefreq: 'daily',
     category: 'Policies & Legal',
-    lastmod: '2026-09-25',
+    lastmod: '2026-10-23',
   },
 ];
 
@@ -438,7 +543,7 @@ export function getAppSitemapRoutes(baseUrl: string = CANONICAL_BASE_URL): (AppV
     ogType: 'website' as const,
     priority: 0.85,
     changefreq: 'weekly' as const,
-    category: 'Astrological Tools' as const,
+    category: 'Astrology Reports' as const,
     lastmod: new Date().toISOString().split('T')[0],
     canonicalUrl: `${normalizedBase}${rep.path}`,
   }));

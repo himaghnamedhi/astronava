@@ -73,16 +73,41 @@ async function startServer() {
   app.use('/api/horoscope', horoscopeRouter);
   app.use('/api/user', userRouter);
 
-  // Dynamic XML Sitemap Endpoint for Web Crawlers and Search Engines
+  // Dynamic XML Sitemap Endpoint for Web Crawlers and Google Search Console
   app.get('/sitemap.xml', (req, res) => {
     try {
-      const xml = generateClientSitemapXml();
+      const host = req.get('host') || 'www.astronava.com';
+      const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+      const baseUrl = host.includes('localhost') ? `${protocol}://${host}` : 'https://www.astronava.com';
+      const xml = generateClientSitemapXml(baseUrl);
       res.header('Content-Type', 'application/xml; charset=utf-8');
+      res.header('Cache-Control', 'public, max-age=3600');
       res.send(xml);
     } catch (error) {
       console.error('Failed to generate sitemap.xml:', error);
       res.status(500).send('Error generating sitemap');
     }
+  });
+
+  // Robots.txt Directives for Google Search Console & Search Crawlers
+  app.get('/robots.txt', (req, res) => {
+    const host = req.get('host') || 'www.astronava.com';
+    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const baseUrl = host.includes('localhost') ? `${protocol}://${host}` : 'https://www.astronava.com';
+    const robotsTxt = [
+      '# Astronava Vedic Astrology - Search Crawler Directives',
+      'User-agent: *',
+      'Allow: /',
+      'Disallow: /api/',
+      'Disallow: /admin',
+      'Disallow: /store/admin',
+      '',
+      `Sitemap: ${baseUrl}/sitemap.xml`,
+      'Sitemap: https://www.astronava.com/sitemap.xml',
+    ].join('\n');
+    res.header('Content-Type', 'text/plain; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=86400');
+    res.send(robotsTxt);
   });
 
   // Google AdSense Authorized Digital Sellers (ads.txt)
