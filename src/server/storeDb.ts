@@ -427,7 +427,11 @@ export async function getProducts(options: ProductFilterOptions = {}) {
   };
 }
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string, includeDrafts: boolean = false) {
+  const whereCond = includeDrafts
+    ? eq(products.slug, slug)
+    : and(eq(products.slug, slug), eq(products.isPublished, true));
+
   const prod = await db
     .select({
       product: products,
@@ -435,7 +439,7 @@ export async function getProductBySlug(slug: string) {
     })
     .from(products)
     .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(eq(products.slug, slug))
+    .where(whereCond)
     .limit(1);
 
   if (prod.length === 0) return null;
@@ -679,7 +683,7 @@ export async function createProduct(
     });
   }
 
-  return getProductBySlug(inserted.slug);
+  return getProductBySlug(inserted.slug, true);
 }
 
 export async function updateProduct(
@@ -799,7 +803,7 @@ export async function updateProduct(
     }
   }
 
-  return getProductBySlug(updated.slug);
+  return getProductBySlug(updated.slug, true);
 }
 
 export async function deleteProduct(id: number) {
@@ -1021,8 +1025,8 @@ export async function createOrder(payload: CreateOrderPayload) {
       .where(eq(products.id, productId))
       .limit(1);
 
-    if (dbProdList.length === 0) {
-      throw new Error(`Product #${productId} no longer exists`);
+    if (dbProdList.length === 0 || !dbProdList[0].isPublished) {
+      throw new Error(`Product #${productId} is unavailable or no longer exists`);
     }
     const dbProd = dbProdList[0];
 
@@ -1098,8 +1102,10 @@ export async function createOrder(payload: CreateOrderPayload) {
 
     if (couponList.length > 0) {
       const c = couponList[0];
+      const isNotExpired = !c.expiresAt || new Date(c.expiresAt) >= new Date();
+      const isWithinUsageLimit = c.usageLimit === null || c.usageLimit === undefined || c.timesUsed < c.usageLimit;
       const minOrder = Number(c.minOrderAmount || 0);
-      if (subtotal >= minOrder) {
+      if (isNotExpired && isWithinUsageLimit && subtotal >= minOrder) {
         if (c.discountType === 'percentage') {
           discountAmount = (subtotal * Number(c.discountValue)) / 100;
           if (c.maxDiscount) {
@@ -1180,6 +1186,22 @@ export async function createOrder(payload: CreateOrderPayload) {
           stock: sql`GREATEST(0, ${productVariations.stock} - ${vItem.quantity})`,
         })
         .where(eq(productVariations.id, vItem.variationId));
+
+      await db
+        .update(inventory)
+        .set({
+          stockQuantity: sql`GREATEST(0, ${inventory.stockQuantity} - ${vItem.quantity})`,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(inventory.productId, vItem.productId), eq(inventory.variationId, vItem.variationId)));
+    } else {
+      await db
+        .update(inventory)
+        .set({
+          stockQuantity: sql`GREATEST(0, ${inventory.stockQuantity} - ${vItem.quantity})`,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(inventory.productId, vItem.productId), isNull(inventory.variationId)));
     }
   }
 
@@ -1408,6 +1430,10 @@ export async function validateCouponCode(code: string, subtotal: number) {
 
   if (c.expiresAt && new Date(c.expiresAt) < new Date()) {
     return { valid: false, error: 'This coupon has expired' };
+  }
+
+  if (c.usageLimit !== null && c.usageLimit !== undefined && c.timesUsed >= c.usageLimit) {
+    return { valid: false, error: 'This coupon has reached its usage limit' };
   }
 
   const minOrder = Number(c.minOrderAmount || 0);

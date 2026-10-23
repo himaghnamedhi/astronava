@@ -124,11 +124,11 @@ export const AuthModal: React.FC = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-        className="relative w-full max-w-md sm:max-w-lg my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden h-[620px] sm:h-[640px] flex flex-col justify-between"
+        className="relative w-full max-w-md sm:max-w-lg my-auto bg-[#FAF8F5] rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col justify-between"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Luxury Top Header */}
-        <div className="bg-gradient-to-r from-[#170F0A] via-[#241710] to-[#170F0A] px-6 py-6 text-amber-50 relative shrink-0 text-center">
+        <div className="bg-gradient-to-r from-[#170F0A] via-[#241710] to-[#170F0A] px-6 py-5 sm:py-6 text-amber-50 relative shrink-0 text-center">
           <button
             onClick={closeAuthModal}
             aria-label="Close modal"
@@ -156,7 +156,7 @@ export const AuthModal: React.FC = () => {
 
         {/* View Mode Switch Tabs */}
         {viewMode !== 'forgot_password' && (
-          <div className="p-1.5 mx-6 mt-5 bg-stone-200/70 rounded-2xl flex items-center relative">
+          <div className="p-1.5 mx-6 mt-4 shrink-0 bg-stone-200/70 rounded-2xl flex items-center relative">
             <button
               type="button"
               onClick={() => {
@@ -202,7 +202,7 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* Form & Main Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto flex-1">
 
           {/* Official Google Sign-In with Verified Identity Branding */}
           {viewMode !== 'forgot_password' && (

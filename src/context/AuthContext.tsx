@@ -420,12 +420,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Save to Firestore
     if (db && !user.isAnonymous) {
       const userRef = doc(db, 'users', user.uid);
-      const data: any = {};
-      if (profileUpdate.displayName) data.displayName = profileUpdate.displayName;
-      if (profileUpdate.phoneNumber !== undefined) data.phoneNumber = profileUpdate.phoneNumber;
-      if (profileUpdate.preferredLanguage) data.preferredLanguage = profileUpdate.preferredLanguage;
-      if (profileUpdate.notificationTime) data.notificationTime = profileUpdate.notificationTime;
-      if (profileUpdate.notificationChannels) data.notificationChannels = profileUpdate.notificationChannels;
+      const data: any = { updatedAt: serverTimestamp() };
+      if (profileUpdate.displayName) data.displayName = String(profileUpdate.displayName).slice(0, 100);
+      if (profileUpdate.phoneNumber !== undefined) data.phoneNumber = String(profileUpdate.phoneNumber || '').slice(0, 30);
+      if (profileUpdate.preferredLanguage) data.preferredLanguage = String(profileUpdate.preferredLanguage).slice(0, 20);
+      if (profileUpdate.notificationTime) data.notificationTime = String(profileUpdate.notificationTime).slice(0, 10);
+      if (profileUpdate.notificationChannels) data.notificationChannels = profileUpdate.notificationChannels.slice(0, 5);
+      if (profileUpdate.addresses) data.addresses = profileUpdate.addresses.slice(0, 20);
       await setDoc(userRef, data, { merge: true });
     }
   };

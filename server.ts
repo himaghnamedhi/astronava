@@ -18,7 +18,41 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '1mb' }));
+  app.disable('x-powered-by');
+
+  // Security HTTP headers middleware
+  app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
+    next();
+  });
+
+  app.use(express.json({ limit: '256kb' }));
+
+  // Lightweight sliding-window rate limiter to protect AI and transactional endpoints
+  const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
+  const createRateLimiter = (maxRequests: number, windowMs: number) => {
+    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'unknown';
+      const key = `${req.baseUrl || ''}${req.path}:${ip}`;
+      const now = Date.now();
+      const entry = rateLimitBuckets.get(key);
+      if (!entry || now > entry.resetAt) {
+        rateLimitBuckets.set(key, { count: 1, resetAt: now + windowMs });
+        return next();
+      }
+      if (entry.count >= maxRequests) {
+        return res.status(429).json({ error: 'Too many requests. Please wait a moment and try again.' });
+      }
+      entry.count += 1;
+      return next();
+    };
+  };
+
+  const aiRateLimiter = createRateLimiter(15, 60 * 1000); // 15 req / min per IP
+  const storeActionLimiter = createRateLimiter(30, 60 * 1000); // 30 req / min per IP
 
   // Initialize seed data for the store
   seedStoreIfEmpty().catch((err) => {
@@ -31,8 +65,11 @@ async function startServer() {
   });
 
   // Astronava Store API Routes
+  app.use('/api/store/orders', storeActionLimiter);
+  app.use('/api/store/coupons', storeActionLimiter);
   app.use('/api/store', storeRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/horoscope/generate', aiRateLimiter);
   app.use('/api/horoscope', horoscopeRouter);
   app.use('/api/user', userRouter);
 
@@ -55,7 +92,7 @@ async function startServer() {
   });
 
   // AI Kundli Summary Endpoint
-  app.post('/api/ai/summarize-kundli', async (req, res) => {
+  app.post('/api/ai/summarize-kundli', aiRateLimiter, async (req, res) => {
     try {
       const { kundliData, focus, depth } = req.body;
       if (!kundliData || typeof kundliData !== 'object') {
@@ -73,7 +110,7 @@ async function startServer() {
   });
 
   // Comprehensive Full Astrology Report Endpoint
-  app.post('/api/ai/full-astrology-report', async (req, res) => {
+  app.post('/api/ai/full-astrology-report', aiRateLimiter, async (req, res) => {
     try {
       const { kundliData, forecastYears } = req.body;
       if (!kundliData || typeof kundliData !== 'object') {
@@ -81,16 +118,16 @@ async function startServer() {
       }
 
       const boundedYears = Math.min(10, Math.max(1, Number(forecastYears) || 3));
-      const report = await generateFullAstrologyReportWithAi(kundliData, boundedYears);
+      const report = await generateFullAstrologyReportWithAi(kundliData, boundedYears as 1 | 2 | 3 | 5);
       res.json(report);
     } catch (error: any) {
       console.error('Full Astrology Report generation failed:', error);
-      res.status(500).json({ error: error.message || 'Failed to generate full astrology report' });
+      res.status(500).json({ error: 'Failed to generate full astrology report' });
     }
   });
 
   // Real-time Planet or House Insight Endpoint using Gemini
-  app.post('/api/ai/planet-house-insight', async (req, res) => {
+  app.post('/api/ai/planet-house-insight', aiRateLimiter, async (req, res) => {
     try {
       const { targetType, targetId, placements } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
@@ -131,12 +168,12 @@ async function startServer() {
       }
     } catch (error: any) {
       console.error('Planet/House insight generation failed:', error);
-      res.status(500).json({ error: error.message || 'Failed to generate insight' });
+      res.status(500).json({ error: 'Failed to generate insight' });
     }
   });
 
   // AI Match Analysis & Synastry Endpoint using Gemini
-  app.post('/api/ai/match-analysis', async (req, res) => {
+  app.post('/api/ai/match-analysis', aiRateLimiter, async (req, res) => {
     try {
       const { matchReport, p1, p2 } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
@@ -145,9 +182,13 @@ async function startServer() {
         return res.status(400).json({ error: 'Gemini API key not configured' });
       }
 
+      const safeP1Name = String(p1?.name || 'Partner 1').slice(0, 80);
+      const safeP2Name = String(p2?.name || 'Partner 2').slice(0, 80);
+      const safeMatchReport = JSON.stringify(matchReport || {}).slice(0, 10000);
+
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `Analyze the Vedic Guna Milan and synastry compatibility between ${p1?.name || 'Partner 1'} and ${p2?.name || 'Partner 2'}. 
-Match Report data: ${JSON.stringify(matchReport)}. 
+      const prompt = `Analyze the Vedic Guna Milan and synastry compatibility between ${safeP1Name} and ${safeP2Name}. 
+Match Report data: ${safeMatchReport}. 
 Return JSON with fields: 
 - executiveSummary (string)
 - synastryStrengths (array of objects with domain and description)
@@ -193,7 +234,7 @@ Return JSON with fields:
       }
     } catch (error: any) {
       console.error('Match analysis generation failed:', error);
-      res.status(500).json({ error: error.message || 'Failed to generate match analysis' });
+      res.status(500).json({ error: 'Failed to generate match analysis' });
     }
   });
 

@@ -64,7 +64,7 @@ service cloud.firestore {
           'id', 'email', 'createdAt', 'updatedAt', 'displayName', 'photoURL', 'phoneNumber',
           'dob', 'tob', 'isTobUnknown', 'birthPlace', 'latitude', 'longitude', 'timezoneOffset',
           'gender', 'preferredLanguage', 'notificationTime', 'notificationsEnabled',
-          'notificationChannels', 'consentGiven', 'consentTimestamp', 'birthDetails'
+          'notificationChannels', 'consentGiven', 'consentTimestamp', 'birthDetails', 'addresses'
         ]) &&
         data.id is string && data.id == request.auth.uid &&
         data.email is string && data.email.size() <= 150 &&
@@ -86,6 +86,7 @@ service cloud.firestore {
         (!('consentGiven' in data) || data.consentGiven is bool) &&
         (!('consentTimestamp' in data) || (data.consentTimestamp is string && data.consentTimestamp.size() <= 50)) &&
         (!('birthDetails' in data) || data.birthDetails is map) &&
+        (!('addresses' in data) || (data.addresses is list && data.addresses.size() <= 20)) &&
         (!('updatedAt' in data) || data.updatedAt is timestamp) &&
         data.createdAt is timestamp;
     }
@@ -176,7 +177,8 @@ service cloud.firestore {
 
     function isValidSellerApplication(data, sellerId) {
       return data.keys().hasAll(['legalBusinessName', 'contactPerson', 'gstin', 'email', 'phone', 'addressLine1', 'state', 'status', 'createdAt']) &&
-        data.keys().hasOnly(['userId', 'legalBusinessName', 'contactPerson', 'gstin', 'email', 'phone', 'addressLine1', 'state', 'status', 'adminNotes', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'userId', 'legalBusinessName', 'contactPerson', 'gstin', 'email', 'phone', 'addressLine1', 'state', 'status', 'adminNotes', 'createdAt', 'updatedAt']) &&
+        (!('id' in data) || (data.id is string && data.id == sellerId)) &&
         (!('userId' in data) || (data.userId is string && data.userId == sellerId)) &&
         data.legalBusinessName is string && data.legalBusinessName.size() <= 200 &&
         data.contactPerson is string && data.contactPerson.size() <= 120 &&
@@ -185,17 +187,19 @@ service cloud.firestore {
         data.phone is string && data.phone.size() <= 30 &&
         data.addressLine1 is string && data.addressLine1.size() <= 300 &&
         data.state is string && data.state.size() <= 100 &&
-        data.status == 'pending' &&
-        data.createdAt == request.time;
+        (data.status == 'pending' || data.status == 'approved' || data.status == 'rejected') &&
+        (!('adminNotes' in data) || (data.adminNotes is string && data.adminNotes.size() <= 1000)) &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp) &&
+        data.createdAt is timestamp;
     }
 
     // Seller Portal Applications collection
     match /sellers/{sellerId} {
-      allow get: if isAdmin() || (request.auth != null && request.auth.uid == sellerId);
+      allow get: if isValidId(sellerId) && (isAdmin() || (request.auth != null && request.auth.uid == sellerId));
       allow list: if isAdmin();
-      allow create: if request.auth != null && request.auth.uid == sellerId && isValidSellerApplication(incoming(), sellerId);
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if request.auth != null && isValidId(sellerId) && request.auth.uid == sellerId && isValidSellerApplication(incoming(), sellerId) && incoming().status == 'pending' && incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(sellerId) && isValidSellerApplication(incoming(), sellerId) && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes', 'updatedAt']);
+      allow delete: if isAdmin() && isValidId(sellerId);
     }
 
     // Match Finder 24-hour collection

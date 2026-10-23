@@ -22,10 +22,18 @@ export const getUserProfile = functions.https.onRequest(async (req, res) => {
     return;
   }
 
-  const token = authHeader.split('Bearer ')[1];
+  const token = authHeader.split('Bearer ')[1]?.trim();
+  if (!token) {
+    res.status(401).send({ error: 'Unauthorized' });
+    return;
+  }
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
+    if (!decodedToken.email_verified) {
+      res.status(403).send({ error: 'Forbidden: Verified email required' });
+      return;
+    }
     const uid = decodedToken.uid;
 
     // Fetch user profile from Firestore

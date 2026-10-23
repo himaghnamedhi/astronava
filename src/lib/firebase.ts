@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { 
   getFirestore, 
   doc, 
+  getDoc,
   setDoc, 
   getDocs, 
   query, 
@@ -108,12 +109,15 @@ export interface StoredMatchSubmission {
   sessionId: string;
 }
 
-// Generate or retrieve persistent browser session ID
+// Generate or retrieve persistent browser session ID using CSPRNG
 export function getSessionId(): string {
   const KEY = 'jyotish_match_session_id';
   let sid = localStorage.getItem(KEY);
   if (!sid) {
-    sid = 'sess_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
+    const randomPart = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID().replace(/-/g, '')
+      : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+    sid = `sess_${randomPart}`;
     localStorage.setItem(KEY, sid);
   }
   return sid;
@@ -253,18 +257,25 @@ export async function syncUserProfile(user: {
   phoneNumber?: string | null;
 }): Promise<void> {
   if (!user || !user.uid || !user.email) return;
-  const path = `users/${user.uid}`;
-  const data: UserProfileData = {
-    id: user.uid,
-    email: user.email,
-    displayName: user.displayName || user.email.split('@')[0] || 'Vedic Seeker',
-    photoURL: user.photoURL || '',
-    ...(user.phoneNumber ? { phoneNumber: user.phoneNumber } : {}),
-    createdAt: serverTimestamp(),
-  };
+  const userRef = doc(db, 'users', user.uid);
 
   try {
-    await setDoc(doc(db, 'users', user.uid), data, { merge: true });
+    const existingSnap = await getDoc(userRef);
+    const data: Record<string, any> = {
+      id: user.uid,
+      email: String(user.email).slice(0, 150),
+      displayName: String(user.displayName || user.email.split('@')[0] || 'Vedic Seeker').slice(0, 100),
+      photoURL: String(user.photoURL || '').slice(0, 500),
+      ...(user.phoneNumber ? { phoneNumber: String(user.phoneNumber).slice(0, 30) } : {}),
+    };
+
+    if (existingSnap.exists()) {
+      data.updatedAt = serverTimestamp();
+    } else {
+      data.createdAt = serverTimestamp();
+    }
+
+    await setDoc(userRef, data, { merge: true });
   } catch (error) {
     console.warn('Could not sync user profile:', error);
   }
@@ -550,11 +561,22 @@ export interface FirebaseSellerApplication {
 }
 
 export async function saveSellerApplicationToFirestore(data: Omit<FirebaseSellerApplication, 'id' | 'status' | 'createdAt'>): Promise<string> {
-  const sellerId = `seller_${Date.now()}`;
+  const uid = auth.currentUser?.uid;
+  if (!uid) {
+    throw new Error('Authentication required to submit a seller application');
+  }
+  const sellerId = uid;
   const path = `sellers/${sellerId}`;
   const payload = {
     id: sellerId,
-    ...data,
+    userId: sellerId,
+    legalBusinessName: String(data.legalBusinessName || '').slice(0, 200),
+    contactPerson: String(data.contactPerson || '').slice(0, 120),
+    gstin: String(data.gstin || '').slice(0, 30),
+    phone: String(data.phone || '').slice(0, 30),
+    email: String(data.email || '').slice(0, 150),
+    addressLine1: String(data.addressLine1 || '').slice(0, 300),
+    state: String(data.state || '').slice(0, 100),
     status: 'pending',
     createdAt: serverTimestamp(),
   };

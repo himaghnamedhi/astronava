@@ -253,10 +253,15 @@ adminRouter.get('/orders', requireAdmin, async (req: AuthRequest, res: Response)
 
 adminRouter.patch('/orders/:id/status', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const updated = await updateOrderStatus(Number(req.params.id), req.body.status);
+    const allowedStatuses = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    const nextStatus = String(req.body.status || '').trim();
+    if (!allowedStatuses.includes(nextStatus)) {
+      return res.status(400).json({ error: 'Invalid order status value' });
+    }
+    const updated = await updateOrderStatus(Number(req.params.id), nextStatus);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to update order status' });
   }
 });
 
@@ -266,16 +271,18 @@ adminRouter.get('/sellers', requireAdmin, async (req: AuthRequest, res: Response
     const sellers = await listSellers();
     res.json(sellers);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to fetch sellers' });
   }
 });
 
 adminRouter.patch('/sellers/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const updated = await updateSellerStatus(Number(req.params.id), req.body.status, req.body.adminNotes);
+    const status = req.body.status === 'approved' ? 'approved' : 'rejected';
+    const adminNotes = req.body.adminNotes ? String(req.body.adminNotes).slice(0, 1000) : undefined;
+    const updated = await updateSellerStatus(Number(req.params.id), status, adminNotes);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to update seller status' });
   }
 });
 
@@ -285,16 +292,17 @@ adminRouter.get('/pending-products', requireAdmin, async (_req: AuthRequest, res
     const products = await getPendingProducts();
     res.json(products);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to fetch pending products' });
   }
 });
 
 adminRouter.patch('/pending-products/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const updated = await updateProductStatus(Number(req.params.id), req.body.status);
+    const status = req.body.status === 'approved' ? 'approved' : 'rejected';
+    const updated = await updateProductStatus(Number(req.params.id), status);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to update product status' });
   }
 });
 
