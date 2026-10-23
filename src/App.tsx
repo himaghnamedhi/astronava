@@ -260,7 +260,14 @@ export default function App() {
       setTimeout(() => handleOpenFullReport(), 50);
       return true;
     }
-    if (cleanPath === '/sitemap' || cleanPath === '/sitemap.html' || cleanPath === 'sitemap' || cleanPath === 'sitemap.html') {
+    if (
+      cleanPath === '/sitemap' ||
+      cleanPath === '/sitemap.html' ||
+      cleanPath === '/sitemap.xml' ||
+      cleanPath === 'sitemap' ||
+      cleanPath === 'sitemap.html' ||
+      cleanPath === 'sitemap.xml'
+    ) {
       setActiveTab('sitemap');
       return true;
     }
@@ -955,6 +962,15 @@ export default function App() {
                 className="hover:text-amber-400 transition-colors cursor-pointer font-medium"
               >
                 Sitemap
+              </a>
+              <span>&bull;</span>
+              <a
+                href="/sitemap.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-400 transition-colors cursor-pointer font-mono text-[11px]"
+              >
+                sitemap.xml
               </a>
 
             </div>

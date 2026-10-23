@@ -49,7 +49,19 @@ interface SitemapPageProps {
 type ActiveViewTab = 'directory' | 'xml' | 'json';
 
 export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) => {
-  const [activeViewTab, setActiveViewTab] = useState<ActiveViewTab>('directory');
+  const [activeViewTab, setActiveViewTab] = useState<ActiveViewTab>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('sitemap.xml') || hash.includes('xml')) {
+        return 'xml';
+      }
+      if (hash.includes('json')) {
+        return 'json';
+      }
+    }
+    return 'directory';
+  });
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);

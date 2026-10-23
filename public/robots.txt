@@ -1,0 +1,8 @@
+# Astronava Vedic Astrology - Search Engine Directives
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /store/admin
+
+Sitemap: https://www.astronava.com/sitemap.xml
