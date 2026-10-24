@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw, Compass } from 'lucide-react';
 import {
   LegalDocType,
+  ABOUT_US_CONTENT,
   DISCLAIMER_CONTENT,
   TERMS_AND_CONDITIONS_CONTENT,
   PRIVACY_POLICY_CONTENT,
@@ -49,6 +50,8 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
   const getDocContent = (type: LegalDocType): string => {
     switch (type) {
+      case 'about':
+        return ABOUT_US_CONTENT;
       case 'disclaimer':
         return DISCLAIMER_CONTENT;
       case 'terms':
@@ -215,6 +218,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         <div className="p-5 sm:p-6 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 border border-amber-200 shrink-0">
+              {activeDoc === 'about' && <Compass className="w-5 h-5" />}
               {activeDoc === 'privacy' && <Shield className="w-5 h-5" />}
               {activeDoc === 'terms' && <FileText className="w-5 h-5" />}
               {activeDoc === 'disclaimer' && <AlertCircle className="w-5 h-5" />}
@@ -223,6 +227,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold font-vedic text-stone-900">
+                {activeDoc === 'about' && 'About Astronava'}
                 {activeDoc === 'privacy' && 'Privacy Policy'}
                 {activeDoc === 'terms' && 'Terms & Conditions'}
                 {activeDoc === 'disclaimer' && 'Disclaimer'}
@@ -230,7 +235,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 {activeDoc === 'contact' && 'Contact Us'}
               </h1>
               <p className="text-xs text-stone-500">
-                Astronava Official Legal Policies &bull; Effective September 2026
+                {activeDoc === 'about'
+                  ? 'Astronava Vedic Philosophy & Heritage • Effective October 2026'
+                  : 'Astronava Official Legal Policies • Effective September 2026'}
               </p>
             </div>
           </div>
@@ -242,6 +249,18 @@ export const LegalPage: React.FC<LegalPageProps> = ({
           ref={tabsRef}
           className="relative flex items-center border-b border-stone-200 bg-stone-100/60 px-4 pt-2 gap-2 overflow-x-auto no-scrollbar scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-38px),transparent)] sm:[mask-image:none]"
         >
+          <button
+            id="page-tab-about"
+            onClick={() => onSelectDoc('about')}
+            className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              activeDoc === 'about'
+                ? 'border-amber-600 text-amber-900 bg-white shadow-2xs font-bold'
+                : 'border-transparent text-stone-600 hover:text-stone-900 hover:bg-stone-200/50'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5 text-amber-700" />
+            <span>About Us</span>
+          </button>
           <button
             id="page-tab-privacy-policy"
             onClick={() => onSelectDoc('privacy')}
@@ -320,22 +339,39 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 
                 {/* General Email Card */}
                 <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Mail className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">General Inquiries</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider">General Inquiries</span>
                   </div>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
-                    className="text-stone-900 font-semibold text-sm hover:text-amber-800 transition-colors block break-all"
+                    className="text-stone-900 font-semibold text-xs sm:text-sm hover:text-amber-800 transition-colors block break-all"
                   >
                     {CONTACT_INFO.email}
                   </a>
                   <p className="text-[11px] text-stone-500">
-                    General, Legal &amp; Astrological Tools
+                    Astrological Tools &amp; Policies
+                  </p>
+                </div>
+
+                {/* Publisher & Editorial Desk */}
+                <div className="p-4 rounded-xl border border-amber-200/80 bg-amber-50/40 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-900">
+                    <Sparkles className="w-4 h-4 text-amber-700" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Publisher &amp; Editorial</span>
+                  </div>
+                  <a
+                    href={`mailto:${CONTACT_INFO.publisherEmail}`}
+                    className="text-stone-900 font-semibold text-xs sm:text-sm hover:text-amber-800 transition-colors block break-all"
+                  >
+                    {CONTACT_INFO.publisherEmail}
+                  </a>
+                  <p className="text-[11px] text-stone-500">
+                    Direct Publisher Correspondence
                   </p>
                 </div>
 
@@ -343,21 +379,21 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2">
                   <div className="flex items-center gap-2 text-amber-800">
                     <RotateCcw className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Orders, Returns &amp; Refunds</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Orders &amp; Returns</span>
                   </div>
                   <a
                     href={`mailto:${CONTACT_INFO.supportEmail}`}
-                    className="text-stone-900 font-semibold text-sm hover:text-amber-800 transition-colors block break-all"
+                    className="text-stone-900 font-semibold text-xs sm:text-sm hover:text-amber-800 transition-colors block break-all"
                   >
                     {CONTACT_INFO.supportEmail}
                   </a>
                   <p className="text-[11px] text-stone-500">
-                    Store Support, Shipping &amp; Refund Desk
+                    Sacred Store Customer Desk
                   </p>
                 </div>
 
                 {/* Website Card */}
-                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2 sm:col-span-2">
+                <div className="p-4 rounded-xl border border-stone-200 bg-stone-50/70 space-y-2 sm:col-span-3">
                   <div className="flex items-center gap-2 text-amber-800">
                     <Sparkles className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">Official Website</span>
@@ -405,6 +441,33 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             </div>
           ) : (
             <div className="prose prose-stone max-w-none">
+              {activeDoc === 'about' && (
+                <div className="mb-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 not-prose">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-bold font-vedic text-amber-950 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-amber-700" />
+                      <span>Explore the Full Interactive Experience</span>
+                    </span>
+                    <p className="text-[11px] text-stone-600">
+                      Discover our interactive pillars, classical Sanskrit shastras, and platform ecosystem.
+                    </p>
+                  </div>
+                  <a
+                    href="/about"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (typeof window !== 'undefined') {
+                        window.history.pushState(null, '', '/about');
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+                  >
+                    <span>View Interactive Story</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
               {renderMarkdown(rawContent)}
             </div>
           )}

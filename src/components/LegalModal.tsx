@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw } from 'lucide-react';
+import { X, Shield, FileText, AlertCircle, Mail, ExternalLink, Sparkles, RotateCcw, Compass } from 'lucide-react';
 import {
   LegalDocType,
+  ABOUT_US_CONTENT,
   DISCLAIMER_CONTENT,
   TERMS_AND_CONDITIONS_CONTENT,
   PRIVACY_POLICY_CONTENT,
@@ -44,6 +45,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({
 
   const getDocContent = (type: LegalDocType): string => {
     switch (type) {
+      case 'about':
+        return ABOUT_US_CONTENT;
       case 'disclaimer':
         return DISCLAIMER_CONTENT;
       case 'terms':
@@ -203,6 +206,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         <div className="p-4 sm:p-5 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 border border-amber-200">
+              {activeTab === 'about' && <Compass className="w-5 h-5" />}
               {activeTab === 'privacy' && <Shield className="w-5 h-5" />}
               {activeTab === 'terms' && <FileText className="w-5 h-5" />}
               {activeTab === 'disclaimer' && <AlertCircle className="w-5 h-5" />}
@@ -211,6 +215,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-bold font-vedic text-stone-900">
+                {activeTab === 'about' && 'About Astronava'}
                 {activeTab === 'privacy' && 'Privacy Policy'}
                 {activeTab === 'terms' && 'Terms & Conditions'}
                 {activeTab === 'disclaimer' && 'Disclaimer'}
@@ -218,7 +223,9 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                 {activeTab === 'contact' && 'Contact Us'}
               </h3>
               <p className="text-xs text-stone-500">
-                Astronava Official Policies &bull; Effective September 2026
+                {activeTab === 'about'
+                  ? 'Astronava Vedic Philosophy & Heritage • Effective October 2026'
+                  : 'Astronava Official Policies • Effective September 2026'}
               </p>
             </div>
           </div>
@@ -237,6 +244,18 @@ export const LegalModal: React.FC<LegalModalProps> = ({
 
         {/* Tab Selector */}
         <div className="flex border-b border-stone-200 bg-stone-100/60 px-4 pt-2 gap-2 overflow-x-auto">
+          <button
+            id="tab-about"
+            onClick={() => setActiveTab('about')}
+            className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'about'
+                ? 'border-amber-600 text-amber-900 bg-white shadow-2xs font-bold'
+                : 'border-transparent text-stone-600 hover:text-stone-900 hover:bg-stone-200/50'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5 text-amber-700" />
+            <span>About Us</span>
+          </button>
           <button
             id="tab-privacy-policy"
             onClick={() => setActiveTab('privacy')}

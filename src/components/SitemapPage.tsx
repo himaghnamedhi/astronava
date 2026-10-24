@@ -861,6 +861,10 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate, onBack }) 
             robots.txt
           </a>
           <span>•</span>
+          <a href="/about" onClick={(e) => handleRouteClick(e, 'about')} className="hover:text-amber-400 transition-colors">
+            About Us
+          </a>
+          <span>•</span>
           <a href="/privacy-policy" onClick={(e) => handleRouteClick(e, 'legal', 'privacy')} className="hover:text-amber-400 transition-colors">
             Privacy Policy
           </a>

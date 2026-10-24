@@ -4,8 +4,8 @@
  * and dynamic meta tag injection for search engine crawlability across all astrological tools.
  */
 
-export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'account' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap';
-export type LegalDocType = 'privacy' | 'terms' | 'disclaimer' | 'return-refund' | 'contact';
+export type AppTabType = 'home' | 'horoscope' | 'generator' | 'builder' | 'gemstones' | 'account' | 'match' | 'numerology' | 'name-correction' | 'legal' | 'store' | 'profile' | 'sitemap' | 'about';
+export type LegalDocType = 'about' | 'privacy' | 'terms' | 'disclaimer' | 'return-refund' | 'contact';
 
 export type SitemapCategoryType =
   | 'Astrological Tools'
@@ -486,6 +486,28 @@ export const APP_ROUTES: AppViewRoute[] = [
     category: 'Policies & Legal',
     lastmod: '2026-10-23',
   },
+  {
+    id: 'about-us',
+    tab: 'about',
+    path: '/about',
+    aliases: ['/about-us', '/about.html'],
+    title: 'About Us | Astronava — Authentic Vedic Jyotish & Sacred Philosophy',
+    shortTitle: 'About Us',
+    description: 'Learn about Astronava: Our mission to unite 3,000-year-old classical Parashari Jyotish with high-precision astronomical ephemeris, ethical Vedic remedies, and zero-data-monetization standards.',
+    keywords: [
+      'about astronava',
+      'vedic astrology philosophy',
+      'authentic jyotish story',
+      'parashari astrology mission',
+      'astronava founders',
+      'ethical astrology remedies',
+    ],
+    ogType: 'website',
+    priority: 0.85,
+    changefreq: 'monthly',
+    category: 'Policies & Legal',
+    lastmod: '2026-10-24',
+  },
 ];
 
 export const ASTROLOGICAL_REPORT_TYPES = [
@@ -622,7 +644,7 @@ export const SITEMAP_SECTIONS: SitemapSectionDefinition[] = [
     path: '/sitemap-general.xml',
     title: 'Core Platform & Directory Pages',
     description: 'Homepage, complete navigation directory, and authenticated user services',
-    filter: (r) => r.path === '/' || r.path === '/sitemap' || r.category === 'User Services' || r.tab === 'profile',
+    filter: (r) => r.path === '/' || r.path === '/sitemap' || r.path === '/about' || r.category === 'User Services' || r.tab === 'profile' || r.tab === 'about',
   },
 ];
 

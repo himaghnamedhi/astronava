@@ -134,11 +134,20 @@ async function startServer() {
     }
   });
 
-  // Robots.txt Directives for Google Search Console & Search Crawlers
+  // Robots.txt Directives for Google Search Console & AdSense Crawlers
   app.get('/robots.txt', (req, res) => {
     const baseUrl = getRequestBaseUrl(req);
     const robotsTxt = [
       '# Astronava Vedic Astrology - Search Crawler Directives',
+      'User-agent: Mediapartners-Google',
+      'Allow: /',
+      '',
+      'User-agent: Googlebot',
+      'Allow: /',
+      '',
+      'User-agent: Googlebot-Image',
+      'Allow: /',
+      '',
       'User-agent: *',
       'Allow: /',
       'Disallow: /api/',

@@ -243,7 +243,7 @@ export const SellerPortalRoot: React.FC = () => {
                   <span className="text-xl font-bold font-vedic text-white tracking-wider">ASTRONAVA</span>
                 </div>
                 <p className="text-xs text-stone-400 leading-relaxed">
-                  A modern Vedic astrology platform built on open-source technologies, using classical Vedic astrology principles and structured calculations to generate Kundli analysis, gemstone recommendations, and compatibility reports.
+                  A modern Vedic astrology platform using classical Vedic astrology principles and structured calculations to generate Kundli analysis, gemstone recommendations, and compatibility reports.
                 </p>
               </div>
 

@@ -278,8 +278,8 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  {/* Footer link to Global Life Topics Search */}
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between px-1 relative z-10">
+                  {/* Footer link to Global Life Topics Search & About Us */}
+                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between px-1 relative z-10 text-xs gap-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -289,7 +289,18 @@ export const Header: React.FC<HeaderProps> = ({
                       className="py-2.5 min-h-[44px] text-xs font-semibold text-amber-800 hover:text-amber-950 flex items-center gap-1.5 transition-colors cursor-pointer group"
                     >
                       <Search className="w-3.5 h-3.5 text-amber-700 group-hover:scale-110 transition-transform" />
-                      <span>Search life topics (marriage, career, wealth) &rarr;</span>
+                      <span>Search topics &rarr;</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setServicesDropdownOpen(false);
+                        setActiveTab('about');
+                      }}
+                      className="py-2.5 min-h-[44px] text-xs font-bold text-stone-600 hover:text-amber-900 flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <span>About Us &rarr;</span>
                     </button>
                   </div>
                 </div>

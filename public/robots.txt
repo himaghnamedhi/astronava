@@ -1,4 +1,13 @@
 # Astronava Vedic Astrology - Search Engine Directives
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /api/
@@ -7,3 +16,4 @@ Disallow: /store/admin
 
 Sitemap: https://www.astronava.com/sitemap-index.xml
 Sitemap: https://www.astronava.com/sitemap.xml
+

@@ -1,4 +1,4 @@
-export type LegalDocType = 'disclaimer' | 'terms' | 'privacy' | 'return-refund' | 'contact';
+export type LegalDocType = 'about' | 'privacy' | 'terms' | 'disclaimer' | 'return-refund' | 'contact';
 
 export interface LegalDocItem {
   id: LegalDocType;
@@ -6,6 +6,82 @@ export interface LegalDocItem {
   effectiveDate: string;
   content: string;
 }
+
+export const ABOUT_US_CONTENT = `# About Astronava
+
+**Effective Date:** October 2026  
+**Vedic Standard:** Chitrapaksha Lahiri Ayanamsha (Government of India Ephemeris Standard)  
+**Heritage Lineage:** Parashari & Jaimini Jyotish Traditions  
+
+Welcome to **Astronava**, an authentic Vedic astrology platform, precision ephemeric calculation suite, and consecrated sacred store.
+
+---
+
+# 1. Our Sacred Mission
+
+In classical Sanskrit, the term **Jyotiṣa (ज्योतिष)** is derived from *Jyoti* (light) and *Iṣa* (divine). It literally signifies **"The Science of Cosmic Light"** — an ancient observational and spiritual discipline created to illumine one’s dharma, psychological predispositions, life milestones, and karmic seasons.
+
+Astronava was founded with a singular conviction: **to restore Vedic astrology to its true dignity**. Across modern digital platforms, astrology is frequently compromised by fear-inducing doom predictions, generic commercial sun-sign horoscopes, and predatory upselling of counterfeit synthetic gems.
+
+Astronava unites centuries of sacred Sanskrit treatises with modern high-precision astronomical ephemeris (calibrated against NASA/JPL planetary data). We provide individuals with transparent, mathematically verifiable cosmic insights that empower free will, conscious right action (**Purushartha**), and spiritual peace.
+
+---
+
+# 2. The Five Sacred Pillars of Astronava
+
+### I. Astronomical & Ephemeric Integrity
+Every planetary longitude, ascendant Lagna degree, retrograde arc, planetary combustion (Asta), and house cusp on Astronava is calculated using the Chitrapaksha Lahiri Ayanamsha down to arcseconds. We do not use simplified approximations; our engine computes exact planetary coordinates across all 16 divisional charts (Shodashvargas, D1 through D12).
+
+### II. Empowerment Over Fatalism
+A Janam Kundli birth chart is an astrological weather forecast of your soul's karmic journey — not a fatalistic prison. We firmly believe in **Purushartha** (conscious righteous action). Astrology provides cosmic discernment so you can navigate challenging transits with wisdom, fortitude, and constructive remedial measures.
+
+### III. Authentic & Calibrated Remedial Science
+Remedies in Jyotish are intended to harmonize planetary frequencies, not exploit fear. When prescribing Vedic gemstones, our algorithm calibrates the exact Ratti dosage based on the native's body weight, Lagna/Trikona lordship, wearing finger, auspicious metal, and traditional Vedic Beej mantras.
+
+### IV. Sacred Store Sanctity
+Every gemstone, Rudraksha bead, and sacred artifact in our store is:
+* **100% Natural, Untreated & Unheated**: Completely free from glass fillings, dye treatments, or synthetic lab-grown substitutes.
+* **Independently Certified**: Tested by accredited gemological laboratories with verifiable certification cards.
+* **Vedic Prana Pratishtha Consecration**: Consecrated with authentic Vedic Abhishek and energizing mantras by practicing Brahmins before dispatch.
+
+### V. Absolute Data Sanctity & Zero Commercialization
+Your birth details (date of birth, exact time, geographic latitude, and longitude) constitute sacred personal data. Astronava operates under a strict **Zero-Data-Monetization Policy**. We never sell, rent, or distribute your personal birth coordinates or consultation records to advertisers, data aggregators, or brokers.
+
+---
+
+# 3. Codified Sanskrit Heritage Treatises
+
+Our computational engines translate classical Sanskrit treatises into transparent digital models, adhering strictly to:
+
+* **Brihat Parashara Hora Shastra** by Maharishi Parashara (The foundational authority on Lagna, 12 Bhavas, Drishti aspects, Vimshottari Dasha, and Divisional Vargas).
+* **Brihat Jataka** by Acharya Varahamihira (Classical planetary strengths, Shadbala, and character analysis).
+* **Phaladeepika** by Mantreswara (Gochar transits from the natal Moon, Raja Yogas, and remedial measures).
+* **Jaimini Upadesha Sutras** by Rishi Jaimini (Chara Karaka dynamics, Atmakaraka soul purpose, and sign aspects).
+* **Saravali** by Kalyana Varma (Planetary combinations across houses and Nakshatra padas).
+* **Garuda Purana & Ratna Pariksha** (Vedic gemology, mineral radiation absorption, and sacred consecration rituals).
+
+---
+
+# 4. Our Core Offerings
+
+* **Janam Kundli & Patrika Maker**: Precision North & South Indian birth chart generator with 12 Bhavas, Vimshottari Mahadasha-Antardasha timelines, and 20-Section Full Life Astrology Reports.
+* **Interactive Kundli Visualizer & Builder**: Dynamic exploratory sandbox allowing astrologers and students to inspect house strengths, planetary aspects, and degree cusps.
+* **Daily Gochar Horizon & Panchang**: Real ephemeris transit tracking against your natal ascendant across 20 distinct life domains with Choghadiya Muhurat windows.
+* **36 Guna Ashtakoota Kundli Milan**: Classical marriage compatibility testing across 8 sacred dimensions (Nadi, Bhakoot, Gana, Maitri, Yoni, Tara, Vasya, Varna) with Kuja (Manglik) Dosha checks.
+* **Vedic Sankhya Shastra Numerology**: Mulank (Psychic), Bhagyank (Destiny), and Namank (Name Vibration) analysis with Chaldean and Pythagorean spelling harmonizers.
+* **The Sacred Consecrated Store**: Authenticated, certified natural gemstones, genuine 1 to 14 Mukhi Nepali Rudraksha beads, energized Yantras, and spiritual healing bracelets delivered across India.
+
+---
+
+# 5. Ethical Stewardship & Contact
+
+Astronava is committed to transparent, accessible, and ethical astrological knowledge. If you have questions about our calculations, gemstone certifications, or platform:
+
+* **General Support & Inquiries**: [customer-support@astronava.com](mailto:customer-support@astronava.com)
+* **Administrative & Editorial Office**: [contact@astronava.com](mailto:contact@astronava.com)
+* **Official Website**: https://www.astronava.com
+
+*“May the cosmic light of the Grahas guide your journey with clarity, peace, and spiritual strength.”*`;
 
 export const DISCLAIMER_CONTENT = `# Disclaimer
 
@@ -219,7 +295,7 @@ Unless otherwise stated, all content available on Astronava, including but not l
 * Graphics
 * Icons
 * Software
-* Source code (excluding third-party open-source components)
+* Source code and computational algorithms
 * Databases
 * Astrological calculations
 * Original content
@@ -403,77 +479,89 @@ If you submit information relating to another individual, you confirm that you h
 
 ---
 
-# 6. Cookies and Similar Technologies
+# 6. Cookies, Google AdSense & Advertising Technologies
 
-Astronava may use essential cookies or similar technologies to:
+Astronava uses cookies, local storage, and similar web technologies to provide an optimal browsing experience, maintain website functionality, and support our free Vedic astrology tools through digital advertising.
 
-* Maintain website functionality
-* Improve website performance
-* Enhance user experience
-* Prevent abuse and unauthorized access
+### 6.1 Essential & Functional Cookies
+These cookies are necessary for the basic operation of the website, such as remembering your selected Vedic chart style (North vs. South Indian), active astrology tab, and cookie preferences. These cookies do not store personally identifiable information.
 
-These cookies do not identify you personally.
+### 6.2 Google AdSense & Third-Party Advertising Cookies
+We use **Google AdSense** to serve advertisements when you visit our website. To comply strictly with Google AdSense Publisher Program Policies, we disclose the following:
+
+* **Third-Party Vendor Cookies:** Third-party vendors, including Google, use cookies (such as the Google DoubleClick DART cookie) to serve ads based on a user's prior visits to Astronava or other websites across the Internet.
+* **Personalized Advertising:** Google's use of advertising cookies enables it and its network partners to serve relevant advertisements to our users based on their visits to our site and/or other destinations on the Internet.
+* **Third-Party Ad Networks:** Other third-party ad networks or vendors certified by Google may also serve ads on Astronava. These companies may use cookies, JavaScript, or web beacons to measure advertising campaign effectiveness and personalize ad content.
+
+### 6.3 How to Opt Out of Personalized Advertising
+You have complete control over how advertising cookies are used:
+
+* **Google Ads Settings:** You may opt out of personalized Google advertising at any time by visiting [Google Ad Settings](https://adssettings.google.com).
+* **AboutAds Choice Tool:** You may opt out of third-party vendor cookies for personalized advertising through the Digital Advertising Alliance Consumer Choice page at [www.aboutads.info/choices](https://optout.aboutads.info).
+* **Network Advertising Initiative (NAI):** You can also opt out of participating ad networks by visiting the [Network Advertising Initiative Opt-Out Page](https://thenai.org/opt-out/).
+* **European Users (EDAA):** Visitors residing in the European Union or United Kingdom can manage ad preferences through [Your Online Choices](https://www.youronlinechoices.eu).
+* **Browser-Level Controls:** You can instruct your web browser (Google Chrome, Mozilla Firefox, Apple Safari, or Microsoft Edge) to refuse all cookies or notify you when a cookie is sent. Note that disabling essential cookies may impact certain interactive calculation features.
 
 ---
 
-# 7. Third-Party Services
+# 7. Third-Party Services & Integrations
 
-To operate our website, we may use trusted third-party providers, including:
+To operate our platform efficiently, Astronava interfaces with trusted service providers:
 
-* Vercel (Website Hosting)
-* Firebase (Backend and Database Services)
-* Google Analytics (Website Analytics)
+* **Google AdSense:** Digital advertising partner providing contextual and programmatic advertisements. (Subject to [Google Privacy & Terms](https://policies.google.com/technologies/ads)).
+* **Google Analytics:** Aggregated, anonymized traffic measurement to assess website health and performance.
+* **Vercel & Cloudflare:** Content delivery, DNS, and secure edge infrastructure.
+* **Firebase:** Secure cloud database and real-time backend infrastructure.
 
-These providers may process limited technical information necessary to provide their services.
+These third-party providers have access to technical information (such as anonymized IP address, device type, and browser user agent) solely to perform services on our behalf and are obligated not to disclose or use it for any other purpose.
 
 ---
 
 # 8. Data Security
 
-We implement reasonable administrative, technical, and organizational measures to safeguard the information we collect.
+We implement rigorous administrative, technical, and cryptographic safeguards to protect any data processed by Astronava:
 
-While we strive to protect your information, no method of electronic transmission or storage is completely secure. Accordingly, we cannot guarantee absolute security.
+* End-to-end SSL/TLS 256-bit encryption for all transmitted data.
+* No long-term storage of birth details: user-entered birth data is processed in-memory or stored transiently for a maximum of 24 hours.
+* Zero data monetization: we never sell, trade, or rent personal birth coordinates, horoscopes, or consultation records to data brokers.
 
 ---
 
 # 9. Children's Privacy
 
-Astronava is not intended for children under the age of 13.
-
-We do not knowingly collect personal information from children.
-
-If you believe that a child has provided personal information through our website, please contact us so that appropriate action can be taken.
+Astronava is not directed to individuals under the age of 13. We do not knowingly collect personal identifiable information from children. If you become aware that a child has provided us with personal information, please notify us immediately at [contact@astronava.com](mailto:contact@astronava.com) or [himaghnamedhi1@gmail.com](mailto:himaghnamedhi1@gmail.com), and we will promptly purge the data from our servers.
 
 ---
 
-# 10. Your Rights
+# 10. User Rights & Data Protection (GDPR, CCPA & Global Laws)
 
-Subject to applicable law, you may have the right to:
+Depending on your geographic jurisdiction, you have fundamental rights regarding your personal information:
 
-* Request information about the personal data we process
-* Request correction of inaccurate information
-* Request deletion of your personal information where applicable
-* Contact us regarding any privacy concerns
-
-Requests may be submitted using the contact information provided below.
+* **Right of Access & Portability:** You have the right to request a copy of the personal information we hold about you.
+* **Right to Rectification:** You may request correction of any inaccurate or incomplete personal records.
+* **Right to Erasure ("Right to be Forgotten"):** You may request that we delete all your records by contacting us or visiting our [Data Deletion Request Page](/request-delete).
+* **Right to Restrict or Object to Processing:** You can object to the processing of your data for advertising purposes.
+* **Non-Discrimination:** We will never deny services, charge different prices, or degrade quality for exercising your privacy rights.
 
 ---
 
 # 11. Changes to this Privacy Policy
 
-We may update this Privacy Policy from time to time to reflect changes in our services, legal requirements, or operational practices.
-
-The updated version will be published on this page with a revised Effective Date.
+We may periodically revise this Privacy Policy to reflect enhancements in our astrological tools, updates to Google AdSense guidelines, or statutory compliance updates. When revisions occur, the "Effective Date" at the top of this policy will be refreshed. We encourage users to periodically review this page.
 
 ---
 
-# 12. Contact Us
+# 12. Publisher Identity & Contact Information
 
-If you have any questions about this Privacy Policy or the way your information is handled, please contact us:
+For any questions, feedback, grievance redressal, or requests regarding this Privacy Policy or Google AdSense advertising on Astronava, please contact our publisher and data protection team:
 
-**Email:** [contact@astronava.com](mailto:contact@astronava.com)
-
-**Website:** https://www.astronava.com
+* **Publisher & Developer:** Himaghna Medhi
+* **Primary Editorial Contact:** [himaghnamedhi1@gmail.com](mailto:himaghnamedhi1@gmail.com)
+* **General Legal & Privacy Inquiries:** [contact@astronava.com](mailto:contact@astronava.com)
+* **Store & Customer Support:** [customer-support@astronava.com](mailto:customer-support@astronava.com)
+* **Official Website:** https://www.astronava.com
+* **Jurisdiction & Location:** Guwahati, Assam, India
+* **Response Commitment:** We review and respond to all privacy, data, and editorial inquiries within 24 to 48 business hours.
 
 ---
 
@@ -628,10 +716,12 @@ Thank you for shopping with Astronava.`;
 
 export const CONTACT_INFO = {
   email: 'contact@astronava.com',
+  publisherEmail: 'himaghnamedhi1@gmail.com',
   supportEmail: 'customer-support@astronava.com',
   website: 'https://www.astronava.com',
   developerName: 'Himaghna Medhi',
   twitter: 'https://x.com/himaghnamedhi',
   effectiveDate: 'September 2026',
 };
+
 

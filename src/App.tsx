@@ -14,9 +14,10 @@ import { LegalModal } from './components/LegalModal';
 import { LegalPage } from './components/LegalPage';
 import { SitemapModal } from './components/SitemapModal';
 import { SitemapPage } from './components/SitemapPage';
+import { AboutPage } from './components/AboutPage';
 import { LegalDocType } from './data/legalPolicies';
 import { CompleteKundliData, generateCompleteKundli } from './data/vedicEphemeris';
-import { Sparkles, ArrowUp, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass, RotateCcw } from 'lucide-react';
+import { Sparkles, ArrowUp, ArrowRight, Shield, FileText, AlertCircle, Mail, ExternalLink, Compass, RotateCcw, Info } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { StoreProvider } from './context/StoreContext';
@@ -25,6 +26,7 @@ import { HomePage } from './components/HomePage';
 const HoroscopeDashboard = lazy(() => import('./components/horoscope/HoroscopeDashboard').then(m => ({ default: m.HoroscopeDashboard })));
 const UserDashboard = lazy(() => import('./components/user/UserDashboard').then(m => ({ default: m.UserDashboard })));
 import { NotificationToast } from './components/common/NotificationToast';
+import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { RequestDeletePage } from './components/user/RequestDeletePage';
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
@@ -47,8 +49,11 @@ export const TAB_SEO_SUFFIXES: Record<AppTabType, string | ((doc?: LegalDocType)
   profile: 'My Profile & Account Dashboard | astronava.com',
   account: 'My Account & Preferences | astronava.com',
   sitemap: 'Sitemap Directory | astronava.com',
+  about: 'About Us | astronava.com',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
+      case 'about':
+        return 'About Us | astronava.com';
       case 'terms':
         return 'Terms & Conditions | astronava.com';
       case 'disclaimer':
@@ -81,8 +86,11 @@ export const TAB_SEO_LEADS: Record<AppTabType, string | ((doc?: LegalDocType) =>
   profile: 'Astronava Member Dashboard & Astrological Records',
   account: 'Astronava User Account & Dashboard Settings',
   sitemap: 'Directory of All Astronava Astrology Tools & Services',
+  about: 'The Story & Sacred Philosophy of Astronava',
   legal: (doc?: LegalDocType) => {
     switch (doc) {
+      case 'about':
+        return 'The Story & Sacred Philosophy of Astronava';
       case 'terms':
         return 'Astrology Service Terms of Use';
       case 'disclaimer':
@@ -261,10 +269,26 @@ export default function App() {
       return true;
     }
     if (
+      cleanPath === '/about' ||
+      cleanPath === '/about-us' ||
+      cleanPath === '/about.html' ||
+      cleanPath === 'about' ||
+      cleanPath === 'about-us' ||
+      cleanPath === 'about.html'
+    ) {
+      setActiveTab('about');
+      return true;
+    }
+    if (
       cleanPath.startsWith('/sitemap') ||
       cleanPath.startsWith('sitemap')
     ) {
       setActiveTab('sitemap');
+      return true;
+    }
+    if (cleanPath === '/legal/about' || cleanPath === '/legal/about-us' || cleanPath === 'legal/about' || cleanPath === 'legal/about-us') {
+      setSelectedLegalDoc('about');
+      setActiveTab('legal');
       return true;
     }
     if (cleanPath === '/privacy-policy' || cleanPath === '/privacy' || cleanPath === '/legal/privacy' || cleanPath === 'privacy-policy' || cleanPath === 'privacy' || cleanPath === 'legal/privacy') {
@@ -657,6 +681,13 @@ export default function App() {
           {activeTab === 'profile' && (
             <UserDashboard onNavigateTab={handleTabChange} />
           )}
+
+          {activeTab === 'about' && (
+            <AboutPage
+              onNavigateTab={handleTabChange}
+              onBack={handleReturnHome}
+            />
+          )}
         </Suspense>
 
       </main>
@@ -667,7 +698,7 @@ export default function App() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             
-            {/* Col 1: About */}
+            {/* Col 1: Brand & Overview */}
             <div className="space-y-3">
               <div className="flex items-center gap-2.5 cursor-pointer" onClick={handleReturnHome}>
                 <img
@@ -679,7 +710,7 @@ export default function App() {
                 <span className="text-xl font-bold font-vedic text-white tracking-wider">ASTRONAVA</span>
               </div>
               <p className="text-xs text-stone-400 leading-relaxed">
-                A modern Vedic astrology platform built on open-source technologies, using classical Vedic astrology principles and structured calculations to generate Kundli analysis, gemstone recommendations, and compatibility reports.
+                A modern Vedic astrology platform using classical Vedic astrology principles and structured calculations to generate Kundli analysis, gemstone recommendations, and compatibility reports.
               </p>
             </div>
 
@@ -790,6 +821,20 @@ export default function App() {
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 font-vedic">Legal &amp; Policies</h4>
               <ul className="space-y-2 text-xs text-stone-400">
+                <li>
+                  <a
+                    href="/about"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleTabChange('about');
+                      scrollToTop();
+                    }}
+                    className="text-stone-300 hover:text-amber-400 font-medium flex items-center gap-1.5 transition-colors group cursor-pointer text-left"
+                  >
+                    <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>About Us</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     href="/privacy-policy"
@@ -923,6 +968,18 @@ export default function App() {
           <div className="pt-6 sm:pt-8 border-t border-stone-800 flex flex-col items-center justify-center text-xs text-stone-400 gap-4 sm:gap-6 relative">
             <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs text-stone-400">
               <a
+                href="/about"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTabChange('about');
+                  scrollToTop();
+                }}
+                className="hover:text-amber-400 transition-colors cursor-pointer font-medium"
+              >
+                About Us
+              </a>
+              <span>&bull;</span>
+              <a
                 href="/privacy-policy"
                 onClick={(e) => {
                   e.preventDefault();
@@ -976,6 +1033,16 @@ export default function App() {
               >
                 Contact Us
               </a>
+              <span>&bull;</span>
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('astronava_open_cookie_settings'));
+                }}
+                className="hover:text-amber-400 transition-colors cursor-pointer"
+              >
+                Cookie Preferences
+              </button>
               <span>&bull;</span>
               <a
                 href="/store"
@@ -1117,6 +1184,11 @@ export default function App() {
 
       {/* Global Notification Toast */}
       <NotificationToast />
+
+      {/* Google AdSense & Privacy Cookie Consent Banner */}
+      <CookieConsentBanner
+        onOpenPrivacyPolicy={() => handleOpenLegal('privacy')}
+      />
 
         </div>
       </StoreProvider>
