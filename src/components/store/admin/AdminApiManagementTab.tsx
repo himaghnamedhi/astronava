@@ -524,9 +524,6 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
           >
             <TrendingUp className="w-4 h-4 text-stone-900" />
             <span>Consumption Trends &amp; Errors</span>
-            <span className="px-1.5 py-0.5 rounded-full bg-stone-900/20 text-stone-950 text-[10px] font-extrabold">
-              Visualizer
-            </span>
           </button>
 
           <button
@@ -551,11 +548,6 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
           >
             <Activity className="w-4 h-4" />
             <span>Usage &amp; Audit Logs</span>
-            {logs.length > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 text-[10px]">
-                Live
-              </span>
-            )}
           </button>
 
           <button
@@ -740,11 +732,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
 
             {/* Primary Recharts Chart */}
             <div className="mt-6 pt-5 border-t border-stone-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-bold text-stone-800 flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-                  <span>Daily API Consumption vs Error Rate (%)</span>
-                </div>
+              <div className="flex items-center justify-end mb-2">
                 <span className="text-[11px] font-mono text-stone-400">
                   Left Axis: Invocations • Right Axis: Error Rate %
                 </span>

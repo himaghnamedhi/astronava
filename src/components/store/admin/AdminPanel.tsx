@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
   Package,
@@ -18,7 +18,9 @@ import {
   Sparkles,
   MessageSquare,
   Globe,
-  Code2
+  Code2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext.tsx';
 import { auth } from '../../../lib/firebase.ts';
@@ -52,6 +54,65 @@ export const AdminPanel: React.FC = () => {
   const [runningBatch, setRunningBatch] = useState(false);
   const [batchStatusMessage, setBatchStatusMessage] = useState<string | null>(null);
   const [pendingSellersCount, setPendingSellersCount] = useState<number>(2);
+
+  // Invisible slider state & drag navigation for tabs
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isDraggingTabs, setIsDraggingTabs] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+
+  const checkTabsScroll = () => {
+    if (tabsContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsContainerRef.current;
+      setCanScrollLeft(scrollLeft > 6);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+    }
+  };
+
+  useEffect(() => {
+    checkTabsScroll();
+    const el = tabsContainerRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', checkTabsScroll, { passive: true });
+    window.addEventListener('resize', checkTabsScroll);
+    return () => {
+      el.removeEventListener('scroll', checkTabsScroll);
+      window.removeEventListener('resize', checkTabsScroll);
+    };
+  }, []);
+
+  const slideTabsLeft = () => {
+    if (tabsContainerRef.current) {
+      tabsContainerRef.current.scrollBy({ left: -260, behavior: 'smooth' });
+    }
+  };
+
+  const slideTabsRight = () => {
+    if (tabsContainerRef.current) {
+      tabsContainerRef.current.scrollBy({ left: 260, behavior: 'smooth' });
+    }
+  };
+
+  const handleTabsMouseDown = (e: React.MouseEvent) => {
+    if (!tabsContainerRef.current) return;
+    setIsDraggingTabs(true);
+    setStartX(e.pageX - tabsContainerRef.current.offsetLeft);
+    setScrollLeftPos(tabsContainerRef.current.scrollLeft);
+  };
+
+  const handleTabsMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingTabs || !tabsContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabsContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    tabsContainerRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+
+  const handleTabsMouseUp = () => {
+    setIsDraggingTabs(false);
+  };
 
   useEffect(() => {
     async function fetchPendingSellers() {
@@ -255,143 +316,179 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
 
-          {/* Admin Navigation Tabs */}
-          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-2 border-t border-stone-100 text-xs font-bold">
-            <button
-              onClick={() => setActiveAdminTab('dashboard')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${
-                activeAdminTab === 'dashboard'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              Dashboard Overview
-            </button>
+          {/* Admin Navigation Tabs with Invisible Slider */}
+          <div className="relative border-t border-stone-100 group">
+            {/* Left Invisible Slider Arrow Button */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 pl-1 bg-gradient-to-r from-white via-white/90 to-transparent">
+                <button
+                  onClick={slideTabsLeft}
+                  className="w-7 h-7 rounded-full bg-white shadow-md border border-stone-200 text-stone-700 hover:text-amber-900 hover:bg-amber-50 flex items-center justify-center transition-all cursor-pointer"
+                  title="Slide tabs left"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-            <button
-              onClick={() => setActiveAdminTab('categories')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'categories'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
+            {/* Tabs Slider Track */}
+            <div
+              ref={tabsContainerRef}
+              onMouseDown={handleTabsMouseDown}
+              onMouseMove={handleTabsMouseMove}
+              onMouseUp={handleTabsMouseUp}
+              onMouseLeave={handleTabsMouseUp}
+              className={`flex gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-2 text-xs font-bold scroll-smooth select-none ${
+                isDraggingTabs ? 'cursor-grabbing' : 'cursor-grab'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-amber-500" />
-              <span>Category Management</span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('dashboard')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  activeAdminTab === 'dashboard'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                Dashboard Overview
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('products')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${
-                activeAdminTab === 'products'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              Products Catalog
-            </button>
+              {/* API Tab prominently positioned next to Dashboard */}
+              <button
+                onClick={() => setActiveAdminTab('api')}
+                className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'api'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs ring-2 ring-amber-500/30'
+                    : 'bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs'
+                }`}
+              >
+                <Code2 className="w-3.5 h-3.5 text-amber-500" />
+                <span>API &amp; Mobile SDK</span>
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('orders')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${
-                activeAdminTab === 'orders'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              Orders &amp; Fulfillment
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('categories')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'categories'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5 text-amber-500" />
+                <span>Category Management</span>
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('inventory')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${
-                activeAdminTab === 'inventory'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              Inventory Tracking
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('products')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  activeAdminTab === 'products'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                Products Catalog
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('sellers')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 relative ${
-                activeAdminTab === 'sellers'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5 text-amber-500" />
-              <span>Seller Management</span>
-              {pendingSellersCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-extrabold shadow-2xs">
-                  {pendingSellersCount}
-                </span>
-              )}
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('orders')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  activeAdminTab === 'orders'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                Orders &amp; Fulfillment
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('pending-products')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'pending-products'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
-              <span>Product Approval</span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('inventory')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  activeAdminTab === 'inventory'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                Inventory Tracking
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('horoscope')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'horoscope'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <Sun className="w-3.5 h-3.5 text-amber-500" />
-              <span>Batch &amp; Astrology</span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('sellers')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 relative shrink-0 ${
+                  activeAdminTab === 'sellers'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 text-amber-500" />
+                <span>Seller Management</span>
+                {pendingSellersCount > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-extrabold shadow-2xs">
+                    {pendingSellersCount}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('seo')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'seo'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5 text-amber-500" />
-              <span>SEO &amp; CTR Monitor</span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('pending-products')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'pending-products'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
+                <span>Product Approval</span>
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('users')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'users'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5 text-amber-500" />
-              <span>User Management</span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('horoscope')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'horoscope'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+                <span>Batch &amp; Astrology</span>
+              </button>
 
-            <button
-              onClick={() => setActiveAdminTab('api')}
-              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeAdminTab === 'api'
-                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
-                  : 'text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <Code2 className="w-3.5 h-3.5 text-amber-500" />
-              <span>API &amp; Mobile SDK</span>
-              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider">
-                v1.0
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveAdminTab('seo')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'seo'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5 text-amber-500" />
+                <span>SEO &amp; CTR Monitor</span>
+              </button>
+
+              <button
+                onClick={() => setActiveAdminTab('users')}
+                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeAdminTab === 'users'
+                    ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                    : 'text-stone-600 hover:bg-stone-100'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 text-amber-500" />
+                <span>User Management</span>
+              </button>
+            </div>
+
+            {/* Right Invisible Slider Arrow Button */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 pr-1 bg-gradient-to-l from-white via-white/90 to-transparent">
+                <button
+                  onClick={slideTabsRight}
+                  className="w-7 h-7 rounded-full bg-white shadow-md border border-stone-200 text-stone-700 hover:text-amber-900 hover:bg-amber-50 flex items-center justify-center transition-all cursor-pointer"
+                  title="Slide tabs right"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

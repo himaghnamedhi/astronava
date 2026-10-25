@@ -116,15 +116,17 @@ export const requireAdmin = async (
     return next();
   } catch (firebaseErr: any) {
     // In local development / preview environments where Firebase Admin Service Account key
-    // is not provisioned, allow verified admin requests if accompanied by valid admin email header
-    const candidateEmail = (req.headers['x-admin-email'] || req.headers['x-user-email'] || (token === 'admin_dev_token' ? 'himaghnamedhi1@gmail.com' : '')) as string;
-    if (candidateEmail && isAllowedAdminEmail(candidateEmail)) {
-      req.user = {
-        email: candidateEmail,
-        email_verified: true,
-        uid: 'admin_local_session',
-      } as any;
-      return next();
+    // is not provisioned, allow verified admin requests in dev mode only
+    if (process.env.NODE_ENV !== 'production') {
+      const candidateEmail = (req.headers['x-admin-email'] || req.headers['x-user-email'] || (token === 'admin_dev_token' ? 'himaghnamedhi1@gmail.com' : '')) as string;
+      if (candidateEmail && isAllowedAdminEmail(candidateEmail)) {
+        req.user = {
+          email: candidateEmail,
+          email_verified: true,
+          uid: 'admin_local_session',
+        } as any;
+        return next();
+      }
     }
 
     console.error('Admin authentication verification failed:', firebaseErr?.message || firebaseErr);
