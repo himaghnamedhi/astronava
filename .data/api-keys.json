@@ -1,0 +1,55 @@
+[
+  {
+    "id": "key_1792939425349_production",
+    "name": "Astronava Android App (Production)",
+    "environment": "production",
+    "keyPrefix": "ast_live_and...1c4d",
+    "keyHash": "846257d31450002f8cae9fd0aa2a30d64ebf36a01c694b261f036e9f8bb33ed5",
+    "maskedKey": "ast_live_••••••••••••1c4d",
+    "createdAt": "2026-10-23T14:43:45.349Z",
+    "lastUsedAt": "2026-10-25T14:39:45.348Z",
+    "status": "active",
+    "rateLimit": 300,
+    "allowedScopes": [
+      "*"
+    ],
+    "requestCount": 1428,
+    "description": "Official Astronava native Android Kotlin client integration"
+  },
+  {
+    "id": "key_1792853025349_sandbox",
+    "name": "Vedic Matchmaking Partner (Sandbox)",
+    "environment": "sandbox",
+    "keyPrefix": "ast_test_par...5e4f",
+    "keyHash": "25632816fe9e713e353ab1d7d65dffb7865136765ca5451c6a84afdf228bd431",
+    "maskedKey": "ast_test_••••••••••••5e4f",
+    "createdAt": "2026-10-22T14:43:45.349Z",
+    "lastUsedAt": "2026-10-25T14:11:45.349Z",
+    "status": "active",
+    "rateLimit": 60,
+    "allowedScopes": [
+      "/api/v1/kundli/calculate",
+      "/api/v1/match/compatibility"
+    ],
+    "requestCount": 382,
+    "description": "External marital compatibility verification portal"
+  },
+  {
+    "id": "key_1792766625349_production",
+    "name": "Astro Gemstone Research Lab (Production)",
+    "environment": "production",
+    "keyPrefix": "ast_live_gem...9a8b",
+    "keyHash": "1ef9d7a3e2988e199608ee54fe6065001770c90263c186081ddfd37b9d8d7c81",
+    "maskedKey": "ast_live_••••••••••••9a8b",
+    "createdAt": "2026-10-21T14:43:45.349Z",
+    "lastUsedAt": "2026-10-25T12:53:45.349Z",
+    "status": "active",
+    "rateLimit": 120,
+    "allowedScopes": [
+      "/api/v1/gemstones/recommend",
+      "/api/v1/meta"
+    ],
+    "requestCount": 95,
+    "description": "Automated planetary gemstone recommendation service"
+  }
+]

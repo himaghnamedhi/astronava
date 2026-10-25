@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   Sparkles,
   MessageSquare,
-  Globe
+  Globe,
+  Code2
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext.tsx';
 import { auth } from '../../../lib/firebase.ts';
@@ -31,6 +32,7 @@ import { AdminSellersTab } from './AdminSellersTab.tsx';
 import { AdminPendingProductsTab } from './AdminPendingProductsTab.tsx';
 import { AdminSeoTab } from './AdminSeoTab.tsx';
 import { AdminUsersTab } from './AdminUsersTab.tsx';
+import { AdminApiManagementTab } from './AdminApiManagementTab.tsx';
 
 const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
 
@@ -44,7 +46,7 @@ export const AdminPanel: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(isAllowlistedAdmin);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
-  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo' | 'users'>('dashboard');
+  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'categories' | 'products' | 'orders' | 'inventory' | 'horoscope' | 'sellers' | 'pending-products' | 'seo' | 'users' | 'api'>('dashboard');
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loadingMetrics, setLoadingMetrics] = useState<boolean>(false);
   const [runningBatch, setRunningBatch] = useState(false);
@@ -375,6 +377,21 @@ export const AdminPanel: React.FC = () => {
               <Users className="w-3.5 h-3.5 text-amber-500" />
               <span>User Management</span>
             </button>
+
+            <button
+              onClick={() => setActiveAdminTab('api')}
+              className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeAdminTab === 'api'
+                  ? 'bg-amber-950 text-amber-50 shadow-2xs'
+                  : 'text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <Code2 className="w-3.5 h-3.5 text-amber-500" />
+              <span>API &amp; Mobile SDK</span>
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider">
+                v1.0
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -679,6 +696,9 @@ export const AdminPanel: React.FC = () => {
 
         {/* Tab 10: User Management */}
         {activeAdminTab === 'users' && token && <AdminUsersTab token={token} />}
+
+        {/* Tab 11: Astrological REST API, Key Management & Audit Logs */}
+        {activeAdminTab === 'api' && <AdminApiManagementTab token={token} userEmail={user?.email || ''} />}
       </div>
     </div>
   );

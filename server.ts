@@ -16,6 +16,9 @@ import { userRouter } from './src/api/userRoutes.ts';
 import { GoogleGenAI, Type } from '@google/genai';
 import { generateCompleteKundli } from './src/data/vedicEphemeris.ts';
 import { calculateVedAstroMatch } from './src/data/vedicMatchCalculator.ts';
+import { astrologyApiRouter } from './src/server/astrologyRoutes.ts';
+import { adminApiRouter } from './src/server/adminApiRoutes.ts';
+import { recordApiLog, validateApiKey } from './src/server/apiKeyStore.ts';
 
 dotenv.config();
 
@@ -73,10 +76,59 @@ async function startServer() {
   app.use('/api/store/orders', storeActionLimiter);
   app.use('/api/store/coupons', storeActionLimiter);
   app.use('/api/store', storeRouter);
+  app.use('/api/admin/api', adminApiRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/horoscope/generate', aiRateLimiter);
-  app.use('/api/horoscope', horoscopeRouter);
-  app.use('/api/user', userRouter);
+
+  // Astronava Core Astrological REST API v1 (For Native Android, iOS & API Clients)
+  app.use('/api/v1', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Astronava-Api-Key');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+
+    const startHrTime = process.hrtime();
+    const rawKey = (req.headers['x-astronava-api-key'] as string) ||
+      (req.headers.authorization?.startsWith('Bearer ast_') ? req.headers.authorization.split('Bearer ')[1]?.trim() : '');
+
+    let matchedKey: any = null;
+    if (rawKey) {
+      const validation = validateApiKey(rawKey);
+      if (!validation.isValid) {
+        return res.status(401).json({
+          error: validation.reason || 'Invalid API Key',
+          code: 'UNAUTHORIZED_API_KEY',
+        });
+      }
+      matchedKey = validation.key;
+    }
+
+    // Intercept finish event to record telemetry
+    res.on('finish', () => {
+      const diff = process.hrtime(startHrTime);
+      const durationMs = Math.round((diff[0] * 1000 + diff[1] / 1e6) * 10) / 10;
+      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || '127.0.0.1';
+      const userAgent = (req.headers['user-agent'] as string) || 'unknown';
+
+      recordApiLog({
+        method: req.method,
+        path: req.baseUrl ? `${req.baseUrl}${req.path}` : req.originalUrl || req.path,
+        statusCode: res.statusCode,
+        durationMs,
+        ip: clientIp,
+        userAgent,
+        apiKeyId: matchedKey?.id || (rawKey ? 'unregistered' : 'public_client'),
+        keyName: matchedKey?.name || (rawKey ? 'Unregistered Key' : 'Public Applet Client'),
+        requestSize: Number(req.headers['content-length']) || 0,
+        responseSize: Number(res.getHeader('content-length')) || 0,
+      });
+    });
+
+    next();
+  });
+  app.use('/api/v1', astrologyApiRouter);
 
   // Helper to determine canonical base URL from request
   const getRequestBaseUrl = (req: express.Request) => {
