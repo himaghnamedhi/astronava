@@ -183,7 +183,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
   token,
   userEmail,
 }) => {
-  const [activeSubSection, setActiveSubSection] = useState<'trends' | 'keys' | 'logs' | 'docs'>('trends');
+  const [activeSubSection, setActiveSubSection] = useState<'docs' | 'trends' | 'keys' | 'logs'>('docs');
   const [trendTimeRange, setTrendTimeRange] = useState<'14d' | '7d' | '24h'>('14d');
 
   // API Keys state
@@ -515,6 +515,18 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
         {/* Sub-section Tab Switcher */}
         <div className="flex gap-2 mt-6 pt-4 border-t border-amber-800/50 overflow-x-auto no-scrollbar">
           <button
+            onClick={() => setActiveSubSection('docs')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+              activeSubSection === 'docs'
+                ? 'bg-amber-500 text-stone-950 shadow-sm'
+                : 'text-amber-200/80 hover:bg-white/10'
+            }`}
+          >
+            <Code2 className="w-4 h-4 text-stone-900" />
+            <span>Interactive API Documentation</span>
+          </button>
+
+          <button
             onClick={() => setActiveSubSection('trends')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeSubSection === 'trends'
@@ -540,7 +552,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
 
           <button
             onClick={() => setActiveSubSection('logs')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeSubSection === 'logs'
                 ? 'bg-amber-500 text-stone-950 shadow-sm'
                 : 'text-amber-200/80 hover:bg-white/10'
@@ -548,18 +560,6 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
           >
             <Activity className="w-4 h-4" />
             <span>Usage &amp; Audit Logs</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSubSection('docs')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeSubSection === 'docs'
-                ? 'bg-amber-500 text-stone-950 shadow-sm'
-                : 'text-amber-200/80 hover:bg-white/10'
-            }`}
-          >
-            <Code2 className="w-4 h-4" />
-            <span>Interactive Docs &amp; Android SDK</span>
           </button>
         </div>
       </div>
@@ -1364,7 +1364,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
       {/* SUB-SECTION 3: INTERACTIVE DOCS & SDK */}
       {/* ===================================================================== */}
       {activeSubSection === 'docs' && (
-        <AdminApiDocsTab />
+        <AdminApiDocsTab token={token} userEmail={userEmail} />
       )}
 
       {/* ===================================================================== */}

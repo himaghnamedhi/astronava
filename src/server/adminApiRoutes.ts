@@ -9,6 +9,7 @@ import {
   clearAllApiLogs,
   getApiMetricsSummary,
 } from './apiKeyStore.ts';
+import { getInternalApiDocs, getOpenApiSpecification } from './apiDocumentationGenerator.ts';
 
 export const adminApiRouter = Router();
 
@@ -164,3 +165,32 @@ adminApiRouter.get('/metrics', (_req: AuthRequest, res: Response) => {
     res.status(500).json({ error: error.message || 'Failed to compute API metrics' });
   }
 });
+
+/**
+ * GET /api/admin/api/docs
+ * Programmatically generates and serves internal endpoint API documentation
+ * and OpenAPI 3.0 specifications for authenticated admins only.
+ */
+adminApiRouter.get('/docs', (req: AuthRequest, res: Response) => {
+  try {
+    const origin = `${req.protocol}://${req.get('host') || 'www.astronava.com'}`;
+    const format = req.query.format;
+    if (format === 'openapi' || format === 'swagger') {
+      const openApiSpec = getOpenApiSpecification(origin);
+      return res.json(openApiSpec);
+    }
+    const docs = getInternalApiDocs(origin);
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      serverVersion: '1.0.0',
+      totalEndpoints: docs.endpoints.length,
+      categories: docs.categories,
+      endpoints: docs.endpoints,
+    });
+  } catch (error: any) {
+    console.error('Failed to generate API docs:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate API documentation' });
+  }
+});
+

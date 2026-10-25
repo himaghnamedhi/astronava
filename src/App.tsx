@@ -29,6 +29,7 @@ import { NotificationToast } from './components/common/NotificationToast';
 import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { RequestDeletePage } from './components/user/RequestDeletePage';
+const AdminPanel = lazy(() => import('./components/store/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 import { injectDynamicMetaTags, findRouteByTab, AppTabType } from './utils/sitemap';
 
 /**
@@ -226,6 +227,51 @@ export default function App() {
     );
   }
 
+  const checkIsMasterControl = () => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const q = window.location.search.toLowerCase();
+      return (
+        p === '/mastercontrol' ||
+        p.startsWith('/mastercontrol') ||
+        p === '/admin' ||
+        p.startsWith('/admin') ||
+        hash.includes('mastercontrol') ||
+        hash.includes('/mastercontrol') ||
+        q.includes('mastercontrol') ||
+        q.includes('view=mastercontrol')
+      );
+    }
+    return false;
+  };
+
+  const [isMasterControl, setIsMasterControl] = useState(checkIsMasterControl);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setIsMasterControl(checkIsMasterControl());
+    };
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, []);
+
+  if (isMasterControl) {
+    return (
+      <AuthProvider>
+        <StoreProvider>
+          <Suspense fallback={<LoadingFallback />}>
+            <AdminPanel />
+          </Suspense>
+        </StoreProvider>
+      </AuthProvider>
+    );
+  }
+
   const [activeTab, setActiveTab] = useState<AppTabType>('home');
   const [selectedHouse, setSelectedHouse] = useState<HouseNumber>(1);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetId>('sun');
@@ -351,7 +397,11 @@ export default function App() {
       setActiveTab('name-correction');
       return true;
     }
-    if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/cart' || cleanPath === '/checkout' || cleanPath === '/admin' || cleanPath === '/store/admin' || cleanPath === 'store' || cleanPath === 'shop' || cleanPath === 'products' || cleanPath === 'cart' || cleanPath === 'checkout' || cleanPath === 'admin' || cleanPath === 'store/admin') {
+    if (cleanPath === '/mastercontrol' || cleanPath.startsWith('/mastercontrol') || cleanPath === 'mastercontrol' || cleanPath === '/admin' || cleanPath === 'admin') {
+      setIsMasterControl(true);
+      return true;
+    }
+    if (cleanPath === '/store' || cleanPath === '/shop' || cleanPath === '/products' || cleanPath === '/cart' || cleanPath === '/checkout' || cleanPath === 'store' || cleanPath === 'shop' || cleanPath === 'products' || cleanPath === 'cart' || cleanPath === 'checkout') {
       setActiveTab('store');
       return true;
     }

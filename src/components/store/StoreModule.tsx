@@ -1,6 +1,5 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext.tsx';
-import { useAuth } from '../../context/AuthContext.tsx';
 import { StoreHome } from './StoreHome.tsx';
 import { StoreShop } from './StoreShop.tsx';
 import { StoreProductDetail } from './StoreProductDetail.tsx';
@@ -9,15 +8,10 @@ import { StoreCheckout } from './StoreCheckout.tsx';
 import { StoreOrderSuccess } from './StoreOrderSuccess.tsx';
 import { StoreWishlist } from './StoreWishlist.tsx';
 import { StoreUserProfile } from './StoreUserProfile.tsx';
-import { AdminPanel } from './admin/AdminPanel.tsx';
 import { CartDrawer } from './CartDrawer.tsx';
-
-const ADMIN_EMAILS = ['himaghnamedhi1@gmail.com'];
 
 export const StoreModule: React.FC = () => {
   const { activeStoreView } = useStore();
-  const { user } = useAuth();
-  const isAdmin = Boolean(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase().trim()));
 
   return (
     <div className="flex-1 flex flex-col bg-[#FAF8F5] w-full">
@@ -31,7 +25,6 @@ export const StoreModule: React.FC = () => {
         {activeStoreView === 'order-success' && <StoreOrderSuccess />}
         {activeStoreView === 'wishlist' && <StoreWishlist />}
         {activeStoreView === 'profile' && <StoreUserProfile />}
-        {activeStoreView === 'admin' && (isAdmin ? <AdminPanel /> : <StoreHome />)}
       </div>
 
       {/* Slide-over Quick Cart Drawer */}

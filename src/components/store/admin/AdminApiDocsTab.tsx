@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Code2,
   Terminal,
@@ -21,40 +21,52 @@ import {
   AlertCircle,
   HelpCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Search,
+  Filter,
+  Download,
+  Shield,
+  Lock,
+  Server,
+  ChevronDown,
+  ChevronUp,
+  Tag
 } from 'lucide-react';
+import { InternalEndpointDoc } from '../../../server/apiDocumentationGenerator.ts';
 
-interface EndpointSpec {
-  id: string;
-  name: string;
-  toolName: string;
-  method: 'POST' | 'GET';
-  path: string;
-  badge: string;
-  description: string;
-  androidUseCase: string;
-  defaultPayload?: any;
-  defaultQueryParams?: Record<string, string>;
-  kotlinSnippet: string;
-  javaSnippet: string;
-  curlSnippet: (baseUrl: string) => string;
+interface AdminApiDocsTabProps {
+  token: string | null;
+  userEmail: string;
 }
 
-export const AdminApiDocsTab: React.FC = () => {
-  const [activeSubTab, setActiveSubTab] = useState<'explorer' | 'android-sdk' | 'security'>('explorer');
-  const [selectedEndpointId, setSelectedEndpointId] = useState<string>('kundli');
+export const AdminApiDocsTab: React.FC<AdminApiDocsTabProps> = ({ token, userEmail }) => {
+  // Remote documentation data
+  const [endpoints, setEndpoints] = useState<InternalEndpointDoc[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [unauthorized, setUnauthorized] = useState<boolean>(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedMethod, setSelectedMethod] = useState<string>('all');
+  const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
+
+  // Copy state
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  
-  // Live Sandbox state
+
+  // Sandbox testing state
   const [sandboxPayload, setSandboxPayload] = useState<string>('');
   const [sandboxResponse, setSandboxResponse] = useState<string | null>(null);
   const [sandboxLoading, setSandboxLoading] = useState<boolean>(false);
   const [sandboxStatus, setSandboxStatus] = useState<number | null>(null);
   const [sandboxLatency, setSandboxLatency] = useState<number | null>(null);
-  const [codeLanguage, setCodeLanguage] = useState<'kotlin' | 'java' | 'curl'>('kotlin');
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [codeLanguage, setCodeLanguage] = useState<'curl' | 'js' | 'kotlin' | 'python'>('curl');
 
   const originUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.astronava.com';
-  const apiBaseUrl = `${originUrl}/api/v1`;
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -62,1113 +74,641 @@ export const AdminApiDocsTab: React.FC = () => {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  const ENDPOINTS: EndpointSpec[] = [
-    {
-      id: 'kundli',
-      name: 'Janam Kundli & Birth Chart Calculation',
-      toolName: 'Kundli Maker & Visualizer',
-      method: 'POST',
-      path: '/api/v1/kundli/calculate',
-      badge: 'Core Calculation',
-      description: 'Generates complete Vedic Janam Kundli with Lagna (Ascendant), all 9 planetary positions (sign, degree, retrogradation, combustion, dignity), 12 Bhava (houses) with occupant planets, Vimshottari Mahadasha/Antardasha periods, divisional charts (D1, D9 Navamsha, D10 Dashamsha), Yogas, and Doshas.',
-      androidUseCase: 'Power the primary Kundli chart screen in Android. Render North/South Indian charts natively using Android Canvas or Jetpack Compose Path/DrawScope.',
-      defaultPayload: {
-        name: 'Arjun Sharma',
-        gender: 'male',
-        dob: '1995-11-23',
-        tob: '06:45',
-        latitude: 28.6139,
-        longitude: 77.2090,
-        timezoneOffset: 5.5,
-        isTobUnknown: false,
-        ayanamsha: 'lahiri'
-      },
-      kotlinSnippet: `// Retrofit 2 Interface
-@POST("api/v1/kundli/calculate")
-suspend fun calculateKundli(
-    @Body request: KundliRequest
-): Response<KundliApiResponse>
+  // Programmatically fetch documentation from backend
+  const fetchDocumentation = useCallback(async () => {
+    setLoading(true);
+    setFetchError(null);
+    setUnauthorized(false);
 
-// Usage inside Android ViewModel / Coroutine Scope:
-viewModelScope.launch {
     try {
-        val request = KundliRequest(
-            name = "Arjun Sharma",
-            gender = "male",
-            dob = "1995-11-23",
-            tob = "06:45",
-            latitude = 28.6139,
-            longitude = 77.2090,
-            timezoneOffset = 5.5
-        )
-        val response = astronavaApi.calculateKundli(request)
-        if (response.isSuccessful && response.body()?.success == true) {
-            val kundliData = response.body()!!.data
-            _chartState.value = ChartUiState.Success(kundliData)
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token || 'admin_dev_token'}`,
+        'x-admin-email': userEmail || 'himaghnamedhi1@gmail.com',
+      };
+
+      const res = await fetch('/api/admin/api/docs', { headers });
+
+      if (res.status === 401 || res.status === 403) {
+        setUnauthorized(true);
+        setFetchError('Access to internal API documentation is restricted to authorized administrators only.');
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Server returned HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      if (data.success && Array.isArray(data.endpoints)) {
+        setEndpoints(data.endpoints);
+        setCategories(data.categories || []);
+        setLastRefreshedAt(data.timestamp || new Date().toISOString());
+
+        // Default to first endpoint if none selected
+        if (!selectedEndpointId && data.endpoints.length > 0) {
+          const first = data.endpoints[0];
+          setSelectedEndpointId(first.id);
+          setSandboxPayload(
+            first.requestBody?.example
+              ? JSON.stringify(first.requestBody.example, null, 2)
+              : ''
+          );
         }
-    } catch (e: Exception) {
-        _chartState.value = ChartUiState.Error(e.localizedMessage)
+      } else {
+        throw new Error(data.error || 'Invalid API documentation payload received');
+      }
+    } catch (err: any) {
+      console.error('Error fetching programmatic API documentation:', err);
+      setFetchError(err.message || 'Failed to programmatically load API documentation');
+    } finally {
+      setLoading(false);
     }
-}`,
-      javaSnippet: `// OkHttp3 Call
-MediaType JSON = MediaType.get("application/json; charset=utf-8");
-String jsonBody = "{\\"name\\":\\"Arjun Sharma\\",\\"dob\\":\\"1995-11-23\\",\\"tob\\":\\"06:45\\",\\"latitude\\":28.6139,\\"longitude\\":77.2090,\\"timezoneOffset\\":5.5}";
+  }, [token, userEmail, selectedEndpointId]);
 
-RequestBody body = RequestBody.create(jsonBody, JSON);
-Request request = new Request.Builder()
-    .url("${originUrl}/api/v1/kundli/calculate")
-    .post(body)
-    .addHeader("Content-Type", "application/json")
-    .build();
-
-client.newCall(request).enqueue(new Callback() {
-    @Override
-    public void onResponse(Call call, Response response) throws IOException {
-        String responseData = response.body().string();
-        // Parse JSON using Gson or Moshi
-    }
-    @Override
-    public void onFailure(Call call, IOException e) {
-        e.printStackTrace();
-    }
-});`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/kundli/calculate" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "name": "Arjun Sharma",
-    "gender": "male",
-    "dob": "1995-11-23",
-    "tob": "06:45",
-    "latitude": 28.6139,
-    "longitude": 77.2090,
-    "timezoneOffset": 5.5
-  }'`
-    },
-    {
-      id: 'horoscope',
-      name: 'Daily Horoscope & Transit Analysis',
-      toolName: 'Daily Horoscope Engine',
-      method: 'POST',
-      path: '/api/v1/horoscope/daily',
-      badge: 'Daily Feed',
-      description: 'Calculates personalized daily predictions based on user birth coordinates and current Gochara planetary transits. Delivers overall score, domain-wise scores (career, love, finance, health, family, spirituality), auspicious hours, lucky colors/numbers, and Vedic remedies.',
-      androidUseCase: 'Daily push notifications, Android Home Screen App Widget (Glance / RemoteViews), and Daily Horoscope Feed tab.',
-      defaultPayload: {
-        name: 'Priya Sharma',
-        dob: '1998-04-12',
-        tob: '08:30',
-        latitude: 28.6139,
-        longitude: 77.2090,
-        timezoneOffset: 5.5,
-        targetDate: new Date().toISOString().split('T')[0]
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/horoscope/daily")
-suspend fun getDailyHoroscope(
-    @Body request: HoroscopeRequest
-): Response<HoroscopeApiResponse>
-
-// Android Widget / Foreground Sync
-suspend fun updateDailyWidget(context: Context) {
-    val request = HoroscopeRequest(
-        name = userProfile.name,
-        dob = userProfile.dob,
-        tob = userProfile.tob,
-        latitude = userProfile.latitude,
-        longitude = userProfile.longitude,
-        targetDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-    )
-    val response = astronavaApi.getDailyHoroscope(request)
-    if (response.isSuccessful) {
-        val horoscope = response.body()?.data
-        // Update App Widget UI with overallScore and luckyNumber
-    }
-}`,
-      javaSnippet: `// Java Retrofit Call
-Call<HoroscopeResponse> call = apiService.getDailyHoroscope(horoscopeRequest);
-call.enqueue(new Callback<HoroscopeResponse>() {
-    @Override
-    public void onResponse(Call<HoroscopeResponse> call, Response<HoroscopeResponse> res) {
-        if (res.isSuccessful()) {
-            HoroscopeData data = res.body().getData();
-            // Display daily score and opportunities
-        }
-    }
-    @Override
-    public void onFailure(Call<HoroscopeResponse> call, Throwable t) {
-        // Handle failure
-    }
-});`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/horoscope/daily" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "name": "Priya Sharma",
-    "dob": "1998-04-12",
-    "tob": "08:30",
-    "latitude": 28.6139,
-    "longitude": 77.2090,
-    "timezoneOffset": 5.5,
-    "targetDate": "${new Date().toISOString().split('T')[0]}"
-  }'`
-    },
-    {
-      id: 'gemstones',
-      name: 'Vedic Gemstone & Ratna Recommendation',
-      toolName: 'Gemstone Recommender',
-      method: 'POST',
-      path: '/api/v1/gemstones/recommend',
-      badge: 'Vedic Remedies',
-      description: 'Calculates authentic classical Vedic Ratna prescriptions based on Lagna Lord, 9th Lord (Bhagya), 5th Lord (Punya), and Yogakaraka planets. Returns body weight ratti calculations, ideal metals, fingers, beej mantras, and strictly prohibited gems (Maraka/Shatru).',
-      androidUseCase: 'Powers the Gemstone Recommender tool and connects directly to in-app certified gemstone purchasing from the store.',
-      defaultPayload: {
-        dob: '1995-11-23',
-        tob: '06:45',
-        latitude: 28.6139,
-        longitude: 77.2090,
-        timezoneOffset: 5.5,
-        weightKg: 68,
-        lifeGoal: 'wealth_career'
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/gemstones/recommend")
-suspend fun getGemstoneRecommendations(
-    @Body request: GemstoneRequest
-): Response<GemstoneApiResponse>
-
-// Example invocation
-val req = GemstoneRequest(
-    dob = "1995-11-23",
-    tob = "06:45",
-    latitude = 28.6139,
-    longitude = 77.2090,
-    weightKg = 68,
-    lifeGoal = "wealth_career"
-)
-val result = apiService.getGemstoneRecommendations(req)`,
-      javaSnippet: `// Java OkHttp implementation
-RequestBody body = RequestBody.create(
-    "{\\"dob\\":\\"1995-11-23\\",\\"tob\\":\\"06:45\\",\\"weightKg\\":68}",
-    MediaType.get("application/json")
-);
-Request request = new Request.Builder()
-    .url("${originUrl}/api/v1/gemstones/recommend")
-    .post(body)
-    .build();`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/gemstones/recommend" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "dob": "1995-11-23",
-    "tob": "06:45",
-    "latitude": 28.6139,
-    "longitude": 77.2090,
-    "weightKg": 68,
-    "lifeGoal": "wealth_career"
-  }'`
-    },
-    {
-      id: 'match',
-      name: 'Ashtakoota 36-Guna Kundli Milan',
-      toolName: 'Kundli Milan / Matchmaking',
-      method: 'POST',
-      path: '/api/v1/match/compatibility',
-      badge: 'Relationship Synastry',
-      description: 'Calculates the full Ashtakoota 36-Guna compatibility score across Varna (1), Vashya (2), Tara (3), Yoni (4), Graha Maitri (5), Gana (6), Bhakoot (7), and Nadi (8). Checks Manglik Dosha for both partners with classical Vedic cancellation rules, and delivers a definitive verdict.',
-      androidUseCase: 'Powers the partner horoscope matching screen in Android with interactive 36-point progress rings and dosha cancellation reports.',
-      defaultPayload: {
-        p1: {
-          name: 'Rohan Verma',
-          gender: 'male',
-          dob: '1994-08-15',
-          tob: '14:20',
-          latitude: 28.6139,
-          longitude: 77.2090,
-          timezoneOffset: 5.5
-        },
-        p2: {
-          name: 'Ananya Sen',
-          gender: 'female',
-          dob: '1996-03-22',
-          tob: '09:15',
-          latitude: 19.0760,
-          longitude: 72.8777,
-          timezoneOffset: 5.5
-        }
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/match/compatibility")
-suspend fun calculateMatchCompatibility(
-    @Body request: MatchRequest
-): Response<MatchApiResponse>
-
-// Calling from Android MatchViewModel
-val matchRequest = MatchRequest(
-    p1 = partnerOneProfile,
-    p2 = partnerTwoProfile
-)
-val response = astronavaApi.calculateMatchCompatibility(matchRequest)
-val totalScore = response.body()?.data?.totalScore // e.g. 28 / 36`,
-      javaSnippet: `// Java Match calculation call
-Call<MatchApiResponse> call = apiService.calculateMatch(matchRequest);
-Response<MatchApiResponse> response = call.execute();
-if (response.isSuccessful()) {
-    MatchData data = response.body().getData();
-    int score = data.getTotalScore();
-    String verdict = data.getVerdict();
-}`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/match/compatibility" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "p1": {
-      "name": "Rohan Verma",
-      "gender": "male",
-      "dob": "1994-08-15",
-      "tob": "14:20",
-      "latitude": 28.6139,
-      "longitude": 77.2090
-    },
-    "p2": {
-      "name": "Ananya Sen",
-      "gender": "female",
-      "dob": "1996-03-22",
-      "tob": "09:15",
-      "latitude": 19.0760,
-      "longitude": 72.8777
-    }
-  }'`
-    },
-    {
-      id: 'numerology',
-      name: 'Vedic & Pythagorean Numerology Calculator',
-      toolName: 'Numerology Calculator',
-      method: 'POST',
-      path: '/api/v1/numerology/calculate',
-      badge: 'Vibrational Math',
-      description: 'Calculates Mulank (Driver/Psychic Number), Bhagyank (Conductor/Destiny Number), Driver-Conductor planetary harmony relationship (Mitra, Sama, Shatru), full Lo Shu 3x3 Grid planes (Mental, Emotional, Practical, Thought, Will, Action), and Personal Year forecast.',
-      androidUseCase: 'Powers the Numerology tab, Personal Year timeline cards, and daily lucky numbers in Android.',
-      defaultPayload: {
-        name: 'Devendra Patel',
-        day: 17,
-        month: 9,
-        year: 1985,
-        system: 'chaldean'
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/numerology/calculate")
-suspend fun calculateNumerology(
-    @Body request: NumerologyRequest
-): Response<NumerologyApiResponse>
-
-// Execution
-val response = astronavaApi.calculateNumerology(
-    NumerologyRequest(name = "Devendra Patel", day = 17, month = 9, year = 1985)
-)
-val mulank = response.body()?.data?.coreNumbers?.mulank?.number // 8
-val bhagyank = response.body()?.data?.coreNumbers?.bhagyank?.number // 4`,
-      javaSnippet: `// Java Numerology request
-NumerologyRequest req = new NumerologyRequest("Devendra Patel", 17, 9, 1985, "chaldean");
-apiService.calculateNumerology(req).enqueue(new Callback<NumerologyResponse>() {
-    @Override
-    public void onResponse(Call<NumerologyResponse> call, Response<NumerologyResponse> res) {
-        // Display Mulank, Bhagyank, LoShu Grid
-    }
-    @Override
-    public void onFailure(Call<NumerologyResponse> call, Throwable t) {}
-});`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/numerology/calculate" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "name": "Devendra Patel",
-    "day": 17,
-    "month": 9,
-    "year": 1985,
-    "system": "chaldean"
-  }'`
-    },
-    {
-      id: 'name-correction',
-      name: 'Vedic Name Correction & Spelling Harmonizer',
-      toolName: 'Name Correction & Tuning',
-      method: 'POST',
-      path: '/api/v1/name-correction/tune',
-      badge: 'Spelling Tuning',
-      description: 'Calculates name compound vibration using Chaldean and Pythagorean sound values, compares it against the seeker’s Mulank and Bhagyank, and returns algorithmic spelling corrections that elevate the name to auspicious compound numbers (such as 14, 15, 19, 21, 23, 24, 27, 32, 37, 41).',
-      androidUseCase: 'Instant live typing feedback in Android EditText/TextField, showing real-time compound score changes and recommended tuned variations.',
-      defaultPayload: {
-        currentName: 'Amit Shah',
-        targetMulank: 1,
-        targetBhagyank: 5,
-        system: 'chaldean'
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/name-correction/tune")
-suspend fun tuneNameSpelling(
-    @Body request: NameTuningRequest
-): Response<NameTuningApiResponse>
-
-// Android Coroutines live flow
-val tunedResponse = astronavaApi.tuneNameSpelling(
-    NameTuningRequest(currentName = "Amit Shah", targetMulank = 1, targetBhagyank = 5)
-)`,
-      javaSnippet: `// Java Name tuning call
-NameTuningRequest req = new NameTuningRequest("Amit Shah", 1, 5, "chaldean");
-Response<NameTuningResponse> res = apiService.tuneName(req).execute();`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/name-correction/tune" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "currentName": "Amit Shah",
-    "targetMulank": 1,
-    "targetBhagyank": 5,
-    "system": "chaldean"
-  }'`
-    },
-    {
-      id: 'ai-summary',
-      name: 'AI Kundli Summary & Executive Consultation',
-      toolName: 'AI Consultation Layer',
-      method: 'POST',
-      path: '/api/v1/ai/summary',
-      badge: 'Gemini AI',
-      description: 'Generates synthesized natural-language astrological consultation summaries from calculated chart data. Provides focused advice for career, marriage, health, and personalized spiritual remedies.',
-      androidUseCase: 'Powers the "Executive Summary" and "Ask Vedic Scholar" expandable cards in the mobile app.',
-      defaultPayload: {
-        focus: 'career_wealth',
-        depth: 'comprehensive',
-        kundliData: {
-          ascendant: { signName: 'Scorpio', signNumber: 8, lord: 'Mars' },
-          planets: [
-            { id: 'sun', signName: 'Scorpio', house: 1, isExalted: false, isDebilitated: false },
-            { id: 'jupiter', signName: 'Cancer', house: 9, isExalted: true, isDebilitated: false }
-          ]
-        }
-      },
-      kotlinSnippet: `// Retrofit Interface
-@POST("api/v1/ai/summary")
-suspend fun getAiKundliSummary(
-    @Body request: AiSummaryRequest
-): Response<AiSummaryApiResponse>`,
-      javaSnippet: `// Java OkHttp call for AI summary
-RequestBody body = RequestBody.create(jsonPayload, MediaType.get("application/json"));
-Request request = new Request.Builder()
-    .url("${originUrl}/api/v1/ai/summary")
-    .post(body)
-    .build();`,
-      curlSnippet: (baseUrl) => `curl -X POST "${baseUrl}/ai/summary" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "focus": "career_wealth",
-    "kundliData": { "ascendant": { "signName": "Scorpio" } }
-  }'`
-    },
-    {
-      id: 'store-products',
-      name: 'Sacred Store Products & Catalog Feed',
-      toolName: 'Astronava Store & Remedies',
-      method: 'GET',
-      path: '/api/store/products',
-      badge: 'E-Commerce Feed',
-      description: 'Returns certified natural gemstones, energized Nepali Rudrakshas, sacred Yantras, and astrological crystals. Supports filtering by planetary association, zodiac sign, certification type, and price range.',
-      androidUseCase: 'Powers the native Android Store catalog, product detail sheets, and remedy recommendation shopping cards.',
-      defaultQueryParams: {
-        limit: '10',
-        page: '1',
-        categorySlug: 'gemstones'
-      },
-      kotlinSnippet: `// Retrofit Interface
-@GET("api/store/products")
-suspend fun getStoreProducts(
-    @Query("categorySlug") category: String? = null,
-    @Query("planet") planet: String? = null,
-    @Query("limit") limit: Int = 20
-): Response<ProductListResponse>`,
-      javaSnippet: `// Java Retrofit call
-Call<ProductListResponse> call = apiService.getProducts("gemstones", null, 20);
-Response<ProductListResponse> res = call.execute();`,
-      curlSnippet: (baseUrl) => `curl -X GET "${baseUrl.replace('/api/v1', '/api')}/store/products?limit=10&page=1"`
-    }
-  ];
-
-  const currentEndpoint = ENDPOINTS.find((e) => e.id === selectedEndpointId) || ENDPOINTS[0];
-
-  // Initialize sandbox payload when selected endpoint changes
   useEffect(() => {
-    if (currentEndpoint.defaultPayload) {
-      setSandboxPayload(JSON.stringify(currentEndpoint.defaultPayload, null, 2));
-    } else {
-      setSandboxPayload('');
-    }
+    fetchDocumentation();
+  }, [fetchDocumentation]);
+
+  // Filtered endpoints
+  const filteredEndpoints = useMemo(() => {
+    return endpoints.filter((ep) => {
+      const matchesSearch =
+        !searchQuery ||
+        ep.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ep.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ep.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (ep.parameters && ep.parameters.some((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase())));
+
+      const matchesCat = selectedCategory === 'all' || ep.category === selectedCategory;
+      const matchesMethod = selectedMethod === 'all' || ep.method.toUpperCase() === selectedMethod.toUpperCase();
+
+      return matchesSearch && matchesCat && matchesMethod;
+    });
+  }, [endpoints, searchQuery, selectedCategory, selectedMethod]);
+
+  // Active selected endpoint
+  const activeEndpoint = useMemo(() => {
+    return endpoints.find((e) => e.id === selectedEndpointId) || endpoints[0] || null;
+  }, [endpoints, selectedEndpointId]);
+
+  // When changing active endpoint, initialize sandbox payload
+  const handleSelectEndpoint = (ep: InternalEndpointDoc) => {
+    setSelectedEndpointId(ep.id);
+    setSandboxPayload(
+      ep.requestBody?.example ? JSON.stringify(ep.requestBody.example, null, 2) : ''
+    );
     setSandboxResponse(null);
     setSandboxStatus(null);
     setSandboxLatency(null);
-  }, [selectedEndpointId]);
+    setSandboxError(null);
+  };
 
-  // Execute live sandbox request
+  // Live Sandbox Execution
   const handleExecuteSandbox = async () => {
+    if (!activeEndpoint) return;
+
     setSandboxLoading(true);
     setSandboxResponse(null);
     setSandboxStatus(null);
+    setSandboxLatency(null);
+    setSandboxError(null);
+
     const startTime = performance.now();
 
     try {
-      const url = currentEndpoint.method === 'GET'
-        ? (currentEndpoint.path.startsWith('/api/v1') ? `${originUrl}${currentEndpoint.path}` : `${originUrl}${currentEndpoint.path}`)
-        : (currentEndpoint.path.startsWith('/api/v1') ? `${originUrl}${currentEndpoint.path}` : `${originUrl}${currentEndpoint.path}`);
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
 
-      let bodyData: any = undefined;
-      if (currentEndpoint.method === 'POST') {
-        try {
-          bodyData = sandboxPayload ? JSON.parse(sandboxPayload) : {};
-        } catch (e: any) {
-          setSandboxLoading(false);
-          setSandboxStatus(400);
-          setSandboxResponse(JSON.stringify({ error: 'Malformed JSON payload: ' + e.message }, null, 2));
-          return;
+      // Add appropriate auth header based on endpoint requirements
+      if (activeEndpoint.authType.includes('API Key')) {
+        headers['X-Astronava-Api-Key'] = 'ast_live_admin_sandbox_key';
+      } else if (activeEndpoint.authType.includes('Admin Token')) {
+        headers['Authorization'] = `Bearer ${token || 'admin_dev_token'}`;
+        headers['x-admin-email'] = userEmail || 'himaghnamedhi1@gmail.com';
+      }
+
+      let url = `${originUrl}${activeEndpoint.path}`;
+      let body: string | undefined = undefined;
+
+      if (activeEndpoint.method !== 'GET' && activeEndpoint.method !== 'DELETE') {
+        if (sandboxPayload.trim()) {
+          try {
+            // Verify valid JSON
+            JSON.parse(sandboxPayload);
+            body = sandboxPayload;
+          } catch (jsonErr: any) {
+            setSandboxError(`Malformed JSON payload: ${jsonErr.message}`);
+            setSandboxLoading(false);
+            return;
+          }
         }
       }
 
       const res = await fetch(url, {
-        method: currentEndpoint.method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Astronava-Client': 'android-admin-sandbox'
-        },
-        body: currentEndpoint.method === 'POST' ? JSON.stringify(bodyData) : undefined
+        method: activeEndpoint.method,
+        headers,
+        body,
       });
 
-      const latency = Math.round(performance.now() - startTime);
-      setSandboxLatency(latency);
+      const elapsed = Math.round(performance.now() - startTime);
+      setSandboxLatency(elapsed);
       setSandboxStatus(res.status);
 
-      const data = await res.json();
-      setSandboxResponse(JSON.stringify(data, null, 2));
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const json = await res.json();
+        setSandboxResponse(JSON.stringify(json, null, 2));
+      } else {
+        const text = await res.text();
+        setSandboxResponse(text);
+      }
     } catch (err: any) {
-      const latency = Math.round(performance.now() - startTime);
-      setSandboxLatency(latency);
-      setSandboxStatus(500);
-      setSandboxResponse(JSON.stringify({ error: err.message || 'Network error executing sandbox request' }, null, 2));
+      const elapsed = Math.round(performance.now() - startTime);
+      setSandboxLatency(elapsed);
+      setSandboxError(err.message || 'Network request failed or CORS rejected');
     } finally {
       setSandboxLoading(false);
     }
   };
 
-  return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Banner / Hero Card */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-linear-to-br from-stone-900 via-amber-950 to-stone-950 text-white shadow-xl relative overflow-hidden border border-amber-900/40">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-stone-500/10 rounded-full blur-3xl pointer-events-none" />
+  // Export OpenAPI specification
+  const handleDownloadOpenApi = () => {
+    const url = `/api/admin/api/docs?format=openapi`;
+    window.open(url, '_blank');
+  };
 
-        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-extrabold uppercase tracking-wider border border-amber-500/30">
-                Admin Console Only
+  // If unauthorized
+  if (unauthorized) {
+    return (
+      <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-200 shadow-md text-center space-y-4 max-w-xl mx-auto my-8">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center mx-auto">
+          <ShieldAlert className="w-7 h-7" />
+        </div>
+        <h3 className="text-xl font-bold font-vedic text-stone-900">
+          API Documentation Restricted
+        </h3>
+        <p className="text-xs text-stone-600 leading-relaxed">
+          Access to internal API specifications and execution telemetry is only granted to authenticated administrators (<span className="font-mono font-semibold text-stone-800">himaghnamedhi1@gmail.com</span>).
+        </p>
+        <button
+          onClick={fetchDocumentation}
+          className="mt-4 px-5 py-2.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>Retry Authentication</span>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* 1. Header Banner with Live Stats & Actions */}
+      <div className="bg-white border border-stone-200 rounded-3xl p-6 shadow-2xs space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-900 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                Live Internal Registry
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold border border-emerald-500/30 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                REST v1.0 Production
+              <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-bold">
+                {endpoints.length} Endpoints Discovered
+              </span>
+              <span className="text-[11px] text-stone-400 font-mono hidden sm:inline">
+                Base URL: {originUrl}/api
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold font-vedic text-amber-100 tracking-wide">
-              Astronava Mobile REST APIs &amp; Android SDK
+            <h2 className="text-xl sm:text-2xl font-bold font-vedic text-stone-900 tracking-wide flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-amber-600" />
+              <span>Programmatic Internal API Documentation</span>
             </h2>
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
-              High-precision Vedic calculation engine exposed via standardized JSON endpoints. Designed specifically so your native Android app can execute all astrological, gemstone, numerology, and Kundli computations server-side.
+            <p className="text-xs text-stone-500 max-w-3xl leading-relaxed">
+              Programmatically aggregated and documented REST endpoints powering the Astronava Vedic Engine, Store Commerce, Admin Control, and Native Mobile synchronization.
             </p>
           </div>
 
-          {/* Quick Base URL Card */}
-          <div className="bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 w-full lg:w-auto shrink-0 space-y-2">
-            <div className="text-[11px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-              <span>Server API Base URL</span>
-              <span className="text-emerald-400 font-mono text-[10px]">CORS Enabled</span>
-            </div>
-            <div className="flex items-center gap-2 bg-stone-950/80 px-3 py-2 rounded-xl border border-stone-800">
-              <code className="text-xs font-mono text-amber-300 select-all truncate max-w-[280px]">
-                {apiBaseUrl}
-              </code>
-              <button
-                onClick={() => handleCopy(apiBaseUrl, 'baseUrl')}
-                className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 transition-colors cursor-pointer shrink-0"
-                title="Copy Base URL"
-              >
-                {copiedKey === 'baseUrl' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
-            </div>
-            <div className="text-[10px] text-stone-400 flex items-center gap-1.5">
-              <Zap className="w-3 h-3 text-amber-400" />
-              <span>Average calculation latency: &lt; 35ms</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={fetchDocumentation}
+              disabled={loading}
+              className="px-3.5 py-2 rounded-xl border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              title="Sync and re-generate API documentation from backend"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-stone-500 ${loading ? 'animate-spin' : ''}`} />
+              <span>{loading ? 'Introspecting...' : 'Sync Specs'}</span>
+            </button>
+
+            <button
+              onClick={handleDownloadOpenApi}
+              className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+              title="Download OpenAPI 3.0 (Swagger) Specification"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>OpenAPI 3.0 (.json)</span>
+            </button>
           </div>
         </div>
 
-        {/* Navigation Tabs inside API section */}
-        <div className="relative z-10 flex gap-2 pt-6 mt-6 border-t border-white/10 overflow-x-auto no-scrollbar">
+        {/* Categories Bar */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-stone-100 text-xs">
+          <span className="text-[11px] font-semibold text-stone-400 mr-2 flex items-center gap-1">
+            <Filter className="w-3 h-3" /> Categories:
+          </span>
           <button
-            onClick={() => setActiveSubTab('explorer')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeSubTab === 'explorer'
-                ? 'bg-amber-400 text-stone-950 shadow-md'
-                : 'bg-white/5 hover:bg-white/10 text-stone-300'
+            onClick={() => setSelectedCategory('all')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              selectedCategory === 'all'
+                ? 'bg-amber-900 text-white shadow-2xs'
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
-            <Code2 className="w-4 h-4" />
-            <span>Interactive API Explorer</span>
+            All ({endpoints.length})
           </button>
-
-          <button
-            onClick={() => setActiveSubTab('android-sdk')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeSubTab === 'android-sdk'
-                ? 'bg-amber-400 text-stone-950 shadow-md'
-                : 'bg-white/5 hover:bg-white/10 text-stone-300'
-            }`}
-          >
-            <Smartphone className="w-4 h-4" />
-            <span>Android Architecture &amp; Retrofit Guide</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSubTab('security')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              activeSubTab === 'security'
-                ? 'bg-amber-400 text-stone-950 shadow-md'
-                : 'bg-white/5 hover:bg-white/10 text-stone-300'
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4" />
-            <span>Auth &amp; Production Security</span>
-          </button>
+          {categories.map((cat) => {
+            const count = endpoints.filter((e) => e.category === cat).length;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-amber-900 text-white shadow-2xs'
+                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                }`}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* SUB-VIEW 1: Interactive API Explorer */}
-      {activeSubTab === 'explorer' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Endpoint List */}
-          <div className="lg:col-span-4 space-y-3">
-            <div className="flex items-center justify-between px-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                Astrological Tool Endpoints ({ENDPOINTS.length})
-              </h3>
+      {/* 2. Search & Method Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search endpoint name, path (/kundli/calculate), or parameters..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 bg-white text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-xl">
+          {['all', 'GET', 'POST', 'PATCH', 'DELETE'].map((m) => (
+            <button
+              key={m}
+              onClick={() => setSelectedMethod(m)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all cursor-pointer ${
+                selectedMethod === m
+                  ? 'bg-white text-stone-900 shadow-2xs'
+                  : 'text-stone-500 hover:text-stone-900'
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Main Split View: Left Endpoint List & Right Detail / Tester */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Endpoints Directory */}
+        <div className="lg:col-span-5 space-y-2 max-h-[820px] overflow-y-auto pr-1">
+          {loading && endpoints.length === 0 ? (
+            <div className="p-12 text-center bg-white rounded-2xl border border-stone-200 space-y-3">
+              <RefreshCw className="w-6 h-6 animate-spin text-amber-800 mx-auto" />
+              <p className="text-xs text-stone-500">Introspecting internal application endpoints...</p>
             </div>
-
-            <div className="space-y-2">
-              {ENDPOINTS.map((endpoint) => {
-                const isSelected = endpoint.id === selectedEndpointId;
-                return (
-                  <button
-                    key={endpoint.id}
-                    onClick={() => setSelectedEndpointId(endpoint.id)}
-                    className={`w-full text-left p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
-                      isSelected
-                        ? 'bg-white border-amber-600 shadow-md ring-2 ring-amber-500/20'
-                        : 'bg-white/70 hover:bg-white border-stone-200/80 hover:border-stone-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
-                        {endpoint.toolName}
-                      </span>
-                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-stone-100 text-stone-600">
-                        {endpoint.method}
-                      </span>
-                    </div>
-
-                    <h4 className="text-xs font-bold text-stone-900 line-clamp-1">
-                      {endpoint.name}
-                    </h4>
-
-                    <div className="font-mono text-[10px] text-stone-500 truncate">
-                      {endpoint.path}
-                    </div>
-                  </button>
-                );
-              })}
+          ) : filteredEndpoints.length === 0 ? (
+            <div className="p-10 text-center bg-white rounded-2xl border border-stone-200 text-stone-500 text-xs">
+              No endpoints match the selected filters.
             </div>
-          </div>
+          ) : (
+            filteredEndpoints.map((ep) => {
+              const isSelected = activeEndpoint?.id === ep.id;
+              const methodBg =
+                ep.method === 'GET'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : ep.method === 'POST'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                  : ep.method === 'PATCH'
+                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                  : 'bg-rose-50 text-rose-700 border-rose-200';
 
-          {/* Right Endpoint Documentation & Interactive Sandbox */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
-              {/* Endpoint Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-100">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-extrabold bg-emerald-100 text-emerald-800">
-                      {currentEndpoint.method}
-                    </span>
-                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200/60">
-                      {currentEndpoint.badge}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-extrabold font-vedic text-stone-900">
-                    {currentEndpoint.name}
-                  </h3>
-                  <code className="text-xs font-mono text-stone-600 bg-stone-100 px-2 py-0.5 rounded-md inline-block">
-                    {currentEndpoint.path}
-                  </code>
-                </div>
-
-                <button
-                  onClick={() => handleCopy(`${originUrl}${currentEndpoint.path}`, 'epUrl')}
-                  className="px-3 py-1.5 rounded-xl border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto shrink-0"
+              return (
+                <div
+                  key={ep.id}
+                  onClick={() => handleSelectEndpoint(ep)}
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer text-left space-y-1.5 ${
+                    isSelected
+                      ? 'bg-amber-50/70 border-amber-500/80 shadow-xs ring-1 ring-amber-500/40'
+                      : 'bg-white border-stone-200/90 hover:border-amber-300 hover:bg-stone-50/70 shadow-2xs'
+                  }`}
                 >
-                  {copiedKey === 'epUrl' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-stone-500" />}
-                  <span>Copy URL</span>
-                </button>
-              </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase border ${methodBg}`}
+                      >
+                        {ep.method}
+                      </span>
+                      <span className="font-mono text-xs font-semibold text-stone-800 truncate">
+                        {ep.path}
+                      </span>
+                    </div>
+                    {ep.authRequired && (
+                      <span
+                        className="p-1 rounded-md bg-stone-100 text-stone-500 shrink-0"
+                        title={ep.authType}
+                      >
+                        <Lock className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
 
-              {/* Description & Android Use Case */}
-              <div className="space-y-3">
-                <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                  {currentEndpoint.description}
-                </p>
+                  <p className="text-xs font-medium text-stone-900 line-clamp-1">{ep.name}</p>
 
-                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-2.5">
-                  <Smartphone className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
-                  <div className="text-xs text-stone-800">
-                    <strong className="text-amber-950 font-semibold">Android Implementation Note: </strong>
-                    {currentEndpoint.androidUseCase}
+                  <div className="flex items-center justify-between text-[11px] text-stone-400 pt-0.5">
+                    <span className="truncate">{ep.category}</span>
+                    <span className="font-mono text-[10px]">{ep.rateLimit}</span>
                   </div>
                 </div>
-              </div>
+              );
+            })
+          )}
+        </div>
 
-              {/* Multi-language code snippets */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 flex items-center gap-1.5">
-                    <Code2 className="w-4 h-4 text-amber-600" />
-                    <span>Client Code Snippets</span>
-                  </h4>
+        {/* Right Column: Comprehensive Detail & Interactive Sandbox */}
+        <div className="lg:col-span-7">
+          {activeEndpoint ? (
+            <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-2xs space-y-6">
+              {/* Endpoint Header */}
+              <div className="space-y-2 pb-4 border-b border-stone-100">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-2.5 py-1 rounded-md text-xs font-extrabold uppercase border ${
+                        activeEndpoint.method === 'GET'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : activeEndpoint.method === 'POST'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : activeEndpoint.method === 'PATCH'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
+                          : 'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}
+                    >
+                      {activeEndpoint.method}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-bold">
+                      {activeEndpoint.category}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-bold">
+                      {activeEndpoint.badge}
+                    </span>
+                  </div>
 
-                  <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl text-xs font-semibold">
-                    <button
-                      onClick={() => setCodeLanguage('kotlin')}
-                      className={`px-2.5 py-1 rounded-lg cursor-pointer transition-colors ${
-                        codeLanguage === 'kotlin' ? 'bg-amber-900 text-amber-50 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      Kotlin (Retrofit)
-                    </button>
-                    <button
-                      onClick={() => setCodeLanguage('java')}
-                      className={`px-2.5 py-1 rounded-lg cursor-pointer transition-colors ${
-                        codeLanguage === 'java' ? 'bg-amber-900 text-amber-50 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      Java (OkHttp)
-                    </button>
-                    <button
-                      onClick={() => setCodeLanguage('curl')}
-                      className={`px-2.5 py-1 rounded-lg cursor-pointer transition-colors ${
-                        codeLanguage === 'curl' ? 'bg-amber-900 text-amber-50 shadow-2xs' : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      cURL
-                    </button>
+                  <div className="flex items-center gap-1.5 text-xs text-stone-500">
+                    <Shield className="w-3.5 h-3.5 text-stone-400" />
+                    <span>{activeEndpoint.authType}</span>
                   </div>
                 </div>
 
-                <div className="relative rounded-2xl bg-stone-950 p-4 border border-stone-800 text-white font-mono text-xs overflow-x-auto shadow-inner">
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <h3 className="text-lg font-bold font-vedic text-stone-900">
+                    {activeEndpoint.name}
+                  </h3>
                   <button
-                    onClick={() => {
-                      const snippet =
-                        codeLanguage === 'kotlin'
-                          ? currentEndpoint.kotlinSnippet
-                          : codeLanguage === 'java'
-                          ? currentEndpoint.javaSnippet
-                          : currentEndpoint.curlSnippet(apiBaseUrl);
-                      handleCopy(snippet, 'codeSnippet');
-                    }}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors cursor-pointer"
-                    title="Copy Code"
+                    onClick={() => handleCopy(`${originUrl}${activeEndpoint.path}`, 'url')}
+                    className="p-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer text-xs flex items-center gap-1 shrink-0"
+                    title="Copy full endpoint URL"
                   >
-                    {copiedKey === 'codeSnippet' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedKey === 'url' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5 text-stone-500" />
+                    )}
+                    <span className="font-mono text-[11px] hidden sm:inline">Copy Path</span>
                   </button>
-
-                  <pre className="pr-10 leading-relaxed text-stone-200">
-                    {codeLanguage === 'kotlin' && currentEndpoint.kotlinSnippet}
-                    {codeLanguage === 'java' && currentEndpoint.javaSnippet}
-                    {codeLanguage === 'curl' && currentEndpoint.curlSnippet(apiBaseUrl)}
-                  </pre>
                 </div>
+
+                <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 font-mono text-xs text-stone-800 break-all select-all flex items-center justify-between">
+                  <span>{activeEndpoint.path}</span>
+                  <span className="text-[10px] text-stone-400 font-sans">{activeEndpoint.rateLimit}</span>
+                </div>
+
+                <p className="text-xs text-stone-600 leading-relaxed pt-1">
+                  {activeEndpoint.description}
+                </p>
               </div>
 
-              {/* LIVE SANDBOX: Test Endpoint Right in Admin */}
-              <div className="pt-4 border-t border-stone-200 space-y-4">
+              {/* Parameters Table (if any) */}
+              {activeEndpoint.parameters && activeEndpoint.parameters.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 font-vedic flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Request Parameters</span>
+                  </h4>
+                  <div className="overflow-x-auto rounded-xl border border-stone-200">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 text-[11px] font-bold">
+                        <tr>
+                          <th className="py-2 px-3">Field</th>
+                          <th className="py-2 px-3">Type</th>
+                          <th className="py-2 px-3">Location</th>
+                          <th className="py-2 px-3">Required</th>
+                          <th className="py-2 px-3">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100 font-mono text-[11px]">
+                        {activeEndpoint.parameters.map((p) => (
+                          <tr key={p.name} className="hover:bg-stone-50/60">
+                            <td className="py-2 px-3 font-semibold text-stone-900">{p.name}</td>
+                            <td className="py-2 px-3 text-stone-600 font-sans">{p.type}</td>
+                            <td className="py-2 px-3 text-stone-500 font-sans">{p.in}</td>
+                            <td className="py-2 px-3 font-sans">
+                              {p.required ? (
+                                <span className="text-rose-600 font-bold">Yes</span>
+                              ) : (
+                                <span className="text-stone-400">Optional</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 font-sans text-stone-600">{p.description}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Live Sandbox / Tester */}
+              <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-amber-900/15 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">
-                      Live Test Sandbox
-                    </h4>
+                    <Play className="w-4 h-4 text-amber-700" />
+                    <span className="text-xs font-bold text-stone-900 font-vedic uppercase tracking-wider">
+                      Live Endpoint Tester (Sandbox)
+                    </span>
                   </div>
-                  <span className="text-[11px] text-stone-500">
-                    Test live calculations against the local / production server
-                  </span>
+                  <button
+                    onClick={handleExecuteSandbox}
+                    disabled={sandboxLoading}
+                    className="px-4 py-1.5 rounded-xl bg-amber-900 hover:bg-amber-800 text-amber-50 text-xs font-bold shadow-2xs hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${sandboxLoading ? 'animate-pulse' : ''}`} />
+                    <span>{sandboxLoading ? 'Executing...' : 'Send Request'}</span>
+                  </button>
                 </div>
 
-                {currentEndpoint.method === 'POST' && (
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-stone-700 flex items-center justify-between">
-                      <span>Request Payload (JSON)</span>
+                {/* Request Payload Editor */}
+                {activeEndpoint.method !== 'GET' && activeEndpoint.method !== 'DELETE' && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] text-stone-500">
+                      <span>JSON Request Body:</span>
                       <button
-                        onClick={() => setSandboxPayload(JSON.stringify(currentEndpoint.defaultPayload, null, 2))}
-                        className="text-[11px] text-amber-700 hover:underline cursor-pointer"
+                        onClick={() =>
+                          setSandboxPayload(
+                            activeEndpoint.requestBody?.example
+                              ? JSON.stringify(activeEndpoint.requestBody.example, null, 2)
+                              : ''
+                          )
+                        }
+                        className="text-amber-800 hover:underline cursor-pointer"
                       >
-                        Reset to default payload
+                        Reset Default Payload
                       </button>
-                    </label>
+                    </div>
                     <textarea
-                      rows={7}
+                      rows={5}
                       value={sandboxPayload}
                       onChange={(e) => setSandboxPayload(e.target.value)}
-                      className="w-full p-3 rounded-2xl bg-stone-50 border border-stone-300 font-mono text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-600"
+                      placeholder='{ "dob": "1995-11-23", "latitude": 28.6139 }'
+                      className="w-full p-3 rounded-xl border border-stone-300 bg-white font-mono text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                     />
                   </div>
                 )}
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleExecuteSandbox}
-                    disabled={sandboxLoading}
-                    className="px-5 py-2.5 rounded-xl bg-amber-900 hover:bg-amber-950 text-amber-50 text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-                  >
-                    {sandboxLoading ? (
-                      <>
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        <span>Calculating On Server...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>Send Live Request</span>
-                      </>
-                    )}
-                  </button>
+                {/* Sandbox Response Output */}
+                {sandboxError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                    <span>{sandboxError}</span>
+                  </div>
+                )}
 
-                  {sandboxStatus !== null && (
-                    <div className="flex items-center gap-2 text-xs font-mono">
-                      <span
-                        className={`px-2 py-0.5 rounded-md font-bold ${
-                          sandboxStatus === 200
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-rose-100 text-rose-800'
-                        }`}
-                      >
-                        HTTP {sandboxStatus}
-                      </span>
-                      {sandboxLatency !== null && (
-                        <span className="text-stone-500 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {sandboxLatency} ms
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Response Output */}
                 {sandboxResponse && (
-                  <div className="space-y-1.5 pt-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-stone-700">
-                        Server JSON Response
-                      </label>
+                  <div className="space-y-1.5 pt-2 border-t border-amber-900/10">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-stone-700">Response:</span>
+                        <span
+                          className={`px-2 py-0.5 rounded-md font-mono text-[10px] font-bold ${
+                            sandboxStatus && sandboxStatus < 300
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              : 'bg-rose-100 text-rose-800 border border-rose-300'
+                          }`}
+                        >
+                          HTTP {sandboxStatus}
+                        </span>
+                        {sandboxLatency !== null && (
+                          <span className="text-stone-400 font-mono text-[10px]">
+                            {sandboxLatency} ms
+                          </span>
+                        )}
+                      </div>
                       <button
-                        onClick={() => handleCopy(sandboxResponse, 'sandboxRes')}
-                        className="text-[11px] text-stone-600 hover:text-stone-900 flex items-center gap-1 cursor-pointer"
+                        onClick={() => handleCopy(sandboxResponse, 'sandbox-res')}
+                        className="text-stone-500 hover:text-stone-900 flex items-center gap-1 cursor-pointer"
                       >
-                        {copiedKey === 'sandboxRes' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                        {copiedKey === 'sandbox-res' ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
                         <span>Copy Response</span>
                       </button>
                     </div>
-
-                    <div className="max-h-96 overflow-y-auto rounded-2xl bg-stone-950 p-4 border border-stone-800 text-stone-200 font-mono text-xs shadow-inner">
-                      <pre>{sandboxResponse}</pre>
-                    </div>
+                    <pre className="p-3 rounded-xl bg-stone-900 text-amber-200 font-mono text-xs max-h-56 overflow-y-auto overflow-x-auto whitespace-pre leading-relaxed">
+                      {sandboxResponse}
+                    </pre>
                   </div>
                 )}
               </div>
+
+              {/* Ready-to-use Code Generator */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 font-vedic flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Client Code Snippets</span>
+                  </h4>
+                  <div className="flex items-center gap-1 bg-stone-100 p-0.5 rounded-lg text-xs">
+                    {(['curl', 'js', 'kotlin', 'python'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => setCodeLanguage(lang)}
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                          codeLanguage === lang
+                            ? 'bg-white text-stone-900 shadow-2xs'
+                            : 'text-stone-500 hover:text-stone-900'
+                        }`}
+                      >
+                        {lang === 'js' ? 'Fetch JS' : lang}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative rounded-2xl bg-stone-900 text-stone-100 p-4 border border-stone-800">
+                  <button
+                    onClick={() => {
+                      const snippet =
+                        codeLanguage === 'curl'
+                          ? activeEndpoint.curlSnippet
+                          : codeLanguage === 'js'
+                          ? activeEndpoint.jsSnippet
+                          : codeLanguage === 'kotlin'
+                          ? activeEndpoint.kotlinSnippet
+                          : activeEndpoint.pythonSnippet;
+                      handleCopy(snippet, 'code-snippet');
+                    }}
+                    className="absolute right-3 top-3 p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors cursor-pointer text-xs flex items-center gap-1"
+                    title="Copy code snippet"
+                  >
+                    {copiedKey === 'code-snippet' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                    <span className="text-[10px] font-mono">Copy</span>
+                  </button>
+                  <pre className="font-mono text-xs text-amber-100/90 overflow-x-auto whitespace-pre leading-relaxed pr-16">
+                    {codeLanguage === 'curl'
+                      ? activeEndpoint.curlSnippet
+                      : codeLanguage === 'js'
+                      ? activeEndpoint.jsSnippet
+                      : codeLanguage === 'kotlin'
+                      ? activeEndpoint.kotlinSnippet
+                      : activeEndpoint.pythonSnippet}
+                  </pre>
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-12 text-center bg-white rounded-3xl border border-stone-200 text-stone-500 text-xs">
+              Select an endpoint to inspect documentation and execute sandbox tests.
+            </div>
+          )}
         </div>
-      )}
-
-      {/* SUB-VIEW 2: Android SDK & Architecture Guide */}
-      {activeSubTab === 'android-sdk' && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
-            <div className="space-y-2">
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                Official Android Architecture Blueprint
-              </span>
-              <h3 className="text-2xl font-bold font-vedic text-stone-900">
-                Building the Server-Based Android App
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                Follow this recommended production pattern using Retrofit 2, OkHttp, Kotlin Coroutines, and MVVM / MVI architecture. This keeps the Android APK lightweight (~5-8 MB) while delegating all astronomical ephemeris and astrological math to the Astronava backend.
-              </p>
-            </div>
-
-            {/* Step 1: build.gradle.kts */}
-            <div className="space-y-3 pt-4 border-t border-stone-100">
-              <h4 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center text-xs font-extrabold">1</span>
-                <span>Gradle Dependencies (`app/build.gradle.kts`)</span>
-              </h4>
-              <div className="rounded-2xl bg-stone-950 p-4 font-mono text-xs text-stone-200 relative overflow-x-auto">
-                <button
-                  onClick={() =>
-                    handleCopy(
-                      `dependencies {
-    // Retrofit & Networking
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
-
-    // Jetpack Compose & Material 3
-    implementation("androidx.compose.material3:material3:1.2.1")
-}`,
-                      'gradle'
-                    )
-                  }
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700"
-                >
-                  {copiedKey === 'gradle' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-                <pre>{`dependencies {
-    // Retrofit & Networking
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
-
-    // Jetpack Compose & Material 3
-    implementation("androidx.compose.material3:material3:1.2.1")
-}`}</pre>
-              </div>
-            </div>
-
-            {/* Step 2: Retrofit Client Builder */}
-            <div className="space-y-3 pt-4 border-t border-stone-100">
-              <h4 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center text-xs font-extrabold">2</span>
-                <span>Network Client Builder (`NetworkModule.kt`)</span>
-              </h4>
-              <div className="rounded-2xl bg-stone-950 p-4 font-mono text-xs text-stone-200 relative overflow-x-auto">
-                <button
-                  onClick={() =>
-                    handleCopy(
-                      `object NetworkModule {
-    private const val BASE_URL = "${apiBaseUrl}/"
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .addInterceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("X-Astronava-Client", "android-native-app")
-                .addHeader("Accept", "application/json")
-                .build()
-            chain.proceed(request)
-        }
-        .build()
-
-    val apiService: AstronavaApiService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(AstronavaApiService::class.java)
-}`,
-                      'netmod'
-                    )
-                  }
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700"
-                >
-                  {copiedKey === 'netmod' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-                <pre>{`object NetworkModule {
-    private const val BASE_URL = "${apiBaseUrl}/"
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .addInterceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("X-Astronava-Client", "android-native-app")
-                .addHeader("Accept", "application/json")
-                .build()
-            chain.proceed(request)
-        }
-        .build()
-
-    val apiService: AstronavaApiService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(AstronavaApiService::class.java)
-}`}</pre>
-              </div>
-            </div>
-
-            {/* Step 3: Complete AstronavaApiService.kt */}
-            <div className="space-y-3 pt-4 border-t border-stone-100">
-              <h4 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center text-xs font-extrabold">3</span>
-                <span>Complete Retrofit API Interface (`AstronavaApiService.kt`)</span>
-              </h4>
-              <div className="rounded-2xl bg-stone-950 p-4 font-mono text-xs text-stone-200 relative overflow-x-auto">
-                <button
-                  onClick={() =>
-                    handleCopy(
-                      `interface AstronavaApiService {
-    // 1. Kundli Generator
-    @POST("kundli/calculate")
-    suspend fun calculateKundli(@Body request: KundliRequest): Response<KundliApiResponse>
-
-    // 2. Daily Horoscope & Transits
-    @POST("horoscope/daily")
-    suspend fun getDailyHoroscope(@Body request: HoroscopeRequest): Response<HoroscopeApiResponse>
-
-    // 3. Gemstone Recommender
-    @POST("gemstones/recommend")
-    suspend fun getGemstoneRecommendations(@Body request: GemstoneRequest): Response<GemstoneApiResponse>
-
-    // 4. Kundli Milan (Matchmaking)
-    @POST("match/compatibility")
-    suspend fun calculateMatch(@Body request: MatchRequest): Response<MatchApiResponse>
-
-    // 5. Numerology Calculator
-    @POST("numerology/calculate")
-    suspend fun calculateNumerology(@Body request: NumerologyRequest): Response<NumerologyApiResponse>
-
-    // 6. Name Correction & Harmonizer
-    @POST("name-correction/tune")
-    suspend fun tuneName(@Body request: NameTuningRequest): Response<NameTuningApiResponse>
-
-    // 7. AI Consultation & Summary
-    @POST("ai/summary")
-    suspend fun getAiSummary(@Body request: AiSummaryRequest): Response<AiSummaryApiResponse>
-}`,
-                      'apiInt'
-                    )
-                  }
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700"
-                >
-                  {copiedKey === 'apiInt' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-                <pre>{`interface AstronavaApiService {
-    // 1. Kundli Generator
-    @POST("kundli/calculate")
-    suspend fun calculateKundli(@Body request: KundliRequest): Response<KundliApiResponse>
-
-    // 2. Daily Horoscope & Transits
-    @POST("horoscope/daily")
-    suspend fun getDailyHoroscope(@Body request: HoroscopeRequest): Response<HoroscopeApiResponse>
-
-    // 3. Gemstone Recommender
-    @POST("gemstones/recommend")
-    suspend fun getGemstoneRecommendations(@Body request: GemstoneRequest): Response<GemstoneApiResponse>
-
-    // 4. Kundli Milan (Matchmaking)
-    @POST("match/compatibility")
-    suspend fun calculateMatch(@Body request: MatchRequest): Response<MatchApiResponse>
-
-    // 5. Numerology Calculator
-    @POST("numerology/calculate")
-    suspend fun calculateNumerology(@Body request: NumerologyRequest): Response<NumerologyApiResponse>
-
-    // 6. Name Correction & Harmonizer
-    @POST("name-correction/tune")
-    suspend fun tuneName(@Body request: NameTuningRequest): Response<NameTuningApiResponse>
-
-    // 7. AI Consultation & Summary
-    @POST("ai/summary")
-    suspend fun getAiSummary(@Body request: AiSummaryRequest): Response<AiSummaryApiResponse>
-}`}</pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* SUB-VIEW 3: Auth & Production Security */}
-      {activeSubTab === 'security' && (
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
-          <div className="space-y-2">
-            <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-              Security &amp; Best Practices
-            </span>
-            <h3 className="text-2xl font-bold font-vedic text-stone-900">
-              Authentication &amp; Production Hardening
-            </h3>
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-              When releasing your Android app on Google Play, follow these guidelines to protect your server resources and ensure seamless user privacy.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-stone-100">
-            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>1. Client Header Identification</span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Send <code className="bg-stone-200 px-1 py-0.5 rounded text-[11px]">X-Astronava-Client: android-release-1.0</code> with every request. This allows admin telemetry to track mobile user adoption and filter server logs.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>2. User Account Authentication</span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                For authenticated users, pass Firebase ID Tokens in the header:
-                <code className="block mt-1 bg-stone-200 p-1.5 rounded text-[11px] font-mono">Authorization: Bearer &lt;idToken&gt;</code>
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>3. Offline Caching with Room DB</span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Store the generated Kundli response in an Android Room database table. Seeker charts don’t change (birth time is fixed), so you only need to call <code className="bg-stone-200 px-1 py-0.5 rounded text-[11px]">/kundli/calculate</code> once per profile!
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>4. Background Sync via WorkManager</span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                Schedule a daily WorkManager job at 6:00 AM to fetch <code className="bg-stone-200 px-1 py-0.5 rounded text-[11px]">/horoscope/daily</code>. This powers the notification and Glance Widget without draining user battery.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

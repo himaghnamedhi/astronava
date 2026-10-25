@@ -20,7 +20,8 @@ import {
   Globe,
   Code2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext.tsx';
 import { auth } from '../../../lib/firebase.ts';
@@ -72,6 +73,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   useEffect(() => {
+    document.title = 'Astronava Master Control Console | astronava.com';
     checkTabsScroll();
     const el = tabsContainerRef.current;
     if (!el) return;
@@ -263,10 +265,12 @@ export const AdminPanel: React.FC = () => {
 
         <div className="pt-2">
           <button
-            onClick={navigateToHome}
+            onClick={() => {
+              window.location.href = '/';
+            }}
             className="w-full py-2.5 px-4 rounded-xl border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-bold transition-all cursor-pointer"
           >
-            Return to Store
+            Return to Astronava Home
           </button>
         </div>
       </div>
@@ -282,25 +286,40 @@ export const AdminPanel: React.FC = () => {
             {/* Left Brand and Return Link */}
             <div className="flex items-center gap-3">
               <button
-                onClick={navigateToHome}
+                onClick={() => {
+                  window.location.href = '/';
+                }}
                 className="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 cursor-pointer transition-colors"
-                title="Return to Store"
+                title="Return to Astronava Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-base font-bold font-vedic text-stone-900 tracking-wide">
-                  Astronava Control Console
+                  Astronava Master Control
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider">
                   Admin
                 </span>
+                <span className="hidden md:inline-block px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[10px] font-mono border border-stone-200">
+                  astronava.com/mastercontrol
+                </span>
               </div>
             </div>
 
-            {/* Right Admin Profile */}
+            {/* Right Admin Profile & Quick Links */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  window.location.href = '/store';
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors cursor-pointer"
+              >
+                <span>Store</span>
+                <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+              </button>
+
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-stone-100 text-xs font-medium text-stone-700">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="truncate max-w-[180px]">{user?.email}</span>
@@ -353,18 +372,23 @@ export const AdminPanel: React.FC = () => {
                 Dashboard Overview
               </button>
 
-              {/* API Tab prominently positioned next to Dashboard */}
-              <button
-                onClick={() => setActiveAdminTab('api')}
-                className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-                  activeAdminTab === 'api'
-                    ? 'bg-amber-950 text-amber-50 shadow-2xs ring-2 ring-amber-500/30'
-                    : 'bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs'
-                }`}
-              >
-                <Code2 className="w-3.5 h-3.5 text-amber-500" />
-                <span>API &amp; Mobile SDK</span>
-              </button>
+              {/* API Tab prominently positioned next to Dashboard, restricted to authorized admin */}
+              {isAdmin && (
+                <button
+                  onClick={() => setActiveAdminTab('api')}
+                  className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    activeAdminTab === 'api'
+                      ? 'bg-amber-950 text-amber-50 shadow-2xs ring-2 ring-amber-500/30'
+                      : 'bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/80 shadow-2xs'
+                  }`}
+                >
+                  <Code2 className="w-3.5 h-3.5 text-amber-500" />
+                  <span>API</span>
+                  <span className="px-1.5 py-0.5 rounded-md bg-amber-200/80 text-[10px] text-amber-950 font-bold uppercase">
+                    Docs &amp; Specs
+                  </span>
+                </button>
+              )}
 
               <button
                 onClick={() => setActiveAdminTab('categories')}
@@ -794,8 +818,10 @@ export const AdminPanel: React.FC = () => {
         {/* Tab 10: User Management */}
         {activeAdminTab === 'users' && token && <AdminUsersTab token={token} />}
 
-        {/* Tab 11: Astrological REST API, Key Management & Audit Logs */}
-        {activeAdminTab === 'api' && <AdminApiManagementTab token={token} userEmail={user?.email || ''} />}
+        {/* Tab 11: Astrological REST API, Programmatic Docs, Key Management & Audit Logs (Admin Only) */}
+        {activeAdminTab === 'api' && isAdmin && (
+          <AdminApiManagementTab token={token} userEmail={user?.email || ''} />
+        )}
       </div>
     </div>
   );

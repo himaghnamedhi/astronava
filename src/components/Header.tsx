@@ -402,15 +402,14 @@ export const Header: React.FC<HeaderProps> = ({
                     {isAdminUser && (
                       <button
                         onClick={() => {
-                          setActiveTab('store');
-                          navigateToAdmin();
+                          window.location.href = '/mastercontrol';
                         }}
                         className="w-full px-2.5 py-2 text-left text-xs font-bold text-amber-950 bg-amber-500/15 hover:bg-amber-500/25 rounded-xl transition-colors flex items-center gap-2 cursor-pointer border border-amber-500/30"
                       >
                         <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
                         <div className="flex flex-col min-w-0">
-                          <span className="truncate">Admin Console</span>
-                          <span className="text-[10px] font-medium text-amber-800">Categories &amp; Orders</span>
+                          <span className="truncate">Master Control Console</span>
+                          <span className="text-[10px] font-medium text-amber-800">astronava.com/mastercontrol</span>
                         </div>
                       </button>
                     )}

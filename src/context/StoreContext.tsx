@@ -436,8 +436,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const navigateToAdmin = () => {
     setIsCartOpen(false);
-    setActiveStoreView('admin');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.location.href = '/mastercontrol';
+    }
   };
 
   const navigateToWishlist = () => {
