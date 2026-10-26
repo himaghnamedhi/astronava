@@ -197,6 +197,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
   const [newKeyScopes, setNewKeyScopes] = useState<string[]>(['*']);
   const [newKeyDesc, setNewKeyDesc] = useState<string>('');
   const [creatingKey, setCreatingKey] = useState<boolean>(false);
+  const [createKeyError, setCreateKeyError] = useState<string | null>(null);
   const [togglingKeyId, setTogglingKeyId] = useState<string | null>(null);
   const [deletingKeyId, setDeletingKeyId] = useState<string | null>(null);
 
@@ -354,10 +355,14 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
   // Create Key Handler
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newKeyName.trim()) return;
+    if (!newKeyName.trim()) {
+      setCreateKeyError('Please enter an integration or application name');
+      return;
+    }
 
     try {
       setCreatingKey(true);
+      setCreateKeyError(null);
       const res = await fetch('/api/admin/api/keys', {
         method: 'POST',
         headers: authHeaders,
@@ -373,6 +378,7 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
       if (res.ok) {
         const data = await res.json();
         setNewKeySecret(data.secretKey);
+        setCreateKeyError(null);
         fetchKeys();
         fetchMetrics();
         // Reset form
@@ -380,12 +386,12 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
         setNewKeyDesc('');
         setNewKeyScopes(['*']);
       } else {
-        const err = await res.json();
-        alert(err.error || 'Failed to create API key');
+        const err = await res.json().catch(() => ({}));
+        setCreateKeyError(err.error || `Failed to create API key (HTTP ${res.status})`);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error generating key:', e);
-      alert('Error generating API key');
+      setCreateKeyError(e.message || 'Error generating API key. Please check network connection.');
     } finally {
       setCreatingKey(false);
     }
@@ -1446,6 +1452,12 @@ export const AdminApiManagementTab: React.FC<AdminApiManagementTabProps> = ({
             ) : (
               /* Create Form View */
               <form onSubmit={handleCreateKey} className="space-y-4">
+                {createKeyError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{createKeyError}</span>
+                  </div>
+                )}
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-stone-700">
                     Integration / Application Name <span className="text-rose-500">*</span>

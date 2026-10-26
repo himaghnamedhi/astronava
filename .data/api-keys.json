@@ -1,5 +1,21 @@
 [
   {
+    "id": "key_1792944269866_production",
+    "name": "Test Integration Key",
+    "environment": "production",
+    "keyPrefix": "ast_live_b19...6276",
+    "keyHash": "46bd2e2411fd396227d44cfecfb15ceb3f9741bb47be097823584ec7ad078456",
+    "maskedKey": "ast_live_••••••••••••6276",
+    "createdAt": "2026-10-25T16:04:29.866Z",
+    "lastUsedAt": null,
+    "status": "active",
+    "rateLimit": 120,
+    "allowedScopes": [
+      "*"
+    ],
+    "requestCount": 0
+  },
+  {
     "id": "key_1792939425349_production",
     "name": "Astronava Android App (Production)",
     "environment": "production",

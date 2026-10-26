@@ -1,11 +1,12 @@
-import React from 'react';
-import { HouseNumber, PlanetId } from '../types/astrology.ts';
+import React, { useState, useEffect } from 'react';
+import { HouseNumber, PlanetId, ChartStyle } from '../types/astrology.ts';
 import { PLANETS_DATA } from '../data/planetsData';
 import { HOUSES_DATA } from '../data/housesData';
-import { RefreshCw, BookOpen, FileDown, CheckCircle2, Compass } from 'lucide-react';
+import { RefreshCw, BookOpen, FileDown, CheckCircle2, Compass, Sparkles, Eye } from 'lucide-react';
 import { NavamshaModule } from './astrology/NavamshaModule';
 import { DashamshaModule } from './astrology/DashamshaModule';
 import { AstrologicalInsightsSection } from './astrology/AstrologicalInsightsSection';
+import { VedicChartSvg } from './VedicChartSvg';
 
 interface KundliBuilderProps {
   placements: Record<PlanetId, HouseNumber>;
@@ -85,6 +86,17 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
   onSelectPlanet,
   onOpenReport,
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [chartStyle, setChartStyle] = useState<ChartStyle>('north');
+  const [selectedHouse, setSelectedHouse] = useState<HouseNumber | null>(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 40);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleResetPlacements = () => {
     setPlacements(KUNDLI_PRESETS[0].placements);
   };
@@ -102,10 +114,96 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
+  // Construct divisional chart info for VedicChartSvg
+  const chartInfo = {
+    name: "Interactive Janam Kundli",
+    sanskritName: "वैदिक जन्म कुण्डली चक्र",
+    lagnaSign: 1,
+    planetPlacements: placements,
+    lagnaHouseSign: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12 }
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0 box-border">
+    <div className="space-y-6 sm:space-y-8 w-full max-w-full min-w-0 box-border">
+      
+      {/* Interactive Visual Kundli Chart Grid with Sequential Mount Animation */}
+      <div 
+        style={{
+          opacity: isMounted ? 1 : 0,
+          transform: isMounted ? 'translateY(0)' : 'translateY(16px)',
+          transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0ms'
+        }}
+        className="bg-white p-5 sm:p-7 rounded-3xl border border-amber-900/15 shadow-sm space-y-5"
+      >
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-stone-100">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <h3 className="text-lg sm:text-xl font-bold text-amber-950 font-vedic flex items-center gap-2">
+                <Compass className="w-5 h-5 text-amber-700" />
+                Animated Kundli Chart Grid (भाव चक्र प्रदर्शन)
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                Sequential Fade-In Enabled
+              </span>
+            </div>
+            <p className="text-xs text-stone-600">
+              Houses and planetary occupants fade in sequentially on mount. Click any house to inspect.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 text-xs font-semibold">
+              <button
+                onClick={() => setChartStyle('north')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  chartStyle === 'north' ? 'bg-amber-900 text-amber-50 shadow-xs' : 'text-stone-700 hover:text-stone-900'
+                }`}
+              >
+                North Indian
+              </button>
+              <button
+                onClick={() => setChartStyle('south')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  chartStyle === 'south' ? 'bg-amber-900 text-amber-50 shadow-xs' : 'text-stone-700 hover:text-stone-900'
+                }`}
+              >
+                South Indian
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Animated Chart Grid Wrapper */}
+        <div 
+          style={{
+            opacity: isMounted ? 1 : 0,
+            transform: isMounted ? 'scale(1)' : 'scale(0.97)',
+            transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 150ms'
+          }}
+          className="flex justify-center py-3 bg-[#FAF8F5] rounded-2xl border border-amber-900/10 p-4"
+        >
+          <VedicChartSvg
+            chartData={chartInfo}
+            chartStyle={chartStyle}
+            selectedHouse={selectedHouse || 1}
+            onHouseClick={(hNum) => {
+              setSelectedHouse(hNum);
+              onSelectHouse(hNum);
+            }}
+          />
+        </div>
+      </div>
+
       {/* 9 Planet House Placement Selectors */}
-      <div className="bg-white p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-amber-900/15 shadow-sm space-y-4 sm:space-y-5 w-full min-w-0 box-border">
+      <div 
+        style={{
+          opacity: isMounted ? 1 : 0,
+          transform: isMounted ? 'translateY(0)' : 'translateY(16px)',
+          transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 200ms'
+        }}
+        className="bg-white p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-amber-900/15 shadow-sm space-y-4 sm:space-y-5 w-full min-w-0 box-border"
+      >
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
           <div>
@@ -148,9 +246,9 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
           </div>
         </div>
 
-          {/* 9 Planet House Placement Selectors Grid */}
+          {/* 9 Planet House Placement Selectors Grid with Sequential Entrance */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-            {(Object.keys(PLANETS_DATA) as PlanetId[]).map((pId) => {
+            {(Object.keys(PLANETS_DATA) as PlanetId[]).map((pId, index) => {
               const p = PLANETS_DATA[pId];
               const currentHouse = placements[pId] || 1;
               const effect = p.effects[currentHouse];
@@ -158,6 +256,11 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
               return (
                 <div
                   key={pId}
+                  style={{
+                    opacity: isMounted ? 1 : 0,
+                    transform: isMounted ? 'translateY(0)' : 'translateY(12px)',
+                    transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${300 + index * 40}ms`
+                  }}
                   className="bg-stone-50 p-3.5 rounded-xl border border-stone-200 hover:border-amber-700 transition-all flex flex-col justify-between"
                 >
                   <div>
@@ -201,7 +304,10 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
                       View {p.name} &rarr;
                     </button>
                     <button
-                      onClick={() => onSelectHouse(currentHouse)}
+                      onClick={() => {
+                        setSelectedHouse(currentHouse);
+                        onSelectHouse(currentHouse);
+                      }}
                       className="text-stone-500 hover:text-stone-800 cursor-pointer"
                     >
                       Inspect {getOrdinal(currentHouse)} House
@@ -213,12 +319,25 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
           </div>
       </div>
 
-      <NavamshaModule placements={placements} />
-      <DashamshaModule placements={placements} />
-      <AstrologicalInsightsSection placements={placements} />
+      <div style={{ opacity: isMounted ? 1 : 0, transition: 'opacity 0.6s ease 450ms' }}>
+        <NavamshaModule placements={placements} />
+      </div>
+      <div style={{ opacity: isMounted ? 1 : 0, transition: 'opacity 0.6s ease 550ms' }}>
+        <DashamshaModule placements={placements} />
+      </div>
+      <div style={{ opacity: isMounted ? 1 : 0, transition: 'opacity 0.6s ease 650ms' }}>
+        <AstrologicalInsightsSection placements={placements} />
+      </div>
 
       {/* Generated Kundli Synthesis & Reading */}
-      <div className="bg-[#FAF8F5] p-5 sm:p-7 rounded-3xl border border-amber-900/15 shadow-sm space-y-4">
+      <div 
+        style={{
+          opacity: isMounted ? 1 : 0,
+          transform: isMounted ? 'translateY(0)' : 'translateY(16px)',
+          transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 700ms'
+        }}
+        className="bg-[#FAF8F5] p-5 sm:p-7 rounded-3xl border border-amber-900/15 shadow-sm space-y-4"
+      >
         <div className="flex items-center justify-between border-b border-stone-200 pb-3">
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-amber-700" />
@@ -236,9 +355,8 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as HouseNumber[]).map((hNum) => {
+          {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as HouseNumber[]).map((hNum, index) => {
             const h = HOUSES_DATA[hNum];
-            // Find which planets are placed in this house
             const occupants = (Object.keys(placements) as PlanetId[]).filter(
               pId => placements[pId] === hNum
             );
@@ -246,7 +364,15 @@ export const KundliBuilder: React.FC<KundliBuilderProps> = ({
             return (
               <div
                 key={hNum}
-                onClick={() => onSelectHouse(hNum)}
+                style={{
+                  opacity: isMounted ? 1 : 0,
+                  transform: isMounted ? 'translateY(0)' : 'translateY(10px)',
+                  transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${750 + index * 40}ms`
+                }}
+                onClick={() => {
+                  setSelectedHouse(hNum);
+                  onSelectHouse(hNum);
+                }}
                 className="bg-white p-3.5 rounded-xl border border-stone-200 hover:border-amber-700 cursor-pointer transition-all flex flex-col justify-between"
               >
                 <div>
