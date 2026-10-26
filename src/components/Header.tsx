@@ -345,11 +345,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <ShoppingBag className="w-4 h-4 text-amber-800" />
               <span className="hidden sm:inline text-xs font-semibold">Cart</span>
-              {cartCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold rounded-full bg-amber-900 text-white shadow-2xs">
-                  {cartCount}
-                </span>
-              )}
             </button>
 
             {user ? (
