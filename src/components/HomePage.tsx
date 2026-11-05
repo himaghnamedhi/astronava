@@ -195,13 +195,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTab }) => {
         {/* Subtle Background Vedic Mandala Glow */}
         <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-56 sm:w-80 h-56 sm:h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
-
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-2 sm:space-y-3">
-          {/* Sacred Brand Badge */}
-          <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] sm:text-xs font-semibold tracking-wider uppercase max-w-full">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
-            <span className="truncate">Astronava • Authentic Vedic Jyotish &amp; Sacred Remedies</span>
-          </div>
 
           {/* Main Display Headline */}
           <h1 className="text-2xl sm:text-5xl lg:text-6xl font-extrabold font-vedic tracking-tight text-white leading-tight sm:leading-tight">

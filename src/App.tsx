@@ -27,6 +27,7 @@ const HoroscopeDashboard = lazy(() => import('./components/horoscope/HoroscopeDa
 const UserDashboard = lazy(() => import('./components/user/UserDashboard').then(m => ({ default: m.UserDashboard })));
 import { NotificationToast } from './components/common/NotificationToast';
 import { CookieConsentBanner } from './components/common/CookieConsentBanner';
+import { FestivePopup } from './components/common/FestivePopup';
 import { SellerPortalRoot } from './components/store/seller/SellerPortalRoot';
 import { RequestDeletePage } from './components/user/RequestDeletePage';
 const AdminPanel = lazy(() => import('./components/store/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
@@ -748,8 +749,7 @@ export default function App() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             
-            {/* Col 1: Brand & Overview */}
-            <div className="space-y-3">
+             <div className="space-y-3">
               <div className="flex items-center gap-2.5 cursor-pointer" onClick={handleReturnHome}>
                 <img
                   src="/icons/app_logo.svg"
@@ -759,9 +759,6 @@ export default function App() {
                 />
                 <span className="text-xl font-bold font-vedic text-white tracking-wider">ASTRONAVA</span>
               </div>
-              <p className="text-xs text-stone-400 leading-relaxed">
-                A modern Vedic astrology platform using classical Vedic astrology principles and structured calculations to generate Kundli analysis, gemstone recommendations, and compatibility reports.
-              </p>
             </div>
 
             {/* Col 2: Tools */}
@@ -1251,6 +1248,9 @@ export default function App() {
 
       {/* Global Notification Toast */}
       <NotificationToast />
+
+      {/* Festive Dhanteras Popup (Active October 29th & November 6th) */}
+      <FestivePopup onNavigateStore={() => handleTabChange('store')} />
 
       {/* Google AdSense & Privacy Cookie Consent Banner */}
       <CookieConsentBanner
